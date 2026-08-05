@@ -1,0 +1,112 @@
+.hero {
+  background: #fff;
+  padding: 39px 32px 58px;
+}
+
+.heroFrame {
+  background: #09233a;
+  border-radius: 22px;
+  isolation: isolate;
+  margin: 0 auto;
+  max-width: 1586px;
+  min-height: 538px;
+  overflow: hidden;
+  position: relative;
+}
+
+.background,
+.overlay {
+  height: 100%;
+  inset: 0;
+  position: absolute;
+  width: 100%;
+}
+
+.background {
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  transition: opacity 1.25s ease-in-out;
+  z-index: -2;
+}
+
+.backgroundActive { opacity: 1; }
+
+.overlay {
+  background: linear-gradient(90deg, rgba(3, 18, 37, .88) 0%, rgba(5, 26, 47, .68) 37%, rgba(4, 22, 40, .18) 72%, rgba(3, 16, 30, .26) 100%);
+  z-index: -1;
+}
+
+.content {
+  align-items: flex-start;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 635px;
+  min-height: 538px;
+  padding: 62px 78px;
+}
+
+.eyebrow {
+  align-items: center;
+  color: #78e0ad;
+  display: flex;
+  font-size: 15px;
+  font-weight: 750;
+  gap: 8px;
+  letter-spacing: .2px;
+  margin: 0 0 20px;
+}
+
+h1 {
+  font-size: clamp(42px, 4.5vw, 62px);
+  letter-spacing: -2.7px;
+  line-height: 1.06;
+  margin: 0;
+  max-width: 610px;
+}
+
+.description {
+  color: rgba(238, 247, 252, .84);
+  font-size: 19px;
+  line-height: 1.55;
+  margin: 25px 0 33px;
+  max-width: 530px;
+}
+
+.actions { display: flex; flex-wrap: wrap; gap: 14px; }
+.primaryAction,
+.secondaryAction {
+  align-items: center;
+  border-radius: 6px;
+  display: inline-flex;
+  font-size: 15px;
+  font-weight: 750;
+  gap: 10px;
+  min-height: 51px;
+  padding: 0 23px;
+  text-decoration: none;
+  transition: transform .2s ease, background .2s ease;
+}
+
+.primaryAction { background: #2fb779; color: #fff; }
+.primaryAction:hover { background: #279a66; transform: translateY(-2px); }
+.secondaryAction { border: 1px solid rgba(255, 255, 255, .62); color: #fff; }
+.secondaryAction:hover { background: rgba(255, 255, 255, .11); transform: translateY(-2px); }
+
+@media (max-width: 800px) {
+  .hero { padding: 22px 18px 38px; }
+  .heroFrame { border-radius: 13px; min-height: 510px; }
+  .background { object-position: 68% center; }
+  .overlay { background: linear-gradient(90deg, rgba(3, 18, 37, .9), rgba(3, 18, 37, .57)); }
+  .content { justify-content: flex-end; min-height: 510px; padding: 44px 26px; }
+  h1 { font-size: clamp(37px, 10vw, 49px); letter-spacing: -1.8px; }
+  .description { font-size: 16px; margin: 18px 0 26px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .background { transition: none; }
+  .primaryAction,
+  .secondaryAction { transition: none; }
+}

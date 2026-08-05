@@ -1,0 +1,131 @@
+import React, { useState } from 'react';
+import {
+  ChevronDown,
+  ChevronRight,
+  CircleUserRound,
+  Flame,
+  Grid2X2,
+  Headphones,
+  Heart,
+  MapPin,
+  Menu,
+  MonitorSmartphone,
+  Search,
+  ShoppingCart,
+  Sparkles,
+  X,
+} from 'lucide-react';
+import styles from './Header.module.css';
+
+const navigationItems = [
+  { label: 'Ofertas', icon: Flame, accent: true },
+  { label: 'Inicio', dropdown: true, active: true },
+  { label: 'Nosotros' },
+  { label: 'Tienda', dropdown: true },
+  { label: 'Marcas', dropdown: true },
+  { label: 'Tecnología', dropdown: true },
+  { label: 'Blog', dropdown: true },
+  { label: 'Páginas', dropdown: true },
+  { label: 'Contacto' },
+];
+
+const actionItems = [
+  { label: 'Comparar', value: 3, icon: Sparkles },
+  { label: 'Favoritos', value: 6, icon: Heart },
+  { label: 'Carrito', value: 2, icon: ShoppingCart },
+  { label: 'Cuenta', icon: CircleUserRound },
+];
+
+function Brand() {
+  return (
+    <a className={styles.brand} href="#inicio" aria-label="FEFCOMPUTER, inicio">
+      <span className={styles.brandMark} aria-hidden="true">
+        <MonitorSmartphone size={31} strokeWidth={2.2} />
+      </span>
+      <span>
+        <strong>FEF</strong><b>COMPUTER</b>
+        <small>TECNOLOGÍA Y CONFIANZA</small>
+      </span>
+    </a>
+  );
+}
+
+function HeaderAction({ icon: Icon, label, value }) {
+  return (
+    <button className={styles.headerAction} type="button" aria-label={label}>
+      <span className={styles.actionIcon}>
+        <Icon size={27} strokeWidth={1.8} />
+        {value ? <span className={styles.counter}>{value}</span> : null}
+      </span>
+      <span>{label}</span>
+    </button>
+  );
+}
+
+export function Header() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  return (
+    <header className={styles.header} id="inicio">
+      <div className={styles.topBar}>
+        <div className={styles.container}>
+          <nav className={styles.utilityLinks} aria-label="Enlaces de utilidad">
+            <a href="#nosotros">Nosotros</a>
+            <a href="#cuenta">Mi cuenta</a>
+            <a href="#favoritos">Favoritos</a>
+            <a href="#rastrear">Rastrea tu pedido</a>
+          </nav>
+          <p className={styles.tagline}>Tecnología para potenciar tus ideas</p>
+          <div className={styles.topControls}>
+            <span>¿Necesitas ayuda? <a href="tel:+573000000000">Llámanos: <b>+57 311 8961906</b></a></span>
+            <button type="button">Español <ChevronDown size={12} /></button>
+            <button type="button">COP <ChevronDown size={12} /></button>
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.mainBar}>
+        <div className={`${styles.container} ${styles.mainContent}`}>
+          <Brand />
+          <form className={styles.searchBar} role="search">
+            <button className={styles.categorySelect} type="button">
+              Todas las categorías <ChevronDown size={15} />
+            </button>
+            <label className="srOnly" htmlFor="product-search">Buscar productos</label>
+            <input id="product-search" type="search" placeholder="Busca computadores, periféricos y más…" />
+            <button className={styles.searchButton} type="submit" aria-label="Buscar"><Search size={24} /></button>
+          </form>
+          <button className={styles.location} type="button">
+            <MapPin size={19} />
+            <span><b>Tu ubicación</b><small>Selecciona tu ciudad</small></span>
+            <ChevronDown size={14} />
+          </button>
+          <div className={styles.actions}>
+            {actionItems.map((action) => <HeaderAction key={action.label} {...action} />)}
+          </div>
+          <button className={styles.mobileToggle} type="button" aria-label="Abrir menú" aria-expanded={mobileMenuOpen} onClick={() => setMobileMenuOpen((open) => !open)}>
+            {mobileMenuOpen ? <X /> : <Menu />}
+          </button>
+        </div>
+      </div>
+
+      <div className={`${styles.navigationBar} ${mobileMenuOpen ? styles.menuOpen : ''}`}>
+        <div className={`${styles.container} ${styles.navigationContent}`}>
+          <button className={styles.browseCategories} type="button"><Grid2X2 size={20} /> Explorar categorías <ChevronDown size={16} /></button>
+          <nav className={styles.primaryNavigation} aria-label="Navegación principal">
+            {navigationItems.map(({ label, icon: Icon, accent, active, dropdown }) => (
+              <a key={label} href={`#${label.toLowerCase()}`} className={`${accent ? styles.accentItem : ''} ${active ? styles.activeItem : ''}`}>
+                {Icon ? <Icon size={20} /> : null}{label}{dropdown ? <ChevronDown size={14} /> : null}
+              </a>
+            ))}
+          </nav>
+          <a className={styles.support} href="tel:+573000000000">
+            <Headphones size={35} strokeWidth={1.8} />
+            <span><b>+57 311 896 1906</b><small>Soporte al cliente</small></span>
+          </a>
+          <a className={styles.mobileBrowse} href="#categorias">Ver todas las categorías <ChevronRight size={16} /></a>
+        </div>
+      </div>
+    </header>
+  );
+}

@@ -1,0 +1,101 @@
+.header {
+  background: #fff;
+  color: #173b4d;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.container { margin: 0 auto; max-width: 1535px; padding: 0 32px; }
+.topBar { border-bottom: 1px solid #edf0f1; color: #71808a; font-size: 12px; }
+.topBar .container { min-height: 34px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; }
+.utilityLinks, .topControls { display: flex; align-items: center; gap: 10px; }
+.utilityLinks a + a { border-left: 1px solid #d5dbde; padding-left: 10px; }
+.utilityLinks a, .topControls a { color: inherit; text-decoration: none; }
+.topControls { justify-content: flex-end; }
+.topControls b { color: #2fb779; font-weight: 700; }
+.topControls button { align-items: center; background: transparent; border: 0; border-left: 1px solid #d5dbde; color: inherit; cursor: pointer; display: flex; gap: 3px; padding-left: 10px; }
+.tagline { color: #7f8789; font-weight: 600; margin: 0; }
+
+.mainBar { border-bottom: 1px solid #edf0f1; }
+.mainContent { align-items: center; display: flex; gap: 30px; min-height: 121px; }
+.brand { align-items: center; color: #173b4d; display: inline-flex; flex: 0 0 auto; gap: 9px; text-decoration: none; }
+.brandMark { align-items: center; background: #2fb779; border-radius: 10px 4px 10px 4px; color: #fff; display: grid; height: 48px; justify-content: center; transform: skew(-7deg); width: 48px; }
+.brandMark svg { transform: skew(7deg); }
+.brand strong, .brand b { display: inline; font-size: 22px; letter-spacing: -1.1px; line-height: 1; }
+.brand strong { color: #2fb779; }
+.brand b { color: #173b4d; font-weight: 800; }
+.brand small { color: #65757c; display: block; font-size: 7.5px; font-weight: 700; letter-spacing: 1.25px; margin-top: 4px; }
+
+.searchBar { align-items: center; border: 2px solid #a8e3c1; border-radius: 5px; display: flex; flex: 1 1 550px; height: 54px; min-width: 300px; }
+.categorySelect { align-items: center; background: transparent; border: 0; border-right: 1px solid #dfe6e6; color: #173b4d; cursor: pointer; display: flex; font-weight: 700; gap: 14px; height: 31px; justify-content: space-between; padding: 0 20px; white-space: nowrap; }
+.searchBar input { border: 0; color: #173b4d; flex: 1; font: inherit; font-size: 13px; min-width: 0; outline: none; padding: 0 15px; }
+.searchBar input::placeholder { color: #85919a; }
+.searchButton { background: transparent; border: 0; color: #69777f; cursor: pointer; display: grid; padding: 0 16px; place-items: center; }
+
+.location { align-items: center; background: #fff; border: 1px solid #e7eaeb; border-radius: 5px; box-shadow: 0 7px 17px rgba(26, 52, 65, .06); color: #2fb779; cursor: pointer; display: flex; gap: 8px; padding: 10px 13px; white-space: nowrap; }
+.location span { display: grid; gap: 2px; text-align: left; }
+.location b { font-size: 13px; }
+.location small { color: #89949a; font-size: 10px; }
+.location > svg:last-child { color: #9ba5a9; margin-left: 4px; }
+
+.actions { align-items: center; display: flex; gap: 19px; }
+.headerAction { align-items: center; background: transparent; border: 0; color: #53646d; cursor: pointer; display: flex; flex-direction: column; font-size: 12px; gap: 3px; min-width: 42px; padding: 0; }
+.actionIcon { color: #173b4d; position: relative; }
+.counter { align-items: center; background: #2fb779; border: 2px solid #fff; border-radius: 999px; color: #fff; display: flex; font-size: 9px; font-weight: 800; height: 20px; justify-content: center; position: absolute; right: -11px; top: -10px; width: 20px; }
+.mobileToggle { background: transparent; border: 0; color: #173b4d; display: none; }
+
+.navigationBar { border-bottom: 1px solid #e8ecee; min-height: 74px; }
+.navigationContent { align-items: center; display: flex; gap: 32px; min-height: 74px; }
+.browseCategories { align-items: center; background: #2fb779; border: 0; border-radius: 5px; color: #fff; cursor: pointer; display: flex; font-size: 15px; font-weight: 750; gap: 9px; height: 44px; padding: 0 18px; white-space: nowrap; }
+.browseCategories svg:last-child { margin-left: 5px; }
+.primaryNavigation { align-items: center; display: flex; flex: 1; gap: clamp(18px, 2.2vw, 35px); }
+.primaryNavigation a { align-items: center; color: #173b4d; display: flex; font-size: 15px; font-weight: 700; gap: 6px; text-decoration: none; white-space: nowrap; }
+.primaryNavigation a:hover, .primaryNavigation .activeItem { color: #2fb779; }
+.primaryNavigation .accentItem { color: #173b4d; }
+.primaryNavigation .accentItem svg { color: #2fb779; }
+.support { align-items: center; color: #173b4d; display: flex; gap: 9px; margin-left: auto; text-decoration: none; white-space: nowrap; }
+.support > svg { color: #173b4d; }
+.support span { display: grid; gap: 3px; }
+.support b { color: #2fb779; font-size: 19px; letter-spacing: .4px; line-height: 1; }
+.support small { color: #6f7e85; font-size: 10px; letter-spacing: .3px; }
+.mobileBrowse { display: none; }
+
+@media (max-width: 1350px) {
+  .mainContent { gap: 19px; }
+  .actions { gap: 12px; }
+  .location { display: none; }
+  .navigationContent { gap: 23px; }
+  .primaryNavigation { gap: 18px; }
+  .support b { font-size: 16px; }
+}
+
+@media (max-width: 1050px) {
+  .topBar .container { grid-template-columns: 1fr auto; }
+  .tagline { display: none; }
+  .mainContent { min-height: 102px; }
+  .actions .headerAction:nth-child(-n+2) { display: none; }
+  .primaryNavigation { gap: 15px; }
+  .primaryNavigation a { font-size: 13px; }
+  .support { display: none; }
+}
+
+@media (max-width: 760px) {
+  .container { padding: 0 18px; }
+  .topBar { display: none; }
+  .mainContent { flex-wrap: wrap; gap: 13px; min-height: 132px; padding-bottom: 15px; padding-top: 15px; }
+  .brand { order: 1; }
+  .brand strong, .brand b { font-size: 18px; }
+  .actions { margin-left: auto; order: 2; }
+  .actions .headerAction { display: none; }
+  .actions .headerAction:nth-child(3) { display: flex; }
+  .mobileToggle { display: grid; order: 3; place-items: center; }
+  .searchBar { flex-basis: 100%; height: 45px; order: 4; }
+  .categorySelect { font-size: 11px; gap: 6px; padding: 0 10px; }
+  .searchBar input { font-size: 12px; padding: 0 10px; }
+  .navigationBar { display: none; }
+  .menuOpen { background: #fff; display: block; position: absolute; top: 132px; width: 100%; z-index: 10; }
+  .menuOpen .navigationContent { align-items: stretch; display: flex; flex-direction: column; gap: 0; padding: 12px 18px 20px; }
+  .menuOpen .browseCategories { justify-content: center; }
+  .primaryNavigation { align-items: stretch; display: flex; flex-direction: column; gap: 0; }
+  .primaryNavigation a { border-bottom: 1px solid #edf0f1; justify-content: space-between; padding: 14px 3px; }
+  .mobileBrowse { align-items: center; color: #2fb779; display: flex; font-size: 13px; font-weight: 700; gap: 5px; margin-top: 15px; text-decoration: none; }
+}
