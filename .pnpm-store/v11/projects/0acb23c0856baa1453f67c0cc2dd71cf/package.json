@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
     "prisma:validate": "prisma validate --schema prisma/schema.prisma",
     "prisma:format": "prisma format --schema prisma/schema.prisma",
     "prisma:generate": "prisma generate --schema prisma/schema.prisma",
@@ -11,6 +13,16 @@
   },
   "dependencies": {
     "@prisma/client": "^6.0.0"
+    ,"bcrypt": "^6.0.0"
+    ,"cookie-parser": "^1.4.7"
+    ,"cors": "^2.8.5"
+    ,"dotenv": "^16.6.1"
+    ,"express": "^4.21.2"
+    ,"express-rate-limit": "^7.5.0"
+    ,"helmet": "^8.1.0"
+    ,"jsonwebtoken": "^9.0.2"
+    ,"morgan": "^1.10.0"
+    ,"zod": "^3.24.2"
   },
   "devDependencies": {
     "prisma": "^6.0.0"
