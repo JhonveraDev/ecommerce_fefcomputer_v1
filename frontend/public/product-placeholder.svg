@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Producto de ejemplo FEFCOMPUTER">
+  <rect width="640" height="640" fill="#f2f7f8"/>
+  <rect x="106" y="128" width="428" height="330" rx="28" fill="#dce9ed"/>
+  <rect x="144" y="166" width="352" height="254" rx="16" fill="#173b4d"/>
+  <path d="M230 506h180l25 35H205z" fill="#2fb779"/>
+  <circle cx="320" cy="293" r="55" fill="#2fb779"/>
+  <path d="M296 264h48v16h-48zm0 31h48v16h-48zm0 31h30v16h-30z" fill="#fff"/>
+  <text x="320" y="582" text-anchor="middle" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#173b4d">FEFCOMPUTER</text>
+</svg>
