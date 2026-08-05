@@ -17,13 +17,13 @@
 }
 
 .card:hover {
-  background: #e3f5e9;
-  box-shadow: 0 14px 27px rgba(25, 63, 74, .14);
+  background: #e4f5f3;
+  box-shadow: 0 14px 27px rgba(12, 66, 108, .16);
   transform: translateY(-5px) scale(1.015);
 }
 
-.card:focus-visible { outline: 3px solid #2fb779; outline-offset: 3px; }
-.visual { align-items: center; color: #2fb779; display: flex; height: 75px; justify-content: center; margin-bottom: 13px; width: 100%; }
+.card:focus-visible { outline: 3px solid #0f8c9b; outline-offset: 3px; }
+.visual { align-items: center; color: var(--category-icon-color, #1587a8); display: flex; height: 75px; justify-content: center; margin-bottom: 13px; width: 100%; }
 .visual img { height: 72px; object-fit: contain; width: 72px; }
 .visual svg { height: 58px; stroke-width: 1.55; width: 58px; }
 .card strong { font-size: 15px; line-height: 1.25; max-width: 160px; }

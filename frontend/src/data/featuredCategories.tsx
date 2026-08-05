@@ -6,21 +6,27 @@ import {
 import { mockProducts, productCategories } from './mockProducts';
 import type { FeaturedCategory } from '../components/FeaturedCategories';
 
-const categoryPresentation: Record<string, { icon: ReactNode; backgroundColor: string }> = {
-  'Computadores Gaming': { icon: <Gamepad2 />, backgroundColor: '#edf9ec' },
-  Laptops: { icon: <Laptop />, backgroundColor: '#fff8df' },
-  Monitores: { icon: <Monitor />, backgroundColor: '#eaf8ff' },
-  'Paneles Solares': { icon: <SunMedium />, backgroundColor: '#fff1e8' },
-  'Sistemas CCTV': { icon: <Camera />, backgroundColor: '#f8efff' },
-  'Redes y Telecomunicaciones': { icon: <Network />, backgroundColor: '#eaf9f3' },
-  Servidores: { icon: <Server />, backgroundColor: '#edf4ff' },
-  'Componentes para PC': { icon: <Cpu />, backgroundColor: '#fff0ec' },
-  'Accesorios Tecnológicos': { icon: <Usb />, backgroundColor: '#eef7ff' },
-  Periféricos: { icon: <Gamepad2 />, backgroundColor: '#f4f7e8' },
-  Almacenamiento: { icon: <HardDrive />, backgroundColor: '#fff4e8' },
-  Impresoras: { icon: <Printer />, backgroundColor: '#f2efff' },
-  'Equipos de Oficina': { icon: <Router />, backgroundColor: '#eef8f8' },
-  'Energía y UPS': { icon: <BatteryCharging />, backgroundColor: '#fff2dc' },
+type CategoryPresentation = {
+  icon: ReactNode;
+  backgroundColor: string;
+  iconColor: string;
+};
+
+const categoryPresentation: Record<string, CategoryPresentation> = {
+  'Computadores Gaming': { icon: <Gamepad2 />, backgroundColor: '#e6f4ff', iconColor: '#087bb5' },
+  Laptops: { icon: <Laptop />, backgroundColor: '#e9f8f4', iconColor: '#129a7e' },
+  Monitores: { icon: <Monitor />, backgroundColor: '#e8f5fc', iconColor: '#176f9f' },
+  'Paneles Solares': { icon: <SunMedium />, backgroundColor: '#e5f7f1', iconColor: '#0f9873' },
+  'Sistemas CCTV': { icon: <Camera />, backgroundColor: '#eaf1fc', iconColor: '#285eaa' },
+  'Redes y Telecomunicaciones': { icon: <Network />, backgroundColor: '#e2f7f6', iconColor: '#087f87' },
+  Servidores: { icon: <Server />, backgroundColor: '#e5effb', iconColor: '#2469ae' },
+  'Componentes para PC': { icon: <Cpu />, backgroundColor: '#e6f6ee', iconColor: '#168c68' },
+  'Accesorios Tecnológicos': { icon: <Usb />, backgroundColor: '#edf5ff', iconColor: '#3779bb' },
+  Periféricos: { icon: <Gamepad2 />, backgroundColor: '#e7f8f5', iconColor: '#15967f' },
+  Almacenamiento: { icon: <HardDrive />, backgroundColor: '#e8f2fc', iconColor: '#2b73b8' },
+  Impresoras: { icon: <Printer />, backgroundColor: '#e8f8f2', iconColor: '#0d9270' },
+  'Equipos de Oficina': { icon: <Router />, backgroundColor: '#e7f4fd', iconColor: '#2776ad' },
+  'Energía y UPS': { icon: <BatteryCharging />, backgroundColor: '#e4f8ef', iconColor: '#11966f' },
 };
 
 export const featuredCategoryItems: FeaturedCategory[] = productCategories.map((name) => ({
@@ -28,6 +34,7 @@ export const featuredCategoryItems: FeaturedCategory[] = productCategories.map((
   name,
   productCount: mockProducts.filter((product) => product.category === name).length,
   icon: categoryPresentation[name]?.icon ?? <Waypoints />,
-  backgroundColor: categoryPresentation[name]?.backgroundColor ?? '#eff8f1',
+  backgroundColor: categoryPresentation[name]?.backgroundColor ?? '#e8f4fb',
+  iconColor: categoryPresentation[name]?.iconColor ?? '#1587a8',
   href: `#categoria-${name.toLowerCase()}`,
 }));

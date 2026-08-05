@@ -7,6 +7,7 @@ export interface FeaturedCategory {
   image?: string;
   icon?: ReactNode;
   backgroundColor?: string;
+  iconColor?: string;
   href?: string;
 }
 

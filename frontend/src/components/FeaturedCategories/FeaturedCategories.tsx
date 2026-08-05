@@ -51,7 +51,10 @@ export function FeaturedCategories({
             key={category.id}
             category={category}
             onClick={onCategoryClick}
-            style={{ '--category-background': category.backgroundColor } as CSSProperties}
+            style={{
+              '--category-background': category.backgroundColor,
+              '--category-icon-color': category.iconColor,
+            } as CSSProperties}
           />
         ))}
       </div>
