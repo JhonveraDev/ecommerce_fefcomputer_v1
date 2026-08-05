@@ -22,7 +22,9 @@ Estas restricciones deben reforzarse mediante validación de servicio y una migr
 - Cada usuario solo puede mantener un carrito activo.
 - Las cantidades, precios y calificaciones deben tener límites y no pueden ser negativos.
 - Las transiciones de estado de pedido deben validarse en la capa de servicio.
+- La cobertura de envío sólo puede usarse si departamento, municipio, zona y sus restricciones vigentes lo permiten.
+- Las fechas de restricción deben ser coherentes y el intervalo de entrega mínimo no puede superar el máximo.
 
 ## Próximo paso técnico
 
-Inspeccionar primero y de forma sólo lectura la estructura de la base PostgreSQL existente `ecommerce_fefcomputer`. Después se comparará con este schema y se propondrán únicamente migraciones justificadas, incluyendo cobertura configurable de envíos para Colombia.
+Validar el schema actualizado y generar —sin aplicar automáticamente— la migración inicial para revisión.

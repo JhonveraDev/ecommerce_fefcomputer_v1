@@ -52,4 +52,4 @@ Crear las tablas en una única migración inicial es apropiado porque la base no
 
 ## Aprobación requerida
 
-La siguiente acción propuesta es actualizar el schema con cobertura de envío, validarlo y generar —sin aplicar automáticamente— la migración inicial para revisión. La aplicación de esa migración sobre PostgreSQL debe contar con confirmación explícita.
+La siguiente acción propuesta es validar el schema con cobertura de envío y generar —sin aplicar automáticamente— la migración inicial para revisión. La aplicación de esa migración sobre PostgreSQL debe contar con confirmación explícita.

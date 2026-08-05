@@ -56,6 +56,12 @@ enum ShipmentStatus {
   CANCELLED
 }
 
+enum ShippingCoverageStatus {
+  ACTIVE
+  RESTRICTED
+  INACTIVE
+}
+
 enum InventoryMovementType {
   INBOUND
   ADJUSTMENT
@@ -417,6 +423,7 @@ model Payment {
 model Shipment {
   id             String         @id @default(uuid()) @db.Uuid
   orderId        String         @unique @map("order_id") @db.Uuid
+  shippingZoneId String?        @map("shipping_zone_id") @db.Uuid
   method         String         @db.VarChar(100)
   carrier        String?        @db.VarChar(120)
   trackingNumber String?        @unique @map("tracking_number") @db.VarChar(160)
@@ -427,8 +434,72 @@ model Shipment {
   createdAt      DateTime       @default(now()) @map("created_at")
   updatedAt      DateTime       @updatedAt @map("updated_at")
   order          Order          @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  shippingZone   ShippingZone?  @relation(fields: [shippingZoneId], references: [id], onDelete: SetNull)
 
+  @@index([shippingZoneId])
   @@map("shipments")
+}
+
+model Department {
+  id             String         @id @default(uuid()) @db.Uuid
+  daneCode       String         @unique @map("dane_code") @db.Char(2)
+  name           String         @db.VarChar(120)
+  isActive       Boolean        @default(true) @map("is_active")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  municipalities Municipality[]
+
+  @@map("departments")
+}
+
+model Municipality {
+  id           String         @id @default(uuid()) @db.Uuid
+  departmentId String         @map("department_id") @db.Uuid
+  daneCode     String         @unique @map("dane_code") @db.Char(5)
+  name         String         @db.VarChar(120)
+  isActive     Boolean        @default(true) @map("is_active")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+  department   Department     @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  zones        ShippingZone[]
+
+  @@index([departmentId, name])
+  @@map("municipalities")
+}
+
+model ShippingZone {
+  id                    String                 @id @default(uuid()) @db.Uuid
+  municipalityId        String                 @map("municipality_id") @db.Uuid
+  name                  String                 @db.VarChar(120)
+  coverageStatus        ShippingCoverageStatus @default(ACTIVE) @map("coverage_status")
+  baseRate              Decimal                @default(0) @map("base_rate") @db.Decimal(14, 2)
+  freeShippingThreshold Decimal?               @map("free_shipping_threshold") @db.Decimal(14, 2)
+  estimatedMinDays      Int?                   @map("estimated_min_days")
+  estimatedMaxDays      Int?                   @map("estimated_max_days")
+  createdAt             DateTime               @default(now()) @map("created_at")
+  updatedAt             DateTime               @updatedAt @map("updated_at")
+  municipality          Municipality           @relation(fields: [municipalityId], references: [id], onDelete: Restrict)
+  restrictions          ShippingRestriction[]
+  shipments             Shipment[]
+
+  @@unique([municipalityId, name])
+  @@index([coverageStatus])
+  @@map("shipping_zones")
+}
+
+model ShippingRestriction {
+  id             String       @id @default(uuid()) @db.Uuid
+  shippingZoneId String       @map("shipping_zone_id") @db.Uuid
+  reason         String       @db.VarChar(500)
+  startsAt       DateTime?    @map("starts_at")
+  endsAt         DateTime?    @map("ends_at")
+  isActive       Boolean      @default(true) @map("is_active")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  shippingZone   ShippingZone @relation(fields: [shippingZoneId], references: [id], onDelete: Restrict)
+
+  @@index([shippingZoneId, isActive])
+  @@map("shipping_restrictions")
 }
 
 model Review {
