@@ -16,7 +16,7 @@ export function Hero() {
 
     const intervalId = window.setInterval(() => {
       setActiveBackground((current) => (current + 1) % heroBackgrounds.length);
-    }, 6000);
+    }, 4800);
 
     return () => window.clearInterval(intervalId);
   }, []);

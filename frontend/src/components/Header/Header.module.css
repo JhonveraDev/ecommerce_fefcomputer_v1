@@ -132,12 +132,18 @@
 
 .searchBar {
   align-items: center;
-  border: 1px solid var(--color-primary);
+  border: 1px solid var(--color-border-strong);
   border-radius: 5px;
   display: flex;
   flex: 1 1 550px;
   height: 54px;
   min-width: 300px;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.searchBar:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(37, 69, 213, .12);
 }
 
 .categorySelect {
@@ -165,6 +171,12 @@
   min-width: 0;
   outline: none;
   padding: 0 15px;
+}
+
+.searchBar input:focus-visible,
+.searchBar .categorySelect:focus-visible,
+.searchBar .searchButton:focus-visible {
+  outline: none;
 }
 
 .searchBar input::placeholder {
