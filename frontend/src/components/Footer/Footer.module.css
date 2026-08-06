@@ -1,6 +1,6 @@
 .footer {
-  background: #fff;
-  color: #102d57;
+  background: var(--color-surface);
+  color: var(--color-navy);
   margin-top: 6px;
   padding: 58px 0 20px;
 }
@@ -18,7 +18,7 @@
 
 .brand {
   align-items: center;
-  color: #102d57;
+  color: var(--color-navy);
   display: inline-flex;
   gap: 9px;
   text-decoration: none;
@@ -26,9 +26,9 @@
 
 .brandMark {
   align-items: center;
-  background: #2b59cf;
+  background: var(--color-primary);
   border-radius: 10px 4px 10px 4px;
-  color: #fff;
+  color: var(--color-surface);
   display: grid;
   height: 48px;
   justify-content: center;
@@ -49,16 +49,16 @@
 }
 
 .brand strong {
-  color: #2b59cf;
+  color: var(--color-primary);
 }
 
 .brand b {
-  color: #102d57;
+  color: var(--color-navy);
   font-weight: 800;
 }
 
 .brand small {
-  color: #64748b;
+  color: var(--color-text-muted);
   display: block;
   font-size: 7.5px;
   font-weight: 700;
@@ -82,7 +82,7 @@
 .contacts a,
 .contacts div {
   align-items: flex-start;
-  color: #25415f;
+  color: var(--color-text);
   display: flex;
   font-size: 13px;
   gap: 8px;
@@ -91,13 +91,13 @@
 }
 
 .contacts svg {
-  color: #2b59cf;
+  color: var(--color-primary);
   flex: 0 0 auto;
   margin-top: 1px;
 }
 
 .contacts b {
-  color: #102d57;
+  color: var(--color-navy);
   margin-right: 4px;
 }
 
@@ -115,24 +115,24 @@
 
 .column h2,
 .install h2 {
-  color: #102d57;
+  color: var(--color-navy);
   font-size: 23px;
   line-height: 1.2;
   margin: 7px 0 11px;
 }
 
 .column a {
-  color: #25415f;
+  color: var(--color-text);
   font-size: 14px;
   text-decoration: none;
 }
 
 .column a:hover {
-  color: #2b59cf;
+  color: var(--color-primary);
 }
 
 .install>p {
-  color: #25415f;
+  color: var(--color-text);
   font-size: 14px;
   margin: 25px 0 27px;
 }
@@ -170,7 +170,7 @@
 
 .bottomBar {
   align-items: center;
-  border-top: 1px solid #bdd5e5;
+  border-top: 1px solid var(--color-border-strong);
   display: grid;
   gap: 24px;
   grid-template-columns: repeat(3, minmax(200px, 1fr));
@@ -180,7 +180,7 @@
 }
 
 .copyright {
-  color: #64748b;
+  color: var(--color-text-muted);
   font-size: 13px;
   line-height: 1.8;
   margin: 0;
@@ -195,7 +195,7 @@
 
 .phone {
   align-items: center;
-  color: #8290a0;
+  color: var(--color-text-muted);
   display: flex;
   gap: 8px;
   text-decoration: none;
@@ -207,14 +207,14 @@
 }
 
 .phone b {
-  color: #2877d4;
+  color: var(--color-primary);
   font-size: 22px;
   letter-spacing: .7px;
   line-height: 1;
 }
 
 .phone small {
-  color: #7d8895;
+  color: var(--color-text-muted);
   font-size: 10px;
   margin-top: 4px;
 }
@@ -243,9 +243,9 @@
 
 .socialArea a {
   align-items: center;
-  background: #2b59cf;
+  background: var(--color-primary);
   border-radius: 999px;
-  color: #fff;
+  color: var(--color-surface);
   display: flex;
   height: 29px;
   justify-content: center;
@@ -254,21 +254,20 @@
 }
 
 .socialArea a:hover {
-  background: #102d57;
-  transform: translateY(-2px);
+  background: var(--color-navy);
 }
 
 .socialArea small {
-  color: #7d8895;
+  color: var(--color-text-muted);
   font-size: 12px;
   text-align: right;
 }
 
 .toTop {
   align-items: center;
-  border: 2px solid #21486f;
+  border: 2px solid var(--color-navy);
   border-radius: 50%;
-  color: #21486f;
+  color: var(--color-navy);
   display: flex;
   height: 32px;
   justify-content: center;

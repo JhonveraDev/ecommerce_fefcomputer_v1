@@ -4,7 +4,7 @@
 }
 
 .banner {
-  background: #e8eff7;
+  background: var(--color-surface-blue);
   border-radius: 24px;
   height: 417px;
   overflow: hidden;
@@ -19,7 +19,7 @@
 }
 
 .content h2 {
-  color: #092548;
+  color: var(--color-navy);
   font-size: 42px;
   letter-spacing: -.035em;
   line-height: 1.13;
@@ -28,19 +28,19 @@
 }
 
 .content>p {
-  color: #65758a;
+  color: var(--color-text-muted);
   font-size: 17px;
   margin: 20px 0 44px;
 }
 
 .content>p span {
-  color: #2545d5;
+  color: var(--color-primary);
   font-weight: 700;
 }
 
 .form {
   align-items: center;
-  background: #fff;
+  background: var(--color-surface);
   border-radius: 34px;
   display: flex;
   height: 66px;
@@ -51,7 +51,7 @@
 
 .form input {
   border: 0;
-  color: #173b4d;
+  color: var(--color-text);
   flex: 1;
   height: 100%;
   min-width: 0;
@@ -60,11 +60,11 @@
 }
 
 .form input::placeholder {
-  color: #8490a0;
+  color: var(--color-text-muted);
 }
 
 .emailIcon {
-  color: #65758a;
+  color: var(--color-text-muted);
   left: 23px;
   position: absolute;
 }
@@ -72,10 +72,10 @@
 .form button {
   align-items: center;
   align-self: stretch;
-  background: #2545d5;
+  background: var(--color-primary);
   border: 0;
   border-radius: 34px;
-  color: #fff;
+  color: var(--color-surface);
   cursor: pointer;
   display: flex;
   font-weight: 700;
@@ -86,12 +86,11 @@
 }
 
 .form button:hover {
-  background: #1a2989;
-  transform: translateX(-2px);
+  background: var(--color-primary-hover);
 }
 
 .form button:focus-visible {
-  outline: 3px solid #2545d5;
+  outline: 3px solid var(--color-primary);
   outline-offset: -3px;
 }
 
@@ -114,7 +113,7 @@
 
 .benefit {
   align-items: center;
-  background: #f2f5f9;
+  background: var(--color-surface-soft);
   border-radius: 10px;
   display: flex;
   gap: 17px;
@@ -125,11 +124,10 @@
 
 .benefit:hover {
   box-shadow: 0 10px 22px rgba(9, 37, 72, .1);
-  transform: translateY(-3px);
 }
 
 .benefitIcon {
-  color: #2545d5;
+  color: var(--color-primary);
   display: grid;
   flex: 0 0 auto;
   place-items: center;
@@ -142,14 +140,14 @@
 }
 
 .benefit h3 {
-  color: #092548;
+  color: var(--color-navy);
   font-size: 16px;
   line-height: 1.25;
   margin: 0 0 7px;
 }
 
 .benefit p {
-  color: #8a97a8;
+  color: var(--color-text-subtle);
   font-size: 14px;
   line-height: 1.35;
   margin: 0;

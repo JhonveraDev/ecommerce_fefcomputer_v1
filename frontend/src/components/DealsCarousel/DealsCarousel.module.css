@@ -13,7 +13,7 @@
 }
 
 .section h2 {
-  color: #102d57;
+  color: var(--color-navy);
   font-size: 33px;
   letter-spacing: -.035em;
   margin: 0
@@ -27,14 +27,14 @@
 .section nav button {
   background: transparent;
   border: 0;
-  color: #102d57;
+  color: var(--color-navy);
   cursor: pointer;
   font-size: 15px;
   padding: 5px 0
 }
 
 .section nav .active {
-  color: #2545d5;
+  color: var(--color-primary);
   font-weight: 700
 }
 
@@ -73,7 +73,7 @@
 }
 
 .banner h3 {
-  color: #102d57;
+  color: var(--color-navy);
   font-size: 35px;
   line-height: 1.22;
   margin: 0;
@@ -82,9 +82,9 @@
 
 .banner a {
   align-items: center;
-  background: #102d57;
+  background: var(--color-navy);
   border-radius: 5px;
-  color: #fff;
+  color: var(--color-surface);
   display: inline-flex;
   font-size: 13px;
   font-weight: 700;
@@ -96,7 +96,7 @@
 
 .banner a:hover,
 .add:hover {
-  background: #2545d5
+  background: var(--color-primary)
 }
 
 .viewport {
@@ -117,7 +117,7 @@
 }
 
 .card {
-  border: 1px solid #e3e8ef;
+  border: 1px solid var(--color-border);
   border-radius: 14px;
   display: flex;
   flex: 0 0 calc(25% - 18px);
@@ -131,13 +131,12 @@
 
 .card:hover {
   box-shadow: 0 13px 28px rgba(16, 45, 87, .12);
-  transform: translateY(-4px)
 }
 
 .discount {
-  background: #2545d5;
+  background: var(--color-primary);
   border-radius: 0 0 10px;
-  color: #fff;
+  color: var(--color-surface);
   font-size: 11px;
   font-weight: 700;
   left: 0;
@@ -164,13 +163,13 @@
 }
 
 .product p {
-  color: #8a97a8;
+  color: var(--color-text-subtle);
   font-size: 12px;
   margin: 0 0 10px
 }
 
 .product h3 {
-  color: #173b4d;
+  color: var(--color-text);
   font-size: 15px;
   line-height: 1.32;
   margin: 0;
@@ -179,14 +178,14 @@
 
 .rating {
   align-items: center;
-  color: #f4b634;
+  color: var(--color-warning);
   display: flex;
   gap: 1px;
   margin: 11px 0 19px
 }
 
 .rating small {
-  color: #8a97a8;
+  color: var(--color-text-subtle);
   font-size: 11px;
   margin-left: 4px
 }
@@ -197,12 +196,12 @@
 }
 
 .prices b {
-  color: #2545d5;
+  color: var(--color-primary);
   font-size: 18px
 }
 
 .prices del {
-  color: #9ba5b1;
+  color: var(--color-text-subtle);
   font-size: 12px;
   font-weight: 600
 }
@@ -212,7 +211,7 @@
 }
 
 .stock span {
-  background: #e6ebf1;
+  background: var(--color-border);
   border-radius: 4px;
   display: block;
   height: 5px;
@@ -220,23 +219,23 @@
 }
 
 .stock i {
-  background: #2545d5;
+  background: var(--color-primary);
   display: block;
   height: 100%
 }
 
 .stock p {
-  color: #53646d;
+  color: var(--color-text-muted);
   font-size: 12px;
   margin: 10px 0 18px
 }
 
 .add {
   align-items: center;
-  background: #102d57;
+  background: var(--color-navy);
   border: 0;
   border-radius: 4px;
-  color: #fff;
+  color: var(--color-surface);
   cursor: pointer;
   display: flex;
   font-size: 13px;
@@ -249,10 +248,10 @@
 
 .arrow {
   align-items: center;
-  background: #f2f5f8;
+  background: var(--color-surface-soft);
   border: 0;
   border-radius: 50%;
-  color: #65758a;
+  color: var(--color-text-muted);
   cursor: pointer;
   display: flex;
   height: 41px;
@@ -264,8 +263,8 @@
 }
 
 .arrow:not(:disabled):hover {
-  background: #2545d5;
-  color: #fff
+  background: var(--color-primary);
+  color: var(--color-surface)
 }
 
 .arrow:disabled {

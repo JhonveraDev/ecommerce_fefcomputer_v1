@@ -1,9 +1,9 @@
 .card {
   align-items: center;
-  background: var(--category-background, #f1f4f7);
-  border: 1px solid #dde5ed;
+  background: var(--category-background, var(--color-surface-soft));
+  border: 1px solid var(--color-border);
   border-radius: 12px;
-  color: #173b4d;
+  color: var(--color-text);
   cursor: pointer;
   display: flex;
   flex: 0 0 clamp(145px, calc((100% - 84px) / var(--visible-items, 7)), 180px);
@@ -17,18 +17,17 @@
 }
 
 .card:hover {
-  background: #e5eef8;
-  border-color: #b9d0e7;
+  background: var(--color-surface-blue);
+  border-color: var(--color-border-strong);
   box-shadow: 0 14px 27px rgba(9, 37, 72, .16);
-  transform: translateY(-5px) scale(1.015);
 }
 
-.card:focus-visible { outline: 3px solid #0f8c9b; outline-offset: 3px; }
-.visual { align-items: center; color: var(--category-icon-color, #1587a8); display: flex; height: 82px; justify-content: center; margin-bottom: 13px; width: 100%; }
+.card:focus-visible { outline: 3px solid var(--color-info); outline-offset: 3px; }
+.visual { align-items: center; color: var(--category-icon-color, var(--color-info)); display: flex; height: 82px; justify-content: center; margin-bottom: 13px; width: 100%; }
 .visual img { height: 82px; object-fit: contain; width: 104px; }
 .visual svg { height: 58px; stroke-width: 1.55; width: 58px; }
 .card strong { font-size: 15px; line-height: 1.25; max-width: 160px; }
-.card small { color: #76858d; font-size: 12px; margin-top: 6px; }
+.card small { color: var(--color-text-muted); font-size: 12px; margin-top: 6px; }
 
 @media (max-width: 760px) {
   .card { flex-basis: 145px; min-height: 164px; }

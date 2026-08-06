@@ -1,5 +1,49 @@
-:root { font-family: "Segoe UI", Arial, sans-serif; color: #173b4d; background: #fff; font-synthesis: none; text-rendering: optimizeLegibility; }
+:root {
+  --font-sans: "Segoe UI", Arial, sans-serif;
+  --color-primary: #2545d5;
+  --color-primary-hover: #1a36b8;
+  --color-navy: #102d57;
+  --color-text: #173b4d;
+  --color-text-muted: #65758a;
+  --color-text-subtle: #8a97a8;
+  --color-accent: #2fb779;
+  --color-accent-hover: #279a66;
+  --color-info: #1587a8;
+  --color-success: #2fb779;
+  --color-warning: #f4b634;
+  --color-danger: #dc3b57;
+  --color-surface: #fff;
+  --color-surface-soft: #f2f5f9;
+  --color-surface-blue: #e8eff7;
+  --color-border: #e3e8ef;
+  --color-border-strong: #bdd5e5;
+  --shadow-card: 0 10px 24px rgba(16, 45, 87, .10);
+  --shadow-float: 0 8px 18px rgba(16, 45, 87, .12);
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --radius-xl: 24px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --transition-fast: 160ms ease;
+  --transition-base: 240ms cubic-bezier(.22, .61, .36, 1);
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background: var(--color-surface);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
 * { box-sizing: border-box; }
 body { margin: 0; min-width: 320px; }
-button, input { font: inherit; }
+button, input, select, textarea { font: inherit; }
+button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 3px; }
+button:disabled { cursor: not-allowed; opacity: .55; }
 .srOnly { clip: rect(0, 0, 0, 0); clip-path: inset(50%); height: 1px; overflow: hidden; position: absolute; white-space: nowrap; width: 1px; }

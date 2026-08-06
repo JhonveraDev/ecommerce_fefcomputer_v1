@@ -1,10 +1,10 @@
 .hero {
-  background: #fff;
+  background: var(--color-surface);
   padding: 39px 32px 58px;
 }
 
 .heroFrame {
-  background: #09233a;
+  background: var(--color-navy);
   border-radius: 22px;
   isolation: isolate;
   margin: 0 auto;
@@ -39,7 +39,7 @@
 
 .content {
   align-items: flex-start;
-  color: #fff;
+  color: var(--color-surface);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -50,7 +50,7 @@
 
 .eyebrow {
   align-items: center;
-  color: #00ff8b;
+  color: var(--color-accent);
   display: flex;
   font-size: 15px;
   font-weight: 750;
@@ -90,10 +90,10 @@ h1 {
   transition: transform .2s ease, background .2s ease;
 }
 
-.primaryAction { background: #2545d5; color: #fff; }
-.primaryAction:hover { background: #279a66; transform: translateY(-2px); }
-.secondaryAction { border: 1px solid rgba(255, 255, 255, .62); color: #fff; }
-.secondaryAction:hover { background: rgba(255, 255, 255, .11); transform: translateY(-2px); }
+.primaryAction { background: var(--color-primary); color: var(--color-surface); }
+.primaryAction:hover { background: var(--color-accent-hover); }
+.secondaryAction { border: 1px solid rgba(255, 255, 255, .62); color: var(--color-surface); }
+.secondaryAction:hover { background: rgba(255, 255, 255, .11); }
 
 @media (max-width: 800px) {
   .hero { padding: 22px 18px 38px; }
