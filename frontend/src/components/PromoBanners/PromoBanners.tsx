@@ -11,7 +11,7 @@ export function PromoBanners({ items, onBannerClick, className = '', renderCtaIc
         {items.map((banner) => (
           <PromoBannerCard key={banner.id} banner={banner} onClick={onBannerClick}
             ctaIcon={renderCtaIcon?.() ?? <ArrowRight size={15} aria-hidden="true" />}
-            style={{ '--promo-background': banner.backgroundColor, '--promo-text': banner.textColor, '--promo-cta': banner.ctaColor } as CSSProperties}
+            style={{ '--promo-background': banner.backgroundColor, '--promo-text': banner.textColor } as CSSProperties}
           />
         ))}
       </div>
