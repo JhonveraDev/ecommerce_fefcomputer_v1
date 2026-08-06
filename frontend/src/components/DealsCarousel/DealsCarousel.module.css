@@ -3,6 +3,8 @@
   max-width: 1586px
 }
 
+.viewport { overflow: visible; }
+
 .section>header {
   align-items: center;
   display: flex;
@@ -102,16 +104,23 @@
   position: relative
 }
 
+.trackViewport {
+  overflow: hidden;
+  width: 100%
+}
+
 .products {
-  display: grid;
+  display: flex;
   gap: 24px;
-  grid-template-columns: repeat(4, minmax(0, 1fr))
+  transform: translateX(calc(var(--deal-index) * -1 * (25% + 6px)));
+  transition: transform .8s cubic-bezier(.22, .61, .36, 1)
 }
 
 .card {
   border: 1px solid #e3e8ef;
   border-radius: 14px;
   display: flex;
+  flex: 0 0 calc(25% - 18px);
   flex-direction: column;
   min-width: 0;
   overflow: hidden;
@@ -300,11 +309,11 @@
   }
 
   .products {
-    grid-template-columns: repeat(3, minmax(0, 1fr))
+    transform: translateX(calc(var(--deal-index) * -1 * (33.333% + 5.34px)))
   }
 
-  .products>:nth-child(4) {
-    display: none
+  .card {
+    flex-basis: calc(33.333% - 10.67px)
   }
 
   .banner h3 {
@@ -365,11 +374,12 @@
     grid-auto-columns: 78%;
     grid-auto-flow: column;
     grid-template-columns: none;
-    overflow-x: auto
+    overflow-x: auto;
+    transform: translateX(calc(var(--deal-index) * -1 * (78% + 24px)))
   }
 
-  .products>:nth-child(4) {
-    display: flex
+  .card {
+    flex-basis: 78%
   }
 
   .product img {
