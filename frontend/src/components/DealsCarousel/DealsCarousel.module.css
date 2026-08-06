@@ -46,7 +46,7 @@
 
 .banner {
   border-radius: 14px;
-  height: 540px;
+  height: 530px;
   overflow: hidden;
   position: relative
 }
@@ -106,7 +106,7 @@
 
 .trackViewport {
   overflow: hidden;
-  padding: 14px 0 22px;
+  padding: 0px 0 22px;
   width: 100%
 }
 
@@ -123,6 +123,7 @@
   display: flex;
   flex: 0 0 calc(25% - 18px);
   flex-direction: column;
+  height: 530px;
   min-width: 0;
   overflow: hidden;
   padding: 20px;
@@ -166,7 +167,7 @@
 .product p {
   color: var(--color-text-subtle);
   font-size: 12px;
-  margin: 0 0 10px
+  margin: 0 0 7px
 }
 
 .product h3 {
@@ -174,7 +175,7 @@
   font-size: 15px;
   line-height: 1.32;
   margin: 0;
-  min-height: 59px
+  min-height: 42px
 }
 
 .rating {
@@ -182,7 +183,7 @@
   color: var(--color-warning);
   display: flex;
   gap: 1px;
-  margin: 11px 0 19px
+  margin: 8px 0 12px
 }
 
 .rating small {
@@ -208,7 +209,7 @@
 }
 
 .stock {
-  margin-top: 19px
+  margin-top: 13px
 }
 
 .stock span {
@@ -228,7 +229,7 @@
 .stock p {
   color: var(--color-text-muted);
   font-size: 12px;
-  margin: 10px 0 18px
+  margin: 7px 0 14px
 }
 
 .add {
@@ -379,7 +380,8 @@
   }
 
   .card {
-    flex-basis: 78%
+    flex-basis: 78%;
+    height: auto;
   }
 
   .product img {
