@@ -1,5 +1,5 @@
 import { BadgeDollarSign, Handshake, Network, PackageCheck, ReceiptText } from 'lucide-react';
-import techDeliveryImage from '../assets/newsletter/tech-delivery.png';
+import gamingSetupImage from '../assets/newsletter/gaming-setup.png';
 import type { NewsletterBenefit } from '../components/NewsletterOffer';
 
 export const newsletterBenefits: NewsletterBenefit[] = [
@@ -13,8 +13,8 @@ export const newsletterBenefits: NewsletterBenefit[] = [
 export const newsletterOffer = {
   title: 'Recibe lo mejor de la tecnología en un solo lugar',
   description: <>Suscríbete y recibe novedades, ofertas y soluciones de <span>FEFCOMPUTER</span>.</>,
-  image: techDeliveryImage,
-  imageAlt: 'Especialista de entregas con equipos tecnológicos',
+  image: gamingSetupImage,
+  imageAlt: 'Computador gaming, laptop, audífonos y mouse',
   emailPlaceholder: 'Tu correo electrónico',
   submitLabel: 'Suscribirme',
   benefits: newsletterBenefits,
