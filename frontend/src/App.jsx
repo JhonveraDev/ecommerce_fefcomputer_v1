@@ -5,10 +5,12 @@ import { FeaturedCategories } from './components/FeaturedCategories';
 import { PromoBanners } from './components/PromoBanners';
 import { NewsletterOffer } from './components/NewsletterOffer';
 import { Footer } from './components/Footer';
+import { DealsCarousel } from './components/DealsCarousel';
 import { featuredCategoryItems } from './data/featuredCategories.tsx';
 import { homePromoBanners } from './data/promoBanners';
 import { newsletterOffer } from './data/newsletterOffer';
 import { footerData } from './data/footer';
+import { dailyDealsBanner, dailyDealProducts } from './data/dailyDeals';
 
 export default function App() {
   return (
@@ -25,6 +27,14 @@ export default function App() {
       <PromoBanners
         items={homePromoBanners}
         onBannerClick={(banner) => console.info('Promoción seleccionada:', banner.id)}
+      />
+      <DealsCarousel
+        products={dailyDealProducts}
+        bannerImage={dailyDealsBanner.image}
+        bannerTitle={dailyDealsBanner.title}
+        bannerCtaLabel={dailyDealsBanner.ctaLabel}
+        onProductClick={(product) => console.info('Producto seleccionado:', product.slug)}
+        onAddToCart={(product) => console.info('Producto agregado:', product.slug)}
       />
       <NewsletterOffer
         {...newsletterOffer}
