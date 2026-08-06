@@ -159,7 +159,7 @@
 .product img {
   display: block;
   height: 214px;
-  margin: 0 auto 15px;
+  margin: 0 auto 25px;
   object-fit: contain;
   width: 100%
 }
