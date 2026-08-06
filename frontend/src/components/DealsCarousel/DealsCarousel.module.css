@@ -106,6 +106,7 @@
 
 .trackViewport {
   overflow: hidden;
+  padding: 14px 0 22px;
   width: 100%
 }
 
@@ -130,7 +131,7 @@
 }
 
 .card:hover {
-  box-shadow: 0 13px 28px rgba(16, 45, 87, .12);
+  box-shadow: 0 13px 11px rgba(16, 45, 87, .12);
 }
 
 .discount {
