@@ -43,6 +43,19 @@ export function Hero() {
             <a className={styles.secondaryAction} href="#ofertas">Ver ofertas</a>
           </div>
         </section>
+        <div className={styles.indicators} role="tablist" aria-label="Seleccionar imagen del banner principal">
+          {heroBackgrounds.map((background, index) => (
+            <button
+              key={background}
+              className={index === activeBackground ? styles.indicatorActive : ''}
+              type="button"
+              role="tab"
+              aria-label={`Mostrar banner ${index + 1}`}
+              aria-selected={index === activeBackground}
+              onClick={() => setActiveBackground(index)}
+            />
+          ))}
+        </div>
       </div>
     </main>
   );
