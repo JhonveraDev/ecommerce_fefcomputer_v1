@@ -2,7 +2,9 @@ import React from 'react';
 import { Header } from './components/Header/Header.jsx';
 import { Hero } from './components/Hero/Hero.jsx';
 import { FeaturedCategories } from './components/FeaturedCategories';
+import { PromoBanners } from './components/PromoBanners';
 import { featuredCategoryItems } from './data/featuredCategories.tsx';
+import { homePromoBanners } from './data/promoBanners';
 
 export default function App() {
   return (
@@ -15,6 +17,10 @@ export default function App() {
         visibleItems={8}
         tabs={featuredCategoryItems.slice(0, 4).map((category, index) => ({ id: category.id, label: category.name, active: index === 0 }))}
         onCategoryClick={(category) => console.info('Categoría seleccionada:', category.id)}
+      />
+      <PromoBanners
+        items={homePromoBanners}
+        onBannerClick={(banner) => console.info('Promoción seleccionada:', banner.id)}
       />
     </>
   );

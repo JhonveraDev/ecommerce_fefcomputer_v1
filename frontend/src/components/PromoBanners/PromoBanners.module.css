@@ -1,0 +1,4 @@
+.section { margin: 0 auto 58px; max-width: 1586px; padding: 0; }
+.grid { display: grid; grid-template-columns: repeat(3, 513px); justify-content: space-between; }
+@media (max-width: 1000px) { .section { padding: 0 24px; } .grid { gap: 24px; grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .section { margin-bottom: 38px; padding: 0 16px; } .grid { grid-template-columns: 1fr; } }
