@@ -50,7 +50,7 @@
   border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
-  height: 495px;
+  height: 432px;
   overflow: hidden;
   padding: 20px;
   position: relative;
@@ -87,7 +87,7 @@
 
 .product img {
   display: block;
-  height: 218px;
+  height: 214px;
   margin: 0 auto 14px;
   object-fit: contain;
   width: 100%;
@@ -102,10 +102,10 @@
 
 .product h3 {
   color: var(--color-text);
-  font-size: 16px;
-  line-height: 1.3;
+  font-size: 15px;
+  line-height: 1.32;
   margin: 10px 0 0;
-  min-height: 42px;
+  min-height: 20px;
 }
 
 .rating {
@@ -192,6 +192,6 @@
 
 @media (max-width: 430px) {
   .grid { grid-template-columns: 1fr; }
-  .card { height: 495px; }
-  .product img { height: 218px; }
+  .card { height: 465px; }
+  .product img { height: 214px; }
 }
