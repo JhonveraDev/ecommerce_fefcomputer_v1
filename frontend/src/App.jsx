@@ -3,8 +3,10 @@ import { Header } from './components/Header/Header.jsx';
 import { Hero } from './components/Hero/Hero.jsx';
 import { FeaturedCategories } from './components/FeaturedCategories';
 import { PromoBanners } from './components/PromoBanners';
+import { NewsletterOffer } from './components/NewsletterOffer';
 import { featuredCategoryItems } from './data/featuredCategories.tsx';
 import { homePromoBanners } from './data/promoBanners';
+import { newsletterOffer } from './data/newsletterOffer';
 
 export default function App() {
   return (
@@ -21,6 +23,10 @@ export default function App() {
       <PromoBanners
         items={homePromoBanners}
         onBannerClick={(banner) => console.info('Promoción seleccionada:', banner.id)}
+      />
+      <NewsletterOffer
+        {...newsletterOffer}
+        onSubmit={(email) => console.info('Suscripción solicitada:', email)}
       />
     </>
   );
