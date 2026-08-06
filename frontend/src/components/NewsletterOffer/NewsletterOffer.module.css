@@ -91,7 +91,7 @@
 }
 
 .form button:focus-visible {
-  outline: 3px solid #2fb779;
+  outline: 3px solid #2545d5;
   outline-offset: -3px;
 }
 
@@ -129,7 +129,7 @@
 }
 
 .benefitIcon {
-  color: #2fb779;
+  color: #2545d5;
   display: grid;
   flex: 0 0 auto;
   place-items: center;

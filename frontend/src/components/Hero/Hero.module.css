@@ -50,7 +50,7 @@
 
 .eyebrow {
   align-items: center;
-  color: #78e0ad;
+  color: #00ff8b;
   display: flex;
   font-size: 15px;
   font-weight: 750;
@@ -90,7 +90,7 @@ h1 {
   transition: transform .2s ease, background .2s ease;
 }
 
-.primaryAction { background: #2fb779; color: #fff; }
+.primaryAction { background: #2545d5; color: #fff; }
 .primaryAction:hover { background: #279a66; transform: translateY(-2px); }
 .secondaryAction { border: 1px solid rgba(255, 255, 255, .62); color: #fff; }
 .secondaryAction:hover { background: rgba(255, 255, 255, .11); transform: translateY(-2px); }

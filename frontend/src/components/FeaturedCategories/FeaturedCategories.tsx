@@ -10,7 +10,7 @@ export function FeaturedCategories({
   title,
   tabs = [],
   visibleItems = 7,
-  accentColor = '#2fb779',
+  accentColor = '#2545d5',
   onCategoryClick,
   onTabClick,
   className = '',
