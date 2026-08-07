@@ -143,7 +143,7 @@
 
 .searchBar:focus-within {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(37, 69, 213, .12);
+  box-shadow: 0 0 0 2px rgba(0, 108, 229, .12);
 }
 
 .categorySelect {

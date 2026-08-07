@@ -141,7 +141,7 @@
 .prices { display: grid; gap: 4px; }
 
 .prices strong {
-  color: #173b4d;
+  color: var(--color-text);
   font-size: 18px;
 }
 
