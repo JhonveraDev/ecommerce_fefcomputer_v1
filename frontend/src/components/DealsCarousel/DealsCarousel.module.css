@@ -217,7 +217,7 @@
 }
 
 .prices b {
-  color: var(--color-primary);
+  color: var(--color-text);
   font-size: 18px
 }
 

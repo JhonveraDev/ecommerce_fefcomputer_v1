@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Header } from './components/Header/Header.jsx';
 import { Hero } from './components/Hero/Hero.jsx';
 import { FeaturedCategories } from './components/FeaturedCategories';
@@ -7,6 +7,7 @@ import { NewsletterOffer } from './components/NewsletterOffer';
 import { Footer } from './components/Footer';
 import { DealsCarousel } from './components/DealsCarousel';
 import { FeaturedProducts } from './components/FeaturedProducts';
+import { QuickViewModal } from './components/QuickViewModal';
 import { featuredCategoryItems } from './data/featuredCategories.tsx';
 import { homePromoBanners } from './data/promoBanners';
 import { newsletterOffer } from './data/newsletterOffer';
@@ -15,6 +16,8 @@ import { dailyDealsBanner, dailyDealProducts } from './data/dailyDeals';
 import { featuredProducts } from './data/featuredProducts';
 
 export default function App() {
+  const [quickViewProduct, setQuickViewProduct] = useState(null);
+
   return (
     <>
       <Header />
@@ -36,7 +39,7 @@ export default function App() {
         onAddToCart={(product) => console.info('Producto agregado:', product.slug)}
         onAddToWishlist={(product) => console.info('TODO: agregar a favoritos:', product.slug)}
         onCompare={(product) => console.info('TODO: comparar producto:', product.slug)}
-        onQuickView={(product) => console.info('TODO: abrir vista rápida:', product.slug)}
+        onQuickView={setQuickViewProduct}
       />
       <DealsCarousel
         products={dailyDealProducts}
@@ -47,13 +50,20 @@ export default function App() {
         onAddToCart={(product) => console.info('Producto agregado:', product.slug)}
         onAddToWishlist={(product) => console.info('TODO: agregar a favoritos:', product.slug)}
         onCompare={(product) => console.info('TODO: comparar producto:', product.slug)}
-        onQuickView={(product) => console.info('TODO: abrir vista rápida:', product.slug)}
+        onQuickView={setQuickViewProduct}
       />
       <NewsletterOffer
         {...newsletterOffer}
         onSubmit={(email) => console.info('Suscripción solicitada:', email)}
       />
       <Footer {...footerData} />
+      <QuickViewModal
+        product={quickViewProduct}
+        onClose={() => setQuickViewProduct(null)}
+        onAddToCart={(product, quantity) => console.info('Producto agregado:', product.slug, 'cantidad:', quantity)}
+        onAddToWishlist={(product) => console.info('TODO: agregar a favoritos:', product.slug)}
+        onCompare={(product) => console.info('TODO: comparar producto:', product.slug)}
+      />
     </>
   );
 }
