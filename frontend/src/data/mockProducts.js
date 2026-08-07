@@ -1,3 +1,18 @@
+import gamingPcImage from '../assets/products/gaming-pc.png';
+import laptopImage from '../assets/products/laptop.png';
+import monitorImage from '../assets/products/monitor.png';
+import solarPanelImage from '../assets/products/solar-panel.png';
+import cctvCameraImage from '../assets/products/cctv-camera.png';
+import routerImage from '../assets/products/router.png';
+import serverImage from '../assets/products/server.png';
+import graphicsCardImage from '../assets/products/graphics-card.png';
+import dockingStationImage from '../assets/products/docking-station.png';
+import keyboardImage from '../assets/products/keyboard.png';
+import ssdImage from '../assets/products/ssd.png';
+import printerImage from '../assets/products/printer.png';
+import miniPcImage from '../assets/products/mini-pc.png';
+import upsImage from '../assets/products/ups.png';
+
 /**
  * @typedef {'Disponible' | 'Agotado' | 'Oferta' | 'Nuevo'} ProductStatus
  * @typedef {Object} Product
@@ -19,6 +34,25 @@
  */
 
 export const PRODUCT_PLACEHOLDER = '/product-placeholder.svg';
+
+const categoryImages = {
+  'Computadores Gaming': gamingPcImage,
+  Laptops: laptopImage,
+  Monitores: monitorImage,
+  'Paneles Solares': solarPanelImage,
+  'Sistemas CCTV': cctvCameraImage,
+  'Redes y Telecomunicaciones': routerImage,
+  Servidores: serverImage,
+  'Componentes para PC': graphicsCardImage,
+  'Accesorios Tecnológicos': dockingStationImage,
+  'Accesorios TecnolÃ³gicos': dockingStationImage,
+  Periféricos: keyboardImage,
+  Almacenamiento: ssdImage,
+  Impresoras: printerImage,
+  'Equipos de Oficina': miniPcImage,
+  'Energía y UPS': upsImage,
+  'EnergÃ­a y UPS': upsImage,
+};
 
 export const productCategories = [
   'Computadores Gaming', 'Laptops', 'Monitores', 'Paneles Solares', 'Sistemas CCTV',
@@ -107,7 +141,7 @@ export const mockProducts = [
   previousPrice,
   shortDescription,
   description,
-  image: PRODUCT_PLACEHOLDER,
+  image: categoryImages[category] ?? PRODUCT_PLACEHOLDER,
   status,
   sku,
   stock,
