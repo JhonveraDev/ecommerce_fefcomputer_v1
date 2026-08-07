@@ -1,0 +1,4 @@
+import { Star } from 'lucide-react';
+import type { Product } from '../FeaturedProducts/FeaturedProducts';
+import styles from './StoreSidebar.module.css';
+export function RecentProducts({ products, onProductClick }:{products:Product[];onProductClick:(product:Product)=>void}) { return <section className={styles.recent}><h2>Productos nuevos</h2>{products.slice(0,3).map(product=><button key={product.id} type="button" onClick={()=>onProductClick(product)}><img src={product.image} alt=""/><span><b>{product.name}</b><strong>{new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(product.price)}</strong><i>{Array.from({length:5},(_,index)=><Star key={index} size={12} fill={index<Math.round(product.rating)?'currentColor':'none'}/>)}</i></span></button>)}</section>; }
