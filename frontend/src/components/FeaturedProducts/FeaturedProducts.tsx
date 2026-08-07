@@ -1,5 +1,6 @@
 import { ShoppingCart, Star } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { ProductCardActions } from '../ProductCardActions';
 import styles from './FeaturedProducts.module.css';
 
 type Product = {
@@ -20,6 +21,9 @@ type Props = {
   products: Product[];
   onProductClick?: (product: Product) => void;
   onAddToCart?: (product: Product) => void;
+  onAddToWishlist?: (product: Product) => void;
+  onCompare?: (product: Product) => void;
+  onQuickView?: (product: Product) => void;
 };
 
 const money = (value: number) => new Intl.NumberFormat('es-CO', {
@@ -35,10 +39,13 @@ const tabs = [
   { id: 'popular', label: 'Más populares' },
 ];
 
-function ProductCard({ product, onProductClick, onAddToCart }: {
+function ProductCard({ product, onProductClick, onAddToCart, onAddToWishlist, onCompare, onQuickView }: {
   product: Product;
   onProductClick?: Props['onProductClick'];
   onAddToCart?: Props['onAddToCart'];
+  onAddToWishlist?: Props['onAddToWishlist'];
+  onCompare?: Props['onCompare'];
+  onQuickView?: Props['onQuickView'];
 }) {
   const discount = product.previousPrice
     ? Math.round((1 - product.price / product.previousPrice) * 100)
@@ -48,6 +55,7 @@ function ProductCard({ product, onProductClick, onAddToCart }: {
   return (
     <article className={styles.card}>
       {label && <span className={`${styles.badge} ${product.status === 'Nuevo' ? styles.newBadge : ''}`}>{label}</span>}
+      <ProductCardActions className={styles.actions} product={product} onAddToWishlist={onAddToWishlist} onCompare={onCompare} onQuickView={onQuickView} />
       <button className={styles.product} type="button" onClick={() => onProductClick?.(product)}>
         <img src={product.image} alt={product.name} />
         <p className={styles.category}>{product.category}</p>
@@ -74,7 +82,7 @@ function ProductCard({ product, onProductClick, onAddToCart }: {
   );
 }
 
-export function FeaturedProducts({ products, onProductClick, onAddToCart }: Props) {
+export function FeaturedProducts({ products, onProductClick, onAddToCart, onAddToWishlist, onCompare, onQuickView }: Props) {
   const [activeTab, setActiveTab] = useState('all');
   const visibleProducts = useMemo(() => {
     const ordered = [...products].sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount);
@@ -104,7 +112,7 @@ export function FeaturedProducts({ products, onProductClick, onAddToCart }: Prop
       </header>
       <div className={styles.grid}>
         {filledProducts.map((product) => (
-          <ProductCard key={product.id} product={product} onProductClick={onProductClick} onAddToCart={onAddToCart} />
+          <ProductCard key={product.id} product={product} onProductClick={onProductClick} onAddToCart={onAddToCart} onAddToWishlist={onAddToWishlist} onCompare={onCompare} onQuickView={onQuickView} />
         ))}
       </div>
     </section>

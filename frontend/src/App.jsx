@@ -34,6 +34,9 @@ export default function App() {
         products={featuredProducts}
         onProductClick={(product) => console.info('Producto seleccionado:', product.slug)}
         onAddToCart={(product) => console.info('Producto agregado:', product.slug)}
+        onAddToWishlist={(product) => console.info('TODO: agregar a favoritos:', product.slug)}
+        onCompare={(product) => console.info('TODO: comparar producto:', product.slug)}
+        onQuickView={(product) => console.info('TODO: abrir vista rápida:', product.slug)}
       />
       <DealsCarousel
         products={dailyDealProducts}
@@ -42,6 +45,9 @@ export default function App() {
         bannerCtaLabel={dailyDealsBanner.ctaLabel}
         onProductClick={(product) => console.info('Producto seleccionado:', product.slug)}
         onAddToCart={(product) => console.info('Producto agregado:', product.slug)}
+        onAddToWishlist={(product) => console.info('TODO: agregar a favoritos:', product.slug)}
+        onCompare={(product) => console.info('TODO: comparar producto:', product.slug)}
+        onQuickView={(product) => console.info('TODO: abrir vista rápida:', product.slug)}
       />
       <NewsletterOffer
         {...newsletterOffer}
