@@ -30,8 +30,10 @@ export function StorePage({ onQuickView }: { onQuickView: (product: Product) => 
           <h2>Categorías</h2>
           {['Todas', ...productCategories].map((categoryName) => <button key={categoryName} className={category === categoryName ? styles.selected : ''} onClick={() => selectCategory(categoryName)}>{categoryName}<span>{categoryName === 'Todas' ? mockProducts.length : mockProducts.filter((product) => product.category === categoryName).length}</span></button>)}
         </div>
-        <RecentProducts products={recent} onProductClick={onQuickView} />
-        <PromotionalBanner />
+        <div className={styles.stickySidebarContent}>
+          <RecentProducts products={recent} onProductClick={onQuickView} />
+          <PromotionalBanner />
+        </div>
       </aside>
       <div className={styles.catalog}>
         <div className={styles.toolbar}>
