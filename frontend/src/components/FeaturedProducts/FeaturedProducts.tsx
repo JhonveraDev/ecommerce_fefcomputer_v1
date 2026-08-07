@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { ProductCardActions } from '../ProductCardActions';
 import styles from './FeaturedProducts.module.css';
 
-type Product = {
+export type Product = {
   id: string;
   slug: string;
   name: string;
@@ -39,13 +39,14 @@ const tabs = [
   { id: 'popular', label: 'Más populares' },
 ];
 
-function ProductCard({ product, onProductClick, onAddToCart, onAddToWishlist, onCompare, onQuickView }: {
+export function ProductCard({ product, onProductClick, onAddToCart, onAddToWishlist, onCompare, onQuickView, compact = false }: {
   product: Product;
   onProductClick?: Props['onProductClick'];
   onAddToCart?: Props['onAddToCart'];
   onAddToWishlist?: Props['onAddToWishlist'];
   onCompare?: Props['onCompare'];
   onQuickView?: Props['onQuickView'];
+  compact?: boolean;
 }) {
   const discount = product.previousPrice
     ? Math.round((1 - product.price / product.previousPrice) * 100)
@@ -53,7 +54,7 @@ function ProductCard({ product, onProductClick, onAddToCart, onAddToWishlist, on
   const label = product.status === 'Oferta' ? `-${discount}%` : product.status === 'Nuevo' ? 'Nuevo' : null;
 
   return (
-    <article className={styles.card}>
+    <article className={`${styles.card} ${compact ? styles.compact : ''}`}>
       {label && <span className={`${styles.badge} ${product.status === 'Nuevo' ? styles.newBadge : ''}`}>{label}</span>}
       <ProductCardActions className={styles.actions} product={product} onAddToWishlist={onAddToWishlist} onCompare={onCompare} onQuickView={onQuickView} />
       <button className={styles.product} type="button" onClick={() => onProductClick?.(product)}>

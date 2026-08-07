@@ -1,0 +1,1 @@
+export { StoreBanner } from './StoreBanner';

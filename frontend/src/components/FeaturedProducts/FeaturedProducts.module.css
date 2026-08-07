@@ -64,6 +64,15 @@
   transform: translateY(-4px);
 }
 
+.compact { height: 400px; padding: 16px; }
+.compact .product img { height: 142px; margin-bottom: 10px; }
+.compact .product h3 { font-size: 14px; min-height: 37px; }
+.compact .rating { margin-top: 8px; }
+.compact .brand { margin-top: 7px; }
+.compact .prices strong { font-size: 16px; }
+.compact .add { min-height: 36px; padding: 0 10px; }
+.compact .actions { top: 75px; }
+
 .actions {
   left: 50%;
   opacity: 0;

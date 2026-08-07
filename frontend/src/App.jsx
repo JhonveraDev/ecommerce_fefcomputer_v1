@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Header } from './components/Header/Header.jsx';
 import { Hero } from './components/Hero/Hero.jsx';
 import { FeaturedCategories } from './components/FeaturedCategories';
@@ -9,6 +9,7 @@ import { DealsCarousel } from './components/DealsCarousel';
 import { FeaturedProducts } from './components/FeaturedProducts';
 import { QuickViewModal } from './components/QuickViewModal';
 import { TimedDeals } from './components/TimedDeals';
+import { StorePage } from './pages/StorePage';
 import { featuredCategoryItems } from './data/featuredCategories.tsx';
 import { homePromoBanners } from './data/promoBanners';
 import { newsletterOffer } from './data/newsletterOffer';
@@ -18,6 +19,10 @@ import { featuredProducts } from './data/featuredProducts';
 
 export default function App() {
   const [quickViewProduct, setQuickViewProduct] = useState(null);
+  const [page, setPage] = useState(() => window.location.hash === '#tienda' ? 'store' : 'home');
+  useEffect(() => { const updatePage = () => setPage(window.location.hash === '#tienda' ? 'store' : 'home'); window.addEventListener('hashchange', updatePage); return () => window.removeEventListener('hashchange', updatePage); }, []);
+
+  if (page === 'store') return <><Header /><StorePage onQuickView={setQuickViewProduct} /><NewsletterOffer {...newsletterOffer} onSubmit={(email) => console.info('Suscripción solicitada:', email)} /><Footer {...footerData} /><QuickViewModal product={quickViewProduct} onClose={() => setQuickViewProduct(null)} onAddToCart={(product, quantity) => console.info('Producto agregado:', product.slug, 'cantidad:', quantity)} onAddToWishlist={(product) => console.info('TODO: agregar a favoritos:', product.slug)} onCompare={(product) => console.info('TODO: comparar producto:', product.slug)} /></>;
 
   return (
     <>
