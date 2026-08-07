@@ -28,8 +28,6 @@ export function QuickViewModal({ product, onClose, onAddToCart, onAddToWishlist,
 
   useEffect(() => {
     if (!product) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
     closeButton.current?.focus();
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') { requestClose(); return; }
@@ -41,7 +39,7 @@ export function QuickViewModal({ product, onClose, onAddToCart, onAddToWishlist,
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     };
     window.addEventListener('keydown', onKeyDown);
-    return () => { window.clearTimeout(closeTimer.current); document.body.style.overflow = previousOverflow; window.removeEventListener('keydown', onKeyDown); };
+    return () => { window.clearTimeout(closeTimer.current); window.removeEventListener('keydown', onKeyDown); };
   }, [product]);
 
   useEffect(() => { setQuantity(1); setIsClosing(false); }, [product?.id]);
