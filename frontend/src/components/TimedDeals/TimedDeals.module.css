@@ -1,0 +1,244 @@
+.section {
+  margin: 0 auto 62px;
+  max-width: 1586px;
+}
+
+.section header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 42px;
+}
+
+.section h2 {
+  color: var(--color-navy);
+  font-size: 33px;
+  letter-spacing: -.035em;
+  margin: 0;
+}
+
+.section header a {
+  align-items: center;
+  color: var(--color-text-muted);
+  display: inline-flex;
+  font-size: 14px;
+  gap: 7px;
+  text-decoration: none;
+}
+
+.section header a:hover {
+  color: var(--color-primary);
+}
+
+.grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.card {
+  min-width: 0;
+  padding-bottom: 103px;
+  position: relative;
+}
+
+.visual {
+  background-color: var(--color-surface-blue);
+  background-position: center;
+  background-size: cover;
+  border-radius: var(--radius-lg);
+  height: 334px;
+  position: relative;
+}
+
+.visual::after {
+  background: linear-gradient(180deg, transparent, rgba(10, 35, 66, .14));
+  border-radius: inherit;
+  content: '';
+  inset: 0;
+  position: absolute;
+}
+
+.countdown {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 175px;
+  z-index: 1;
+}
+
+.countdown span {
+  background: var(--color-surface);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-float);
+  display: grid;
+  height: 65px;
+  place-content: center;
+  text-align: center;
+  width: 62px;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.card:hover .countdown span,
+.card:focus-within .countdown span {
+  box-shadow: var(--shadow-float);
+  border-color: var(--color-border-strong);
+}
+
+.countdown b {
+  color: var(--color-success);
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.countdown small {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+.content {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  bottom: 0;
+  box-shadow: var(--shadow-card);
+  left: 25px;
+  padding: 20px 24px;
+  position: absolute;
+  right: 25px;
+  transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.card:hover .content,
+.card:focus-within .content {
+  box-shadow: var(--shadow-float);
+  transform: translateY(-5px);
+}
+
+.title {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.title h3 {
+  color: var(--color-navy);
+  font-size: 15px;
+  line-height: 1.3;
+  margin: 0;
+  min-height: 39px;
+}
+
+.rating {
+  align-items: center;
+  color: var(--color-warning);
+  display: flex;
+  gap: 1px;
+  margin: 8px 0 7px;
+}
+
+.rating small {
+  color: var(--color-text-subtle);
+  font-size: 11px;
+  margin-left: 5px;
+}
+
+.content>p {
+  color: var(--color-text-subtle);
+  font-size: 12px;
+  margin: 0 0 14px;
+}
+
+.content>p span {
+  color: var(--color-success);
+}
+
+.footer {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.footer>div {
+  align-items: baseline;
+  display: flex;
+  gap: 9px;
+}
+
+.footer strong {
+  color: var(--color-success);
+  font-size: 18px;
+}
+
+.footer del {
+  color: var(--color-text-subtle);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.add {
+  align-items: center;
+  background: var(--color-surface-blue);
+  border: 0;
+  border-radius: var(--radius-sm);
+  color: var(--color-primary);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 700;
+  gap: 5px;
+  padding: 10px 13px;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.add:hover {
+  background: var(--color-primary);
+  color: var(--color-surface);
+}
+
+@media (max-width: 1650px) {
+  .section {
+    margin-left: 32px;
+    margin-right: 32px;
+  }
+}
+
+@media (max-width: 1050px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .section {
+    margin: 0 16px 44px;
+  }
+
+  .section header {
+    margin-bottom: 25px;
+  }
+
+  .section h2 {
+    font-size: 28px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .visual {
+    height: 310px;
+  }
+
+  .content {
+    left: 20px;
+    right: 20px;
+  }
+}

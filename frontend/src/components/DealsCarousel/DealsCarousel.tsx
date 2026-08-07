@@ -29,8 +29,8 @@ export function DealsCarousel({products,bannerImage,bannerTitle,bannerCtaLabel,o
   const move=(direction:'next'|'previous')=>setStart(value=>direction==='next'?(value>=maxStart?0:value+1):Math.max(0,value-1));
   useEffect(()=>{ if(paused||!maxStart)return; const timer=window.setInterval(()=>move('next'),6500); return()=>window.clearInterval(timer); },[paused,maxStart]);
   const choose=(id:string)=>{setTab(id);setStart(0)};
-  return <section className={styles.section} aria-label="Ofertas del día">
-    <header><h2>Ofertas del día</h2><nav aria-label="Ordenar ofertas">{[['featured','Destacados'],['popular','Populares'],['new','Recién agregados']].map(([id,label])=><button key={id} className={tab===id?styles.active:''} onClick={()=>choose(id)}>{label}</button>)}</nav></header>
+  return <section className={styles.section} aria-label="Descuentos">
+    <header><h2>Descuentos</h2><nav aria-label="Ordenar ofertas">{[['featured','Destacados'],['popular','Populares'],['new','Recién agregados']].map(([id,label])=><button key={id} className={tab===id?styles.active:''} onClick={()=>choose(id)}>{label}</button>)}</nav></header>
     <div className={styles.layout}><aside className={styles.banner}><img src={bannerImage} alt=""/><div><h3>{bannerTitle}</h3><a href="#ofertas">{bannerCtaLabel}<ArrowRight size={15}/></a></div></aside><div className={styles.viewport} onMouseEnter={()=>setPaused(true)} onMouseLeave={()=>setPaused(false)}><div className={styles.trackViewport}><div className={styles.products} style={{'--deal-index':start} as CSSProperties}>{deals.map(p=><Card key={p.id} product={p} onProductClick={onProductClick} onAddToCart={onAddToCart} onAddToWishlist={onAddToWishlist} onCompare={onCompare} onQuickView={onQuickView}/>)}</div></div><button className={`${styles.arrow} ${styles.prev}`} aria-label="Ver ofertas anteriores" disabled={!start} onClick={()=>move('previous')}><ArrowLeft size={20}/></button><button className={`${styles.arrow} ${styles.next}`} aria-label="Ver más ofertas" onClick={()=>move('next')}><ArrowRight size={20}/></button></div></div>
   </section>;
 }

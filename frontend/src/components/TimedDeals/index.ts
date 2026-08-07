@@ -1,0 +1,1 @@
+export { TimedDeals } from './TimedDeals';

@@ -8,6 +8,7 @@ import { Footer } from './components/Footer';
 import { DealsCarousel } from './components/DealsCarousel';
 import { FeaturedProducts } from './components/FeaturedProducts';
 import { QuickViewModal } from './components/QuickViewModal';
+import { TimedDeals } from './components/TimedDeals';
 import { featuredCategoryItems } from './data/featuredCategories.tsx';
 import { homePromoBanners } from './data/promoBanners';
 import { newsletterOffer } from './data/newsletterOffer';
@@ -51,6 +52,11 @@ export default function App() {
         onAddToWishlist={(product) => console.info('TODO: agregar a favoritos:', product.slug)}
         onCompare={(product) => console.info('TODO: comparar producto:', product.slug)}
         onQuickView={setQuickViewProduct}
+      />
+      <TimedDeals
+        products={dailyDealProducts}
+        onProductClick={(product) => console.info('Producto seleccionado:', product.slug)}
+        onAddToCart={(product) => console.info('Producto agregado:', product.slug)}
       />
       <NewsletterOffer
         {...newsletterOffer}
