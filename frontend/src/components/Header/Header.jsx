@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ChevronDown,
   ChevronRight,
@@ -24,9 +24,9 @@ const navigationItems = [
   { label: 'Nosotros' },
   { label: 'Tienda', dropdown: true },
   { label: 'Marcas', dropdown: true },
-  { label: 'Tecnología', dropdown: true },
+  { label: 'TecnologÃ­a', dropdown: true },
   { label: 'Blog', dropdown: true },
-  { label: 'Páginas', dropdown: true },
+  { label: 'PÃ¡ginas', dropdown: true },
   { label: 'Contacto' },
 ];
 
@@ -45,7 +45,7 @@ function Brand() {
       </span>
       <span>
         <strong>FEF</strong><b>COMPUTER</b>
-        <small>TECNOLOGÍA Y CONFIANZA</small>
+        <small>TECNOLOGÃA Y CONFIANZA</small>
       </span>
     </a>
   );
@@ -77,6 +77,20 @@ function CartHeaderAction({ value, open, setOpen }) {
 export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [miniCartOpen, setMiniCartOpen] = useState(false);
+  const getSearchFromUrl = () => new URLSearchParams(window.location.hash.split('?')[1] || window.location.search).get('search') || '';
+  const [search, setSearch] = useState(getSearchFromUrl);
+  useEffect(() => {
+    const syncSearch = () => setSearch(getSearchFromUrl());
+    window.addEventListener('hashchange', syncSearch);
+    window.addEventListener('popstate', syncSearch);
+    return () => { window.removeEventListener('hashchange', syncSearch); window.removeEventListener('popstate', syncSearch); };
+  }, []);
+  const submitSearch = (event) => {
+    event.preventDefault();
+    const query = search.trim();
+    window.location.hash = query ? `tienda?search=${encodeURIComponent(query)}` : 'tienda';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <header className={styles.header} id="inicio">
@@ -88,10 +102,10 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
             <a href="#favoritos">Favoritos</a>
             <a href="#rastrear">Rastrea tu pedido</a>
           </nav>
-          <p className={styles.tagline}>Tecnología para potenciar tus ideas</p>
+          <p className={styles.tagline}>TecnologÃ­a para potenciar tus ideas</p>
           <div className={styles.topControls}>
-            <span>¿Necesitas ayuda? <a href="tel:+573000000000">Llámanos: <b>+57 311 8961906</b></a></span>
-            <button type="button">Español <ChevronDown size={12} /></button>
+            <span>Â¿Necesitas ayuda? <a href="tel:+573000000000">LlÃ¡manos: <b>+57 311 8961906</b></a></span>
+            <button type="button">EspaÃ±ol <ChevronDown size={12} /></button>
             <button type="button">COP <ChevronDown size={12} /></button>
           </div>
         </div>
@@ -100,23 +114,23 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
       <div className={styles.mainBar}>
         <div className={`${styles.container} ${styles.mainContent}`}>
           <Brand />
-          <form className={styles.searchBar} role="search">
+          <form className={styles.searchBar} role="search" onSubmit={submitSearch}>
             <button className={styles.categorySelect} type="button">
-              Todas las categorías <ChevronDown size={15} />
+              Todas las categorÃ­as <ChevronDown size={15} />
             </button>
             <label className="srOnly" htmlFor="product-search">Buscar productos</label>
-            <input id="product-search" type="search" placeholder="Busca computadores, periféricos y más…" />
+            <input id="product-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Busca computadores, periféricos y más…" />
             <button className={styles.searchButton} type="submit" aria-label="Buscar"><Search size={24} /></button>
           </form>
           <button className={styles.location} type="button">
             <MapPin size={19} />
-            <span><b>Tu ubicación</b><small>Selecciona tu ciudad</small></span>
+            <span><b>Tu ubicaciÃ³n</b><small>Selecciona tu ciudad</small></span>
             <ChevronDown size={14} />
           </button>
           <div className={styles.actions}>
             {actionItems.map((action) => action.label === 'Carrito' ? <CartHeaderAction key={action.label} value={cartCount} open={miniCartOpen} setOpen={setMiniCartOpen} /> : <HeaderAction key={action.label} {...action} value={action.label === 'Favoritos' ? wishlistCount : action.label === 'Comparar' ? compareCount : action.value} onClick={action.label === 'Favoritos' ? () => { window.location.hash = 'favoritos'; } : action.label === 'Comparar' ? () => { window.location.hash = 'comparar'; } : undefined} />)}
           </div>
-          <button className={styles.mobileToggle} type="button" aria-label="Abrir menú" aria-expanded={mobileMenuOpen} onClick={() => setMobileMenuOpen((open) => !open)}>
+          <button className={styles.mobileToggle} type="button" aria-label="Abrir menÃº" aria-expanded={mobileMenuOpen} onClick={() => setMobileMenuOpen((open) => !open)}>
             {mobileMenuOpen ? <X /> : <Menu />}
           </button>
         </div>
@@ -124,8 +138,8 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
 
       <div className={`${styles.navigationBar} ${mobileMenuOpen ? styles.menuOpen : ''}`}>
         <div className={`${styles.container} ${styles.navigationContent}`}>
-          <button className={styles.browseCategories} type="button"><Grid2X2 size={20} /> Explorar categorías <ChevronDown size={16} /></button>
-          <nav className={styles.primaryNavigation} aria-label="Navegación principal">
+          <button className={styles.browseCategories} type="button"><Grid2X2 size={20} /> Explorar categorÃ­as <ChevronDown size={16} /></button>
+          <nav className={styles.primaryNavigation} aria-label="NavegaciÃ³n principal">
             {navigationItems.map(({ label, icon: Icon, accent, active, dropdown }) => (
               <a key={label} href={`#${label.toLowerCase()}`} className={`${accent ? styles.accentItem : ''} ${active ? styles.activeItem : ''}`}>
                 {Icon ? <Icon size={20} /> : null}{label}{dropdown ? <ChevronDown size={14} /> : null}
@@ -136,7 +150,7 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
             <Headphones size={35} strokeWidth={1.8} />
             <span><b>+57 311 896 1906</b><small>Soporte al cliente</small></span>
           </a>
-          <a className={styles.mobileBrowse} href="#categorias">Ver todas las categorías <ChevronRight size={16} /></a>
+          <a className={styles.mobileBrowse} href="#categorias">Ver todas las categorÃ­as <ChevronRight size={16} /></a>
         </div>
       </div>
     </header>
