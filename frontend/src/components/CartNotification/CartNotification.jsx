@@ -11,7 +11,7 @@ export function CartNotification() {
     return () => window.clearTimeout(timer);
   }, [notice, dismissNotice]);
   if (!notice) return null;
-  const openCart = () => { window.location.hash = 'carrito'; dismissNotice(); };
+  const openCart = () => { window.location.hash = 'carrito'; window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' })); dismissNotice(); };
   return <aside className={styles.toast} role="status" aria-live="polite">
     <header><CheckCircle2 size={25} aria-hidden="true" /><b>Artículo añadido a la cesta</b><button type="button" aria-label="Cerrar notificación" onClick={dismissNotice}><X size={19} /></button></header>
     <div className={styles.product}><img src={notice.product.image} alt={notice.product.name} /><div><strong>{notice.product.name}</strong>{notice.product.brand && <span>{notice.product.brand}</span>}{notice.quantity > 1 && <small>Cantidad: {notice.quantity}</small>}</div></div>
