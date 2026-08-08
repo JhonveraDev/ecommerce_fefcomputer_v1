@@ -50,9 +50,9 @@ function Brand() {
   );
 }
 
-function HeaderAction({ icon: Icon, label, value }) {
+function HeaderAction({ icon: Icon, label, value, onClick }) {
   return (
-    <button className={styles.headerAction} type="button" aria-label={label}>
+    <button className={styles.headerAction} type="button" aria-label={label} onClick={onClick}>
       <span className={styles.actionIcon}>
         <Icon size={27} strokeWidth={1.8} />
         {value ? <span className={styles.counter}>{value}</span> : null}
@@ -62,7 +62,7 @@ function HeaderAction({ icon: Icon, label, value }) {
   );
 }
 
-export function Header() {
+export function Header({ cartCount = 0 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -101,7 +101,7 @@ export function Header() {
             <ChevronDown size={14} />
           </button>
           <div className={styles.actions}>
-            {actionItems.map((action) => <HeaderAction key={action.label} {...action} />)}
+            {actionItems.map((action) => <HeaderAction key={action.label} {...action} value={action.label === 'Carrito' ? cartCount : action.value} onClick={action.label === 'Carrito' ? () => { window.location.hash = 'carrito'; } : undefined} />)}
           </div>
           <button className={styles.mobileToggle} type="button" aria-label="Abrir menú" aria-expanded={mobileMenuOpen} onClick={() => setMobileMenuOpen((open) => !open)}>
             {mobileMenuOpen ? <X /> : <Menu />}
