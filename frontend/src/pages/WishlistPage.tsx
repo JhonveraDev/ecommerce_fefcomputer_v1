@@ -1,0 +1,13 @@
+import { ChevronRight, Heart, Home, ShoppingCart, Star, Trash2 } from 'lucide-react';
+import { useWishlist } from '../context/WishlistContext';
+import { mockProducts } from '../data/mockProducts';
+import styles from './WishlistPage.module.css';
+
+const money = (value: number) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(value);
+
+export function WishlistPage({ onProductClick, onAddToCart }: { onProductClick: (product: any) => void; onAddToCart: (product: any) => void }) {
+  const { productIds, removeFromWishlist } = useWishlist() as any;
+  const products = mockProducts.filter((product) => productIds.includes(product.id));
+  if (!products.length) return <main className={styles.page}><nav className={styles.breadcrumb} aria-label="Migas de pan"><a href="#inicio"><Home size={16} />Inicio</a><ChevronRight size={15} /><a href="#tienda">Tienda</a><ChevronRight size={15} /><b>Favoritos</b></nav><section className={styles.empty}><Heart size={52} /><h1>Tu lista de deseos está vacía</h1><p>Guarda los productos que más te interesen para verlos aquí.</p><a href="#tienda">Ir a la tienda</a></section></main>;
+  return <main className={styles.page}><nav className={styles.breadcrumb} aria-label="Migas de pan"><a href="#inicio"><Home size={16} />Inicio</a><ChevronRight size={15} /><a href="#tienda">Tienda</a><ChevronRight size={15} /><b>Favoritos</b></nav><header className={styles.heading}><h1>Lista de deseos</h1><p>Tienes <b>{products.length}</b> {products.length === 1 ? 'producto' : 'productos'} guardados</p></header><section className={styles.table}><header><span>Producto</span><span>Precio</span><span>Estado</span><span>Acción</span><span>Eliminar</span></header>{products.map((product) => { const outOfStock = product.status === 'Agotado' || product.stock === 0; return <article key={product.id}><button className={styles.product} type="button" onClick={() => onProductClick(product)}><img src={product.image} alt={product.name} /><span><b>{product.name}</b><i>{Array.from({ length: 5 }, (_, index) => <Star key={index} size={13} fill={index < Math.round(product.rating) ? 'currentColor' : 'none'} />)} <small>({product.reviewCount})</small></i></span></button><strong className={styles.price}>{money(product.price)}</strong><span className={`${styles.stock} ${outOfStock ? styles.out : ''}`}>{outOfStock ? 'Agotado' : 'En stock'}</span><button className={styles.add} type="button" disabled={outOfStock} onClick={() => onAddToCart(product)}><ShoppingCart size={16} />Agregar</button><button className={styles.remove} type="button" aria-label={`Quitar ${product.name} de favoritos`} onClick={() => removeFromWishlist(product.id)}><Trash2 size={17} /></button></article>; })}</section></main>;
+}

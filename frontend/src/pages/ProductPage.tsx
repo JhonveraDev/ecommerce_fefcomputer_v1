@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { Product } from '../components/FeaturedProducts/FeaturedProducts';
 import { StoreSidebar } from '../components/StoreSidebar';
 import { RelatedProducts } from '../components/RelatedProducts';
+import { useWishlist } from '../context/WishlistContext';
 import styles from './ProductPage.module.css';
 
 type FullProduct = Product & { description?: string; shortDescription?: string; sku?: string; stock?: number };
@@ -28,8 +29,9 @@ function Rating({ product }: { product: FullProduct }) {
 
 function ProductInformation({ product, onAddToCart, onAddToWishlist, onCompare }: Omit<Props, 'product'> & { product: FullProduct }) {
   const [quantity, setQuantity] = useState(1);
-  const [wishlisted, setWishlisted] = useState(false);
-  useEffect(() => { setQuantity(1); setWishlisted(false); }, [product.id]);
+  const { isFavorite, toggleWishlist } = useWishlist() as any;
+  const wishlisted = isFavorite(product.id);
+  useEffect(() => { setQuantity(1); }, [product.id]);
   const outOfStock = product.status === 'Agotado' || !product.stock;
   const discount = product.previousPrice && product.previousPrice > product.price ? Math.round((1 - product.price / product.previousPrice) * 100) : 0;
   const increment = () => setQuantity((value) => Math.min(product.stock || 1, value + 1));
@@ -43,7 +45,7 @@ function ProductInformation({ product, onAddToCart, onAddToWishlist, onCompare }
     <div className={styles.purchase}>
       <div className={styles.quantity} aria-label="Seleccionar cantidad"><button type="button" aria-label="Reducir cantidad" disabled={quantity === 1} onClick={() => setQuantity((value) => Math.max(1, value - 1))}><Minus size={17} /></button><span>{quantity}</span><button type="button" aria-label="Aumentar cantidad" disabled={outOfStock || quantity >= (product.stock || 1)} onClick={increment}><Plus size={17} /></button></div>
       <button className={styles.add} type="button" disabled={outOfStock} onClick={() => onAddToCart(product, quantity)}><ShoppingCart size={19} />Agregar al carrito</button>
-      <button className={`${styles.iconAction} ${wishlisted ? styles.activeAction : ''}`} type="button" aria-label="Agregar a favoritos" onClick={() => { setWishlisted(!wishlisted); onAddToWishlist(product); }}><Heart size={20} fill={wishlisted ? 'currentColor' : 'none'} /></button>
+      <button className={`${styles.iconAction} ${wishlisted ? styles.activeAction : ''}`} type="button" aria-label="Agregar a favoritos" onClick={() => { toggleWishlist(product); onAddToWishlist(product); }}><Heart size={20} fill={wishlisted ? 'currentColor' : 'none'} /></button>
       <button className={styles.iconAction} type="button" aria-label="Comparar producto" onClick={() => onCompare(product)}><Sparkles size={19} /></button>
     </div>
     <dl className={styles.meta}><div><dt>Categoría</dt><dd>{product.category}</dd></div>{product.sku && <div><dt>SKU</dt><dd>{product.sku}</dd></div>}<div><dt>Marca</dt><dd>{product.brand}</dd></div><div><dt>Estado</dt><dd>{outOfStock ? 'Agotado' : 'En stock'}</dd></div></dl>

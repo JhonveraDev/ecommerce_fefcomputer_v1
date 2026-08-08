@@ -1,6 +1,7 @@
 import { Eye, Heart, Minus, Plus, ShoppingCart, Star, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useWishlist } from '../../context/WishlistContext';
 import styles from './QuickViewModal.module.css';
 
 type Product = {
@@ -21,6 +22,7 @@ const money = (value: number) => new Intl.NumberFormat('es-CO', { style: 'curren
 
 export function QuickViewModal({ product, onClose, onAddToCart, onAddToWishlist, onCompare }: Props) {
   const [quantity, setQuantity] = useState(1);
+  const { toggleWishlist } = useWishlist() as any;
   const [isClosing, setIsClosing] = useState(false);
   const closeButton = useRef<HTMLButtonElement>(null);
   const modalRef = useRef<HTMLElement>(null);
@@ -77,7 +79,7 @@ export function QuickViewModal({ product, onClose, onAddToCart, onAddToWishlist,
             <div className={styles.quantity} aria-label="Cantidad"><button type="button" aria-label="Reducir cantidad" disabled={quantity === 1} onClick={() => setQuantity((value) => Math.max(1, value - 1))}><Minus size={16} /></button><span>{quantity}</span><button type="button" aria-label="Aumentar cantidad" onClick={() => setQuantity((value) => value + 1)}><Plus size={16} /></button></div>
             <button className={styles.add} type="button" disabled={isOutOfStock} onClick={() => onAddToCart?.(product, quantity)}><ShoppingCart size={18} />Agregar al carrito</button>
           </div>
-          <div className={styles.secondary}><button type="button" onClick={() => onAddToWishlist?.(product)}><Heart size={17} />Favoritos</button><button type="button" onClick={() => onCompare?.(product)}>Comparar</button></div>
+          <div className={styles.secondary}><button type="button" onClick={() => { toggleWishlist(product); onAddToWishlist?.(product); }}><Heart size={17} />Favoritos</button><button type="button" onClick={() => onCompare?.(product)}>Comparar</button></div>
           <dl><div><dt>Marca</dt><dd>{product.brand ?? 'No especificada'}</dd></div><div><dt>Referencia</dt><dd>{product.slug}</dd></div></dl>
         </div>
       </section>

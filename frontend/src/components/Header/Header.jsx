@@ -62,7 +62,7 @@ function HeaderAction({ icon: Icon, label, value, onClick }) {
   );
 }
 
-export function Header({ cartCount = 0 }) {
+export function Header({ cartCount = 0, wishlistCount = 0 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -101,7 +101,7 @@ export function Header({ cartCount = 0 }) {
             <ChevronDown size={14} />
           </button>
           <div className={styles.actions}>
-            {actionItems.map((action) => <HeaderAction key={action.label} {...action} value={action.label === 'Carrito' ? cartCount : action.value} onClick={action.label === 'Carrito' ? () => { window.location.hash = 'carrito'; } : undefined} />)}
+            {actionItems.map((action) => <HeaderAction key={action.label} {...action} value={action.label === 'Carrito' ? cartCount : action.label === 'Favoritos' ? wishlistCount : action.value} onClick={action.label === 'Carrito' ? () => { window.location.hash = 'carrito'; } : action.label === 'Favoritos' ? () => { window.location.hash = 'favoritos'; } : undefined} />)}
           </div>
           <button className={styles.mobileToggle} type="button" aria-label="Abrir menú" aria-expanded={mobileMenuOpen} onClick={() => setMobileMenuOpen((open) => !open)}>
             {mobileMenuOpen ? <X /> : <Menu />}
