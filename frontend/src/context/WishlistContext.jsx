@@ -6,11 +6,17 @@ const readWishlist = () => { try { return JSON.parse(window.localStorage.getItem
 
 export function WishlistProvider({ children }) {
   const [productIds, setProductIds] = useState(readWishlist);
+  const [notice, setNotice] = useState(null);
   useEffect(() => { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(productIds)); }, [productIds]);
   const isFavorite = (productId) => productIds.includes(productId);
-  const toggleWishlist = (product) => setProductIds((current) => current.includes(product.id) ? current.filter((id) => id !== product.id) : [...current, product.id]);
+  const toggleWishlist = (product) => setProductIds((current) => {
+    const added = !current.includes(product.id);
+    setNotice({ id: Date.now(), product, added });
+    return added ? [...current, product.id] : current.filter((id) => id !== product.id);
+  });
   const removeFromWishlist = (productId) => setProductIds((current) => current.filter((id) => id !== productId));
-  const value = useMemo(() => ({ productIds, wishlistCount: productIds.length, isFavorite, toggleWishlist, removeFromWishlist }), [productIds]);
+  const dismissNotice = () => setNotice(null);
+  const value = useMemo(() => ({ productIds, wishlistCount: productIds.length, notice, isFavorite, toggleWishlist, removeFromWishlist, dismissNotice }), [productIds, notice]);
   return <WishlistContext.Provider value={value}>{children}</WishlistContext.Provider>;
 }
 
