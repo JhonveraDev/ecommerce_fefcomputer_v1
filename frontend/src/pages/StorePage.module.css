@@ -61,7 +61,7 @@
   visibility: hidden
 }
 
-.extraCategories > div {
+.extraCategories>div {
   min-height: 0;
   overflow: hidden
 }
@@ -252,8 +252,73 @@
   }
 }
 
-.searchSummary { align-items:center; background:var(--color-surface-blue); border:1px solid var(--color-border); border-radius:var(--radius-lg); display:flex; justify-content:space-between; margin-top:15px; padding:16px 18px; }
-.searchSummary div { display:grid; gap:3px; }.searchSummary span,.searchSummary small { color:var(--color-text-muted); font-size:13px; }.searchSummary strong { color:var(--color-navy); font-size:18px; }
-.searchSummary button,.emptyState button { background:transparent; border:0; color:var(--color-primary); cursor:pointer; font:inherit; font-weight:700; }
-.emptyState { background:var(--color-surface-soft); border:1px dashed var(--color-border-strong); border-radius:var(--radius-lg); margin-top:8px; padding:52px 24px; text-align:center; }.emptyState h2 { color:var(--color-navy); font-size:21px; margin:0 0 9px; }.emptyState p { color:var(--color-text-muted); margin:0 0 20px; }.emptyState button { background:var(--color-primary); border-radius:var(--radius-sm); color:var(--color-surface); padding:11px 17px; }
-@media(max-width:760px) { .searchSummary { align-items:flex-start; flex-direction:column; gap:13px; } }
+.searchSummary {
+  align-items: center;
+  background: var(--color-surface-blue);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 18px;
+}
+
+.searchSummary div {
+  display: grid;
+  gap: 3px;
+}
+
+.searchSummary span,
+.searchSummary small {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.searchSummary strong {
+  color: var(--color-navy);
+  font-size: 18px;
+}
+
+.searchSummary button,
+.emptyState button {
+  background: transparent;
+  border: 0;
+  color: var(--color-primary);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.emptyState {
+  background: var(--color-surface-soft);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  margin-top: 8px;
+  padding: 52px 24px;
+  text-align: center;
+}
+
+.emptyState h2 {
+  color: var(--color-navy);
+  font-size: 21px;
+  margin: 0 0 9px;
+}
+
+.emptyState p {
+  color: var(--color-text-muted);
+  margin: 0 0 20px;
+}
+
+.emptyState button {
+  background: var(--color-primary);
+  border-radius: var(--radius-sm);
+  color: var(--color-surface);
+  padding: 11px 17px;
+}
+
+@media(max-width:760px) {
+  .searchSummary {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 13px;
+  }
+}

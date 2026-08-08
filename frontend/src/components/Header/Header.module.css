@@ -550,6 +550,6 @@
 .headerAction{border:1px solid transparent;box-shadow:none;position:relative;transition:background 180ms ease,border-color 180ms ease,box-shadow 180ms ease,color 180ms ease,transform 180ms ease}.headerAction::after{background:var(--color-primary);border-radius:999px;bottom:2px;content:'';height:3px;left:50%;opacity:0;position:absolute;transform:translateX(-50%) scaleX(.35);transition:opacity 180ms ease,transform 180ms ease;width:18px}.headerAction:hover,.headerAction:focus-visible{background:#f0f8ff;border-color:#d6eafb;box-shadow:0 7px 16px rgba(24,92,145,.12);color:var(--color-primary);transform:translateY(-3px)}.headerAction:hover .actionIcon,.headerAction:focus-visible .actionIcon{color:var(--color-primary)}.headerAction:hover::after,.headerAction:focus-visible::after{opacity:1;transform:translateX(-50%) scaleX(1)}.headerAction:active{box-shadow:none;transform:translateY(-1px)}
 
 
-/* Interacción sutil de las acciones del encabezado. */
+/* Interacciï¿½n sutil de las acciones del encabezado. */
 .headerAction{background:transparent;border-color:transparent;box-shadow:none;transition:color 180ms ease,transform 180ms ease}.headerAction::after{display:none}.headerAction:hover,.headerAction:focus-visible{background:transparent;border-color:transparent;box-shadow:none;color:var(--color-primary);transform:translateY(-2px)}.headerAction:hover .actionIcon,.headerAction:focus-visible .actionIcon{color:var(--color-primary)}.headerAction:active{transform:translateY(-1px)}
 
