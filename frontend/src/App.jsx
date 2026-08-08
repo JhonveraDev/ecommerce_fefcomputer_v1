@@ -16,13 +16,23 @@ import { newsletterOffer } from './data/newsletterOffer';
 import { footerData } from './data/footer';
 import { dailyDealsBanner, dailyDealProducts } from './data/dailyDeals';
 import { featuredProducts } from './data/featuredProducts';
+import { mockProducts } from './data/mockProducts';
+import { ProductPage } from './pages/ProductPage';
 
 export default function App() {
   const [quickViewProduct, setQuickViewProduct] = useState(null);
-  const [page, setPage] = useState(() => window.location.hash === '#tienda' ? 'store' : 'home');
-  useEffect(() => { const updatePage = () => setPage(window.location.hash === '#tienda' ? 'store' : 'home'); window.addEventListener('hashchange', updatePage); return () => window.removeEventListener('hashchange', updatePage); }, []);
+  const getPage = () => window.location.hash === '#tienda' ? 'store' : window.location.hash.startsWith('#producto/') ? 'product' : 'home';
+  const [page, setPage] = useState(getPage);
+  useEffect(() => { const updatePage = () => setPage(getPage()); window.addEventListener('hashchange', updatePage); return () => window.removeEventListener('hashchange', updatePage); }, []);
+  const openProduct = (product) => { window.location.hash = `producto/${product.slug}`; window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const selectedProduct = mockProducts.find((product) => product.slug === decodeURIComponent(window.location.hash.replace('#producto/', '')));
+  const addToCart = (product, quantity = 1) => console.info('Producto agregado:', product.slug, 'cantidad:', quantity);
+  const addToWishlist = (product) => console.info('TODO: agregar a favoritos:', product.slug);
+  const compare = (product) => console.info('TODO: comparar producto:', product.slug);
 
-  if (page === 'store') return <><Header /><StorePage onQuickView={setQuickViewProduct} /><NewsletterOffer {...newsletterOffer} onSubmit={(email) => console.info('Suscripción solicitada:', email)} /><Footer {...footerData} /><QuickViewModal product={quickViewProduct} onClose={() => setQuickViewProduct(null)} onAddToCart={(product, quantity) => console.info('Producto agregado:', product.slug, 'cantidad:', quantity)} onAddToWishlist={(product) => console.info('TODO: agregar a favoritos:', product.slug)} onCompare={(product) => console.info('TODO: comparar producto:', product.slug)} /></>;
+  if (page === 'product') return <><Header /><ProductPage product={selectedProduct} onAddToCart={addToCart} onAddToWishlist={addToWishlist} onCompare={compare} /><NewsletterOffer {...newsletterOffer} onSubmit={(email) => console.info('Suscripción solicitada:', email)} /><Footer {...footerData} /></>;
+
+  if (page === 'store') return <><Header /><StorePage onQuickView={setQuickViewProduct} onProductClick={openProduct} /><NewsletterOffer {...newsletterOffer} onSubmit={(email) => console.info('Suscripción solicitada:', email)} /><Footer {...footerData} /><QuickViewModal product={quickViewProduct} onClose={() => setQuickViewProduct(null)} onAddToCart={addToCart} onAddToWishlist={addToWishlist} onCompare={compare} /></>;
 
   return (
     <>
@@ -41,10 +51,10 @@ export default function App() {
       />
       <FeaturedProducts
         products={featuredProducts}
-        onProductClick={(product) => console.info('Producto seleccionado:', product.slug)}
-        onAddToCart={(product) => console.info('Producto agregado:', product.slug)}
-        onAddToWishlist={(product) => console.info('TODO: agregar a favoritos:', product.slug)}
-        onCompare={(product) => console.info('TODO: comparar producto:', product.slug)}
+        onProductClick={openProduct}
+        onAddToCart={addToCart}
+        onAddToWishlist={addToWishlist}
+        onCompare={compare}
         onQuickView={setQuickViewProduct}
       />
       <DealsCarousel
@@ -52,16 +62,16 @@ export default function App() {
         bannerImage={dailyDealsBanner.image}
         bannerTitle={dailyDealsBanner.title}
         bannerCtaLabel={dailyDealsBanner.ctaLabel}
-        onProductClick={(product) => console.info('Producto seleccionado:', product.slug)}
-        onAddToCart={(product) => console.info('Producto agregado:', product.slug)}
-        onAddToWishlist={(product) => console.info('TODO: agregar a favoritos:', product.slug)}
-        onCompare={(product) => console.info('TODO: comparar producto:', product.slug)}
+        onProductClick={openProduct}
+        onAddToCart={addToCart}
+        onAddToWishlist={addToWishlist}
+        onCompare={compare}
         onQuickView={setQuickViewProduct}
       />
       <TimedDeals
         products={dailyDealProducts}
-        onProductClick={(product) => console.info('Producto seleccionado:', product.slug)}
-        onAddToCart={(product) => console.info('Producto agregado:', product.slug)}
+        onProductClick={openProduct}
+        onAddToCart={addToCart}
       />
       <NewsletterOffer
         {...newsletterOffer}
@@ -71,9 +81,9 @@ export default function App() {
       <QuickViewModal
         product={quickViewProduct}
         onClose={() => setQuickViewProduct(null)}
-        onAddToCart={(product, quantity) => console.info('Producto agregado:', product.slug, 'cantidad:', quantity)}
-        onAddToWishlist={(product) => console.info('TODO: agregar a favoritos:', product.slug)}
-        onCompare={(product) => console.info('TODO: comparar producto:', product.slug)}
+        onAddToCart={addToCart}
+        onAddToWishlist={addToWishlist}
+        onCompare={compare}
       />
     </>
   );
