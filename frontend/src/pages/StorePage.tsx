@@ -1,20 +1,19 @@
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Grid2X2, SlidersHorizontal } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Grid2X2, SlidersHorizontal } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { ProductCard, type Product } from '../components/FeaturedProducts/FeaturedProducts';
+import { StoreSidebar } from '../components/StoreSidebar';
 import { StoreBanner } from '../components/StoreBanner';
-import { PromotionalBanner, RecentProducts } from '../components/StoreSidebar';
 import { TimedDeals } from '../components/TimedDeals';
-import { mockProducts, productCategories } from '../data/mockProducts';
+import { mockProducts } from '../data/mockProducts';
 import styles from './StorePage.module.css';
 
 const PAGE_SIZE = 20;
-const INITIAL_CATEGORY_COUNT = 8;
 const pageButtons = (page: number, total: number) => total <= 5 ? Array.from({ length: total }, (_, index) => index + 1) : [1, 2, 3, '…', total];
 
 export function StorePage({ onQuickView, onProductClick }: { onQuickView: (product: Product) => void; onProductClick: (product: Product) => void }) {
+  const initialCategory = () => new URLSearchParams(window.location.hash.split('?')[1] || '').get('categoria') || 'Todas';
   const [page, setPage] = useState(1);
-  const [category, setCategory] = useState('Todas');
-  const [categoriesExpanded, setCategoriesExpanded] = useState(false);
+  const [category, setCategory] = useState(initialCategory);
   const [sort, setSort] = useState('featured');
   const filtered = useMemo(() => mockProducts
     .filter((product) => category === 'Todas' || product.category === category)
@@ -22,26 +21,11 @@ export function StorePage({ onQuickView, onProductClick }: { onQuickView: (produ
   const total = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const shown = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const selectCategory = (value: string) => { setCategory(value); setPage(1); };
-  const recent = mockProducts.filter((product) => product.status === 'Nuevo').slice().reverse();
-  const visibleCategories = productCategories.slice(0, INITIAL_CATEGORY_COUNT);
-  const extraCategories = productCategories.slice(INITIAL_CATEGORY_COUNT);
 
   return <main>
     <StoreBanner title="Tienda" items={['Inicio', 'Tienda']} />
     <section className={styles.layout}>
-      <aside className={styles.sidebar}>
-        <div className={styles.filters}>
-          <h2>Categorías</h2>
-          <button className={category === 'Todas' ? styles.selected : ''} onClick={() => selectCategory('Todas')}>Todas<span>{mockProducts.length}</span></button>
-          {visibleCategories.map((categoryName) => <button key={categoryName} className={category === categoryName ? styles.selected : ''} onClick={() => selectCategory(categoryName)}>{categoryName}<span>{mockProducts.filter((product) => product.category === categoryName).length}</span></button>)}
-          {extraCategories.length > 0 && <div id="store-extra-categories" className={`${styles.extraCategories} ${categoriesExpanded ? styles.expanded : ''}`}><div>{extraCategories.map((categoryName) => <button key={categoryName} className={category === categoryName ? styles.selected : ''} onClick={() => selectCategory(categoryName)}>{categoryName}<span>{mockProducts.filter((product) => product.category === categoryName).length}</span></button>)}</div></div>}
-          {extraCategories.length > 0 && <button className={styles.categoryToggle} type="button" aria-expanded={categoriesExpanded} aria-controls="store-extra-categories" onClick={() => setCategoriesExpanded((expanded) => !expanded)}>{categoriesExpanded ? 'Ver menos' : 'Ver más'} {categoriesExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}</button>}
-        </div>
-        <div className={styles.stickySidebarContent}>
-          <RecentProducts products={recent} onProductClick={onQuickView} />
-          <PromotionalBanner />
-        </div>
-      </aside>
+      <StoreSidebar selectedCategory={category} onCategorySelect={selectCategory} onProductClick={onQuickView} />
       <div className={styles.catalog}>
         <div className={styles.toolbar}>
           <p>Encontramos <b>{filtered.length}</b> productos para ti</p>
