@@ -66,7 +66,7 @@ function HeaderAction({ icon: Icon, label, value, onClick }) {
 function CartHeaderAction({ value, open, setOpen }) {
   const closeTimer = useRef();
   const keepOpen = () => { window.clearTimeout(closeTimer.current); setOpen(true); };
-  const scheduleClose = () => { closeTimer.current = window.setTimeout(() => setOpen(false), 260); };
+  const scheduleClose = () => { closeTimer.current = window.setTimeout(() => setOpen(false), 380); };
   return <div className={styles.cartAction} onMouseEnter={keepOpen} onMouseLeave={scheduleClose}>
     <HeaderAction icon={ShoppingCart} label="Carrito" value={value} onClick={() => setOpen((current) => !current)} />
     <MiniCart open={open} onClose={() => setOpen(false)} />
