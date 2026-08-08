@@ -10,7 +10,7 @@ import styles from './StorePage.module.css';
 const PAGE_SIZE = 20;
 const pageButtons = (page: number, total: number) => total <= 5 ? Array.from({ length: total }, (_, index) => index + 1) : [1, 2, 3, '…', total];
 
-export function StorePage({ onQuickView, onProductClick }: { onQuickView: (product: Product) => void; onProductClick: (product: Product) => void }) {
+export function StorePage({ onQuickView, onProductClick, onAddToCart }: { onQuickView: (product: Product) => void; onProductClick: (product: Product) => void; onAddToCart: (product: Product) => void }) {
   const initialCategory = () => new URLSearchParams(window.location.hash.split('?')[1] || '').get('categoria') || 'Todas';
   const [page, setPage] = useState(1);
   const [category, setCategory] = useState(initialCategory);
@@ -34,13 +34,13 @@ export function StorePage({ onQuickView, onProductClick }: { onQuickView: (produ
             <label><SlidersHorizontal size={16} />Ordenar<select value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Destacados</option><option value="price">Precio</option><option value="rating">Calificación</option></select></label>
           </div>
         </div>
-        <div className={styles.grid}>{shown.map((product) => <ProductCard compact key={product.id} product={product} onProductClick={onProductClick} onAddToCart={() => {}} onQuickView={onQuickView} />)}</div>
+        <div className={styles.grid}>{shown.map((product) => <ProductCard compact key={product.id} product={product} onProductClick={onProductClick} onAddToCart={onAddToCart} onQuickView={onQuickView} />)}</div>
         <nav className={styles.pagination} aria-label="Paginación">
           <button disabled={page === 1} onClick={() => setPage(page - 1)}><ChevronLeft size={17} /></button>
           {pageButtons(page, total).map((item, index) => item === '…' ? <span key={`ellipsis-${index}`}>…</span> : <button key={item} className={page === item ? styles.current : ''} onClick={() => setPage(item as number)}>{item}</button>)}
           <button disabled={page === total} onClick={() => setPage(page + 1)}><ChevronRight size={17} /></button>
         </nav>
-        <TimedDeals products={mockProducts} onProductClick={(product) => onProductClick(product as Product)} onAddToCart={(product) => console.info('Producto agregado:', product.slug)} />
+        <TimedDeals products={mockProducts} onProductClick={(product) => onProductClick(product as Product)} onAddToCart={(product) => onAddToCart(product as Product)} />
       </div>
     </section>
   </main>;

@@ -9,3 +9,6 @@
 .productLayout { display: grid; gap: 24px; grid-template-columns: 322px minmax(0, 1fr); }
 .productArea { min-width: 0; }
 @media (max-width: 1180px) { .productLayout { grid-template-columns: 1fr; } }
+.purchase .add { flex: 1 1 210px; font-family: inherit; font-size: 15px; letter-spacing: .005em; line-height: 1; min-height: 50px; min-width: 0; white-space: nowrap; }
+.purchase .add:active { transform: translateY(1px); }
+.purchase .add:focus-visible { outline-offset: 3px; }
