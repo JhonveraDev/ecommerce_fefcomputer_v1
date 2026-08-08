@@ -51,6 +51,51 @@
   width: 22px
 }
 
+.extraCategories {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
+  transition: grid-template-rows 280ms ease, opacity 200ms ease, transform 280ms ease, visibility 0s linear 280ms;
+  visibility: hidden
+}
+
+.extraCategories > div {
+  min-height: 0;
+  overflow: hidden
+}
+
+.extraCategories.expanded {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition: grid-template-rows 320ms ease, opacity 220ms ease, transform 320ms ease;
+  visibility: visible
+}
+
+.filters .categoryToggle {
+  align-items: center;
+  border: 0;
+  color: var(--color-primary);
+  font-weight: 700;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 6px;
+  padding: 10px 4px 0
+}
+
+.filters .categoryToggle:hover {
+  color: var(--color-success)
+}
+
+.filters .categoryToggle:focus-visible {
+  border-radius: var(--radius-sm);
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px
+}
+
 .stickySidebarContent {
   position: sticky;
   top: 24px
@@ -160,11 +205,18 @@
   }
 
   .sidebar {
-    display: none
+    display: block
   }
 
   .grid {
     grid-template-columns: repeat(3, minmax(0, 1fr))
+  }
+
+  .stickySidebarContent {
+    display: grid;
+    gap: 24px;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 322px);
+    position: static
   }
 }
 
@@ -189,6 +241,10 @@
 
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr))
+  }
+
+  .stickySidebarContent {
+    display: block
   }
 
   .pagination {

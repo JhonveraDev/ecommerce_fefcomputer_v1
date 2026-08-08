@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Grid2X2, SlidersHorizontal } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Grid2X2, SlidersHorizontal } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { ProductCard, type Product } from '../components/FeaturedProducts/FeaturedProducts';
 import { StoreBanner } from '../components/StoreBanner';
@@ -8,11 +8,13 @@ import { mockProducts, productCategories } from '../data/mockProducts';
 import styles from './StorePage.module.css';
 
 const PAGE_SIZE = 20;
+const INITIAL_CATEGORY_COUNT = 8;
 const pageButtons = (page: number, total: number) => total <= 5 ? Array.from({ length: total }, (_, index) => index + 1) : [1, 2, 3, '…', total];
 
 export function StorePage({ onQuickView }: { onQuickView: (product: Product) => void }) {
   const [page, setPage] = useState(1);
   const [category, setCategory] = useState('Todas');
+  const [categoriesExpanded, setCategoriesExpanded] = useState(false);
   const [sort, setSort] = useState('featured');
   const filtered = useMemo(() => mockProducts
     .filter((product) => category === 'Todas' || product.category === category)
@@ -21,6 +23,8 @@ export function StorePage({ onQuickView }: { onQuickView: (product: Product) => 
   const shown = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const selectCategory = (value: string) => { setCategory(value); setPage(1); };
   const recent = mockProducts.filter((product) => product.status === 'Nuevo').slice().reverse();
+  const visibleCategories = productCategories.slice(0, INITIAL_CATEGORY_COUNT);
+  const extraCategories = productCategories.slice(INITIAL_CATEGORY_COUNT);
 
   return <main>
     <StoreBanner title="Tienda" items={['Inicio', 'Tienda']} />
@@ -28,7 +32,10 @@ export function StorePage({ onQuickView }: { onQuickView: (product: Product) => 
       <aside className={styles.sidebar}>
         <div className={styles.filters}>
           <h2>Categorías</h2>
-          {['Todas', ...productCategories].map((categoryName) => <button key={categoryName} className={category === categoryName ? styles.selected : ''} onClick={() => selectCategory(categoryName)}>{categoryName}<span>{categoryName === 'Todas' ? mockProducts.length : mockProducts.filter((product) => product.category === categoryName).length}</span></button>)}
+          <button className={category === 'Todas' ? styles.selected : ''} onClick={() => selectCategory('Todas')}>Todas<span>{mockProducts.length}</span></button>
+          {visibleCategories.map((categoryName) => <button key={categoryName} className={category === categoryName ? styles.selected : ''} onClick={() => selectCategory(categoryName)}>{categoryName}<span>{mockProducts.filter((product) => product.category === categoryName).length}</span></button>)}
+          {extraCategories.length > 0 && <div id="store-extra-categories" className={`${styles.extraCategories} ${categoriesExpanded ? styles.expanded : ''}`}><div>{extraCategories.map((categoryName) => <button key={categoryName} className={category === categoryName ? styles.selected : ''} onClick={() => selectCategory(categoryName)}>{categoryName}<span>{mockProducts.filter((product) => product.category === categoryName).length}</span></button>)}</div></div>}
+          {extraCategories.length > 0 && <button className={styles.categoryToggle} type="button" aria-expanded={categoriesExpanded} aria-controls="store-extra-categories" onClick={() => setCategoriesExpanded((expanded) => !expanded)}>{categoriesExpanded ? 'Ver menos' : 'Ver más'} {categoriesExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}</button>}
         </div>
         <div className={styles.stickySidebarContent}>
           <RecentProducts products={recent} onProductClick={onQuickView} />
