@@ -142,7 +142,7 @@
 }
 
 .menuTrigger span { white-space: nowrap }
-.menuTrigger b { color: var(--color-navy); font-weight: 700 }
+.menuTrigger b { color: var(--color-navy); font-weight: 500 }
 .menuTrigger svg:first-child { color: var(--color-primary) }
 .menuTrigger svg:last-child { margin-left: 2px; transition: transform 180ms ease }
 .menuTrigger[aria-expanded='true'] { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(31, 119, 197, .12); color: var(--color-navy) }
