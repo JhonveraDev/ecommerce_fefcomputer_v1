@@ -45,13 +45,13 @@ const categoryImages = {
   Servidores: serverImage,
   'Componentes para PC': graphicsCardImage,
   'Accesorios Tecnológicos': dockingStationImage,
-  'Accesorios TecnolÃ³gicos': dockingStationImage,
+  'Accesorios Tecnológicos': dockingStationImage,
   Periféricos: keyboardImage,
   Almacenamiento: ssdImage,
   Impresoras: printerImage,
   'Equipos de Oficina': miniPcImage,
   'Energía y UPS': upsImage,
-  'EnergÃ­a y UPS': upsImage,
+  'Energía y UPS': upsImage,
 };
 
 export const productCategories = [
