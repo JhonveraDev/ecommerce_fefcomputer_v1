@@ -2,10 +2,11 @@ import { ChevronRight, Heart, Home, Minus, Plus, ShoppingCart, Sparkles, Star } 
 import { useEffect, useMemo, useState } from 'react';
 import type { Product } from '../components/FeaturedProducts/FeaturedProducts';
 import { StoreSidebar } from '../components/StoreSidebar';
+import { RelatedProducts } from '../components/RelatedProducts';
 import styles from './ProductPage.module.css';
 
 type FullProduct = Product & { description?: string; shortDescription?: string; sku?: string; stock?: number };
-type Props = { product: FullProduct | undefined; onAddToCart: (product: FullProduct, quantity: number) => void; onAddToWishlist: (product: FullProduct) => void; onCompare: (product: FullProduct) => void };
+type Props = { product: FullProduct | undefined; onAddToCart: (product: FullProduct, quantity: number) => void; onAddToWishlist: (product: FullProduct) => void; onCompare: (product: FullProduct) => void; onQuickView?: (product: FullProduct) => void };
 const money = (value: number) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(value);
 
 function ProductGallery({ product }: { product: FullProduct }) {
@@ -53,8 +54,8 @@ function ProductDetails({ product }: { product: FullProduct }) {
   return <section className={styles.details}><h2>Detalles del producto</h2><p>{product.description || product.shortDescription || 'No hay información adicional disponible para este producto.'}</p><div><span>Marca <b>{product.brand}</b></span><span>Categoría <b>{product.category}</b></span>{product.sku && <span>SKU <b>{product.sku}</b></span>}</div></section>;
 }
 
-export function ProductPage({ product, onAddToCart, onAddToWishlist, onCompare }: Props) {
+export function ProductPage({ product, onAddToCart, onAddToWishlist, onCompare, onQuickView }: Props) {
   if (!product) return <main className={styles.notFound}><h1>Producto no encontrado</h1><p>El producto que buscas no está disponible o fue eliminado.</p><a href="#tienda">Volver a la tienda</a></main>;
   const browseCategory = (category: string) => { window.location.hash = `#tienda?categoria=${encodeURIComponent(category)}`; };
-  return <main className={styles.page}><nav className={styles.breadcrumb} aria-label="Migas de pan"><a href="#inicio"><Home size={16} />Inicio</a><ChevronRight size={15} /><a href="#tienda">Tienda</a><ChevronRight size={15} /><span>{product.category}</span><ChevronRight size={15} /><b>{product.name}</b></nav><div className={styles.productLayout}><StoreSidebar onCategorySelect={browseCategory} onProductClick={(recentProduct) => { window.location.hash = `#producto/${recentProduct.slug}`; window.scrollTo({ top: 0, behavior: 'smooth' }); }} /><div className={styles.productArea}><div className={styles.content}><ProductGallery product={product} /><ProductInformation product={product} onAddToCart={onAddToCart} onAddToWishlist={onAddToWishlist} onCompare={onCompare} /></div><ProductDetails product={product} /></div></div></main>;
+  return <main className={styles.page}><nav className={styles.breadcrumb} aria-label="Migas de pan"><a href="#inicio"><Home size={16} />Inicio</a><ChevronRight size={15} /><a href="#tienda">Tienda</a><ChevronRight size={15} /><span>{product.category}</span><ChevronRight size={15} /><b>{product.name}</b></nav><div className={styles.productLayout}><StoreSidebar onCategorySelect={browseCategory} onProductClick={(recentProduct) => { window.location.hash = `#producto/${recentProduct.slug}`; window.scrollTo({ top: 0, behavior: 'smooth' }); }} /><div className={styles.productArea}><div className={styles.content}><ProductGallery product={product} /><ProductInformation product={product} onAddToCart={onAddToCart} onAddToWishlist={onAddToWishlist} onCompare={onCompare} /></div><ProductDetails product={product} /><RelatedProducts currentProduct={product} onProductClick={(relatedProduct) => { window.location.hash = `#producto/${relatedProduct.slug}`; window.scrollTo({ top: 0, behavior: 'smooth' }); }} onAddToCart={(relatedProduct) => onAddToCart(relatedProduct, 1)} onAddToWishlist={onAddToWishlist} onCompare={onCompare} onQuickView={onQuickView ?? (() => {})} /></div></div></main>;
 }
