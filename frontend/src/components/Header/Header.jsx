@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   ChevronDown,
   ChevronRight,
@@ -64,7 +64,10 @@ function HeaderAction({ icon: Icon, label, value, onClick }) {
 }
 
 function CartHeaderAction({ value, open, setOpen }) {
-  return <div className={styles.cartAction} onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+  const closeTimer = useRef();
+  const keepOpen = () => { window.clearTimeout(closeTimer.current); setOpen(true); };
+  const scheduleClose = () => { closeTimer.current = window.setTimeout(() => setOpen(false), 260); };
+  return <div className={styles.cartAction} onMouseEnter={keepOpen} onMouseLeave={scheduleClose}>
     <HeaderAction icon={ShoppingCart} label="Carrito" value={value} onClick={() => setOpen((current) => !current)} />
     <MiniCart open={open} onClose={() => setOpen(false)} />
   </div>;
