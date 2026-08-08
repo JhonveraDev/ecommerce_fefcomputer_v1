@@ -16,6 +16,7 @@ import {
   X,
 } from 'lucide-react';
 import styles from './Header.module.css';
+import { MiniCart } from '../MiniCart/MiniCart';
 
 const navigationItems = [
   { label: 'Ofertas', icon: Flame, accent: true },
@@ -62,8 +63,16 @@ function HeaderAction({ icon: Icon, label, value, onClick }) {
   );
 }
 
+function CartHeaderAction({ value, open, setOpen }) {
+  return <div className={styles.cartAction} onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+    <HeaderAction icon={ShoppingCart} label="Carrito" value={value} onClick={() => setOpen((current) => !current)} />
+    <MiniCart open={open} onClose={() => setOpen(false)} />
+  </div>;
+}
+
 export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [miniCartOpen, setMiniCartOpen] = useState(false);
 
   return (
     <header className={styles.header} id="inicio">
@@ -101,7 +110,7 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
             <ChevronDown size={14} />
           </button>
           <div className={styles.actions}>
-            {actionItems.map((action) => <HeaderAction key={action.label} {...action} value={action.label === 'Carrito' ? cartCount : action.label === 'Favoritos' ? wishlistCount : action.label === 'Comparar' ? compareCount : action.value} onClick={action.label === 'Carrito' ? () => { window.location.hash = 'carrito'; } : action.label === 'Favoritos' ? () => { window.location.hash = 'favoritos'; } : action.label === 'Comparar' ? () => { window.location.hash = 'comparar'; } : undefined} />)}
+            {actionItems.map((action) => action.label === 'Carrito' ? <CartHeaderAction key={action.label} value={cartCount} open={miniCartOpen} setOpen={setMiniCartOpen} /> : <HeaderAction key={action.label} {...action} value={action.label === 'Favoritos' ? wishlistCount : action.label === 'Comparar' ? compareCount : action.value} onClick={action.label === 'Favoritos' ? () => { window.location.hash = 'favoritos'; } : action.label === 'Comparar' ? () => { window.location.hash = 'comparar'; } : undefined} />)}
           </div>
           <button className={styles.mobileToggle} type="button" aria-label="Abrir menú" aria-expanded={mobileMenuOpen} onClick={() => setMobileMenuOpen((open) => !open)}>
             {mobileMenuOpen ? <X /> : <Menu />}
