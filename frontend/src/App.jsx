@@ -14,6 +14,7 @@ import { ProductPage } from './pages/ProductPage';
 import { CartPage } from './pages/CartPage';
 import { WishlistPage } from './pages/WishlistPage';
 import { ComparePage } from './pages/ComparePage';
+import { ContactPage } from './pages/ContactPage';
 import { CartProvider, useCart } from './context/CartContext';
 import { WishlistProvider, useWishlist } from './context/WishlistContext';
 import { CompareProvider, useCompare } from './context/CompareContext';
@@ -34,7 +35,7 @@ function Storefront() {
   const wishlist = useWishlist();
   const compareState = useCompare();
   const { wishlistCount } = wishlist;
-  const getPage = (hash = window.location.hash) => hash.startsWith('#tienda') ? 'store' : hash.startsWith('#producto/') ? 'product' : hash === '#carrito' ? 'cart' : hash === '#favoritos' ? 'wishlist' : hash === '#comparar' ? 'compare' : 'home';
+  const getPage = (hash = window.location.hash) => hash.startsWith('#tienda') ? 'store' : hash.startsWith('#producto/') ? 'product' : hash === '#carrito' ? 'cart' : hash === '#favoritos' ? 'wishlist' : hash === '#comparar' ? 'compare' : hash === '#contacto' ? 'contact' : 'home';
   const [locationHash, setLocationHash] = useState(() => window.location.hash);
   const page = getPage(locationHash);
   useEffect(() => { const updateLocation = () => setLocationHash(window.location.hash); window.addEventListener('hashchange', updateLocation); return () => window.removeEventListener('hashchange', updateLocation); }, []);
@@ -49,6 +50,7 @@ function Storefront() {
   if (page === 'cart') return <>{sharedHeader}<CartPage onProductClick={openProduct} /><Footer {...footerData} /></>;
   if (page === 'compare') return <>{sharedHeader}<ComparePage onProductClick={openProduct} onAddToCart={addToCart} /><Footer {...footerData} /></>;
   if (page === 'wishlist') return <>{sharedHeader}<WishlistPage onProductClick={openProduct} onAddToCart={addToCart} /><NewsletterOffer {...newsletterOffer} onSubmit={(email) => console.info('Suscripción solicitada:', email)} /><Footer {...footerData} /></>;
+  if (page === 'contact') return <>{sharedHeader}<ContactPage /><Footer {...footerData} /></>;
   if (page === 'product') return <>{sharedHeader}<ProductPage product={selectedProduct} onAddToCart={addToCart} onAddToWishlist={addToWishlist} onCompare={compare} onQuickView={setQuickViewProduct} /><NewsletterOffer {...newsletterOffer} onSubmit={(email) => console.info('Suscripción solicitada:', email)} /><Footer {...footerData} />{sharedQuickView}</>;
   if (page === 'store') return <>{sharedHeader}<StorePage locationHash={locationHash} onQuickView={setQuickViewProduct} onProductClick={openProduct} onAddToCart={addToCart} /><NewsletterOffer {...newsletterOffer} onSubmit={(email) => console.info('Suscripción solicitada:', email)} /><Footer {...footerData} />{sharedQuickView}</>;
 

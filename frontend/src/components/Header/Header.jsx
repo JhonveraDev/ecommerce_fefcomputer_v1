@@ -141,7 +141,7 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
           <button className={styles.browseCategories} type="button"><Grid2X2 size={20} /> Explorar categorías <ChevronDown size={16} /></button>
           <nav className={styles.primaryNavigation} aria-label="Navegación principal">
             {navigationItems.map(({ label, icon: Icon, accent, active, dropdown }) => (
-              <a key={label} href={`#${label.toLowerCase()}`} className={`${accent ? styles.accentItem : ''} ${active ? styles.activeItem : ''}`}>
+              <a key={label} href={label === 'Contacto' ? '#contacto' : `#${label.toLowerCase()}`} className={`${accent ? styles.accentItem : ''} ${active ? styles.activeItem : ''}`}>
                 {Icon ? <Icon size={20} /> : null}{label}{dropdown ? <ChevronDown size={14} /> : null}
               </a>
             ))}
