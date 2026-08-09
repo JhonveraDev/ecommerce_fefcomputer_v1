@@ -336,7 +336,7 @@
   color: var(--color-primary);
   cursor: pointer;
   font: inherit;
-  font-weight: 700;
+
 }
 
 .searchSummary button {
