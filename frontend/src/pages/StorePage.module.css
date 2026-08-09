@@ -363,24 +363,27 @@
 .searchSummary::before,
 .searchSummary::after {
   border: 1px solid rgba(50, 142, 196, .12);
-  border-radius: 50%;
+  border-radius: 0;
+  clip-path: polygon(25% 7%, 75% 7%, 100% 50%, 75% 93%, 25% 93%, 0 50%);
   content: '';
   pointer-events: none;
   position: absolute;
 }
 
 .searchSummary::before {
-  height: 210px;
+  background: rgba(178, 224, 247, .12);
+  height: 142px;
   right: 8%;
-  top: -130px;
-  width: 210px;
+  top: -68px;
+  width: 164px;
 }
 
 .searchSummary::after {
-  height: 125px;
-  right: 15%;
-  top: -76px;
-  width: 125px;
+  background: rgba(255, 255, 255, .3);
+  height: 86px;
+  right: 18%;
+  top: -20px;
+  width: 100px;
 }
 
 .emptyState {
