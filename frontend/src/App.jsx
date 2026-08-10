@@ -28,6 +28,7 @@ import { CartNotification } from './components/CartNotification/CartNotification
 import { WishlistNotification } from './components/WishlistNotification/WishlistNotification';
 import { CompareNotification } from './components/CompareNotification/CompareNotification';
 import { WhatsAppChat } from './components/WhatsAppChat/WhatsAppChat';
+import { WelcomeOffer } from './components/WelcomeOffer';
 import { featuredCategoryItems } from './data/featuredCategories.tsx';
 import { homePromoBanners } from './data/promoBanners';
 import { newsletterOffer } from './data/newsletterOffer';
@@ -68,6 +69,8 @@ function Storefront() {
   const compare = (product) => compareState.toggleCompare(product);
   const sharedHeader = <Header cartCount={itemCount} wishlistCount={wishlistCount} compareCount={compareState.compareCount} />;
   const sharedQuickView = <QuickViewModal product={quickViewProduct} onClose={() => setQuickViewProduct(null)} onAddToCart={addToCart} onAddToWishlist={addToWishlist} onCompare={compare} />;
+  const welcomeOfferProduct = dailyDealProducts[0];
+  const sharedWelcomeOffer = <WelcomeOffer product={welcomeOfferProduct} onAddToCart={addToCart} onViewProduct={openProduct} />;
 
   if (!isLoading && !isAuthenticated && ['account', 'orders', 'addresses'].includes(page)) { navigate('/login', { replace: true }); return <>{sharedHeader}</>; }
   if (page === 'login') return <>{sharedHeader}<AuthPage mode="login" /><Footer {...footerData} /></>;
@@ -85,10 +88,10 @@ function Storefront() {
   if (page === 'contact') return <>{sharedHeader}<ContactPage /><Footer {...footerData} /></>;
   if (page === 'about') return <>{sharedHeader}<AboutPage /><NewsletterOffer {...newsletterOffer} onSubmit={(email) => console.info('Suscripción solicitada:', email)} /><Footer {...footerData} /></>;
   if (page === 'terms') return <>{sharedHeader}<TermsPage /><Footer {...footerData} /></>;
-  if (page === 'product') return <>{sharedHeader}<ProductPage product={selectedProduct} onAddToCart={addToCart} onAddToWishlist={addToWishlist} onCompare={compare} onQuickView={setQuickViewProduct} /><NewsletterOffer {...newsletterOffer} onSubmit={(email) => console.info('Suscripción solicitada:', email)} /><Footer {...footerData} />{sharedQuickView}</>;
-  if (page === 'store') return <>{sharedHeader}<StorePage locationPath={locationHash} onQuickView={setQuickViewProduct} onProductClick={openProduct} onAddToCart={addToCart} /><NewsletterOffer {...newsletterOffer} onSubmit={(email) => console.info('Suscripción solicitada:', email)} /><Footer {...footerData} />{sharedQuickView}</>;
+  if (page === 'product') return <>{sharedHeader}<ProductPage product={selectedProduct} onAddToCart={addToCart} onAddToWishlist={addToWishlist} onCompare={compare} onQuickView={setQuickViewProduct} /><NewsletterOffer {...newsletterOffer} onSubmit={(email) => console.info('Suscripción solicitada:', email)} /><Footer {...footerData} />{sharedQuickView}{sharedWelcomeOffer}</>;
+  if (page === 'store') return <>{sharedHeader}<StorePage locationPath={locationHash} onQuickView={setQuickViewProduct} onProductClick={openProduct} onAddToCart={addToCart} /><NewsletterOffer {...newsletterOffer} onSubmit={(email) => console.info('Suscripción solicitada:', email)} /><Footer {...footerData} />{sharedQuickView}{sharedWelcomeOffer}</>;
 
-  return <>{sharedHeader}<Hero /><FeaturedCategories title="Categorías destacadas" items={featuredCategoryItems} visibleItems={8} tabs={featuredCategoryItems.slice(0, 4).map((category, index) => ({ id: category.id, label: category.name, active: index === 0 }))} onCategoryClick={(category) => console.info('CategorÃ­a seleccionada:', category.id)} /><PromoBanners items={homePromoBanners} onBannerClick={(banner) => console.info('Promoción seleccionada:', banner.id)} /><FeaturedProducts products={featuredProducts} onProductClick={openProduct} onAddToCart={addToCart} onAddToWishlist={addToWishlist} onCompare={compare} onQuickView={setQuickViewProduct} /><DealsCarousel products={dailyDealProducts} bannerImage={dailyDealsBanner.image} bannerTitle={dailyDealsBanner.title} bannerCtaLabel={dailyDealsBanner.ctaLabel} onProductClick={openProduct} onAddToCart={addToCart} onAddToWishlist={addToWishlist} onCompare={compare} onQuickView={setQuickViewProduct} /><TimedDeals products={dailyDealProducts} onProductClick={openProduct} onAddToCart={addToCart} /><NewsletterOffer {...newsletterOffer} onSubmit={(email) => console.info('Suscripción solicitada:', email)} /><Footer {...footerData} />{sharedQuickView}</>;
+  return <>{sharedHeader}<Hero /><FeaturedCategories title="Categorías destacadas" items={featuredCategoryItems} visibleItems={8} tabs={featuredCategoryItems.slice(0, 4).map((category, index) => ({ id: category.id, label: category.name, active: index === 0 }))} onCategoryClick={(category) => console.info('CategorÃ­a seleccionada:', category.id)} /><PromoBanners items={homePromoBanners} onBannerClick={(banner) => console.info('Promoción seleccionada:', banner.id)} /><FeaturedProducts products={featuredProducts} onProductClick={openProduct} onAddToCart={addToCart} onAddToWishlist={addToWishlist} onCompare={compare} onQuickView={setQuickViewProduct} /><DealsCarousel products={dailyDealProducts} bannerImage={dailyDealsBanner.image} bannerTitle={dailyDealsBanner.title} bannerCtaLabel={dailyDealsBanner.ctaLabel} onProductClick={openProduct} onAddToCart={addToCart} onAddToWishlist={addToWishlist} onCompare={compare} onQuickView={setQuickViewProduct} /><TimedDeals products={dailyDealProducts} onProductClick={openProduct} onAddToCart={addToCart} /><NewsletterOffer {...newsletterOffer} onSubmit={(email) => console.info('Suscripción solicitada:', email)} /><Footer {...footerData} />{sharedQuickView}{sharedWelcomeOffer}</>;
 }
 
 export default function App() { return <AuthProvider><CartProvider><WishlistProvider><CompareProvider><Storefront /><CartNotification /><WishlistNotification /><CompareNotification /><WhatsAppChat /></CompareProvider></WishlistProvider></CartProvider></AuthProvider>; }
