@@ -55,6 +55,13 @@ const actionItems = [
 const categoryIcons = [Gamepad2, Laptop, Monitor, SunMedium, ShieldCheck, Network, Server, Cpu, Cable, Keyboard, HardDrive, Printer, BriefcaseBusiness, BatteryCharging];
 const categoryMenuItems = productCategories.map((label, index) => ({ label, Icon: categoryIcons[index] ?? Grid2X2 }));
 const searchCategoryItems = productCategories.map((label) => ({ label, count: mockProducts.filter((product) => product.category === label).length }));
+const colombianDepartments = ['Amazonas', 'Antioquia', 'Arauca', 'Atlantico', 'Bolivar', 'Boyaca', 'Caldas', 'Caqueta', 'Casanare', 'Cauca', 'Cesar', 'Choco', 'Cordoba', 'Cundinamarca', 'Guainia', 'Guaviare', 'Huila', 'La Guajira', 'Magdalena', 'Meta', 'Narino', 'Norte de Santander', 'Putumayo', 'Quindio', 'Risaralda', 'San Andres, Providencia y Santa Catalina', 'Santander', 'Sucre', 'Tolima', 'Valle del Cauca', 'Vaupes', 'Vichada'];
+function LocationPicker() {
+  const [open, setOpen] = useState(false); const [filter, setFilter] = useState(''); const [location, setLocation] = useState(() => window.localStorage.getItem('fefcomputer-location') || 'Selecciona tu departamento'); const pickerRef = useRef(null); const normalizedFilter = filter.trim().toLocaleLowerCase(); const departments = colombianDepartments.filter((department) => department.toLocaleLowerCase().includes(normalizedFilter));
+  useEffect(() => { if (!open) return undefined; const close = (event) => { if (!pickerRef.current?.contains(event.target)) setOpen(false); }; const escape = (event) => { if (event.key === 'Escape') setOpen(false); }; document.addEventListener('mousedown', close); document.addEventListener('keydown', escape); return () => { document.removeEventListener('mousedown', close); document.removeEventListener('keydown', escape); }; }, [open]);
+  const select = (department) => { window.localStorage.setItem('fefcomputer-location', department); setLocation(department); setFilter(''); setOpen(false); };
+  return <div className={styles.locationPicker} ref={pickerRef}><button className={styles.location} type="button" aria-haspopup="listbox" aria-expanded={open} onClick={() => setOpen((value) => !value)}><MapPin size={19} /><span><b>Tu ubicacion</b><small>{location}</small></span><ChevronDown size={14} /></button>{open && <section className={styles.locationMenu} aria-label="Selecciona tu departamento"><div className={styles.locationSearch}><Search size={17} /><input autoFocus type="search" value={filter} onChange={(event) => setFilter(event.target.value)} placeholder="Buscar departamento" aria-label="Buscar departamento" /></div><div className={styles.locationOptions} role="listbox">{departments.map((department) => <button type="button" role="option" aria-selected={location === department} className={location === department ? styles.selectedLocation : ''} key={department} onClick={() => select(department)}>{department}</button>)}{!departments.length && <p>No encontramos departamentos.</p>}</div><small className={styles.locationCount}>{departments.length} de 32 departamentos</small></section>}</div>;
+}
 
 function CategoryBrowser() {
   const [open, setOpen] = useState(false);
@@ -240,11 +247,7 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
             <input id="product-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Busca computadores, periféricos y más..." />
             <button className={styles.searchButton} type="submit" aria-label="Buscar"><Search size={24} /></button>
           </form>
-          <button className={styles.location} type="button">
-            <MapPin size={19} />
-            <span><b>Tu ubicación</b><small>Selecciona tu ciudad</small></span>
-            <ChevronDown size={14} />
-          </button>
+          <LocationPicker />
           <div className={styles.actions}>
             {actionItems.map((action) => action.label === 'Carrito' ? <CartHeaderAction key={action.label} value={cartCount} open={miniCartOpen} setOpen={setMiniCartOpen} /> : action.label === 'Cuenta' ? <AccountHeaderAction key={action.label} /> : <HeaderAction key={action.label} {...action} value={action.label === 'Favoritos' ? wishlistCount : compareCount} onClick={() => { navigate(action.label === 'Favoritos' ? '/favoritos' : '/comparar'); }} />)}
           </div>
