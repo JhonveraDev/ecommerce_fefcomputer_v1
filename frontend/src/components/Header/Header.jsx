@@ -114,7 +114,6 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
         <div className={styles.container}>
           <nav className={styles.utilityLinks} aria-label="Enlaces de utilidad">
             <a href="#nosotros">Nosotros</a>
-            {isAuthenticated && <a className={styles.userGreeting} href="#cuenta">Hola, {user.name}</a>}
             <a href="#cuenta">Mi cuenta</a>
             <a href="#favoritos">Favoritos</a>
             <a href="#rastrear">Rastrea tu pedido</a>
