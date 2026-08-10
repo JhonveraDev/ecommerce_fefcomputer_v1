@@ -34,7 +34,7 @@ import styles from './Header.module.css';
 import { MiniCart } from '../MiniCart/MiniCart';
 import { AccountPopup } from '../AccountPopup/AccountPopup';
 import { useAuth } from '../../context/AuthContext';
-import { productCategories } from '../../data/mockProducts';
+import { mockProducts, productCategories } from '../../data/mockProducts';
 
 const navigationItems = [
   { label: 'Inicio' },
@@ -52,6 +52,7 @@ const actionItems = [
 
 const categoryIcons = [Gamepad2, Laptop, Monitor, SunMedium, ShieldCheck, Network, Server, Cpu, Cable, Keyboard, HardDrive, Printer, BriefcaseBusiness, BatteryCharging];
 const categoryMenuItems = productCategories.map((label, index) => ({ label, Icon: categoryIcons[index] ?? Grid2X2 }));
+const searchCategoryItems = productCategories.map((label) => ({ label, count: mockProducts.filter((product) => product.category === label).length }));
 
 function CategoryBrowser() {
   const [open, setOpen] = useState(false);
@@ -157,7 +158,8 @@ function SearchCategoryPicker({ selectedCategory, onSelect }) {
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState('');
   const pickerRef = useRef(null);
-  const visibleCategories = productCategories.filter((category) => category.toLocaleLowerCase().includes(filter.toLocaleLowerCase()));
+  const normalizedFilter = filter.trim().toLocaleLowerCase();
+  const visibleCategories = searchCategoryItems.filter(({ label }) => label.toLocaleLowerCase().includes(normalizedFilter));
   useEffect(() => {
     if (!open) return undefined;
     const close = (event) => { if (!pickerRef.current?.contains(event.target)) setOpen(false); };
@@ -166,16 +168,20 @@ function SearchCategoryPicker({ selectedCategory, onSelect }) {
     document.addEventListener('keydown', escape);
     return () => { document.removeEventListener('mousedown', close); document.removeEventListener('keydown', escape); };
   }, [open]);
-  const choose = (category) => { onSelect(category); setFilter(''); setOpen(false); };
+  const choose = (category) => {
+    onSelect(category);
+    setFilter('');
+    setOpen(false);
+    window.location.hash = category ? `tienda?categoria=${encodeURIComponent(category)}` : 'tienda';
+    window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  };
   return <div className={styles.searchCategoryPicker} ref={pickerRef}>
-    <button className={styles.categorySelect} type="button" aria-haspopup="listbox" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
-      <span>{selectedCategory || 'Todas las categorías'}</span><ChevronDown size={15} />
-    </button>
+    <button className={styles.categorySelect} type="button" aria-haspopup="listbox" aria-expanded={open} onClick={() => setOpen((value) => !value)}><span>{selectedCategory || 'Todas las categorías'}</span><ChevronDown size={15} /></button>
     {open && <div className={styles.searchCategoryMenu}>
       <div className={styles.categoryFilter}><Search size={17} /><input autoFocus type="search" value={filter} onChange={(event) => setFilter(event.target.value)} placeholder="Buscar categoría" aria-label="Filtrar categorías" /></div>
       <div className={styles.categoryOptions} role="listbox" aria-label="Categorías de búsqueda">
-        <button type="button" role="option" aria-selected={!selectedCategory} className={!selectedCategory ? styles.selectedCategory : ''} onClick={() => choose('')}>Todas las categorías</button>
-        {visibleCategories.map((category) => <button key={category} type="button" role="option" aria-selected={selectedCategory === category} className={selectedCategory === category ? styles.selectedCategory : ''} onClick={() => choose(category)}>{category}</button>)}
+        <button type="button" role="option" aria-selected={!selectedCategory} className={!selectedCategory ? styles.selectedCategory : ''} onClick={() => choose('')}><span>Todas las categorías</span><small>{mockProducts.length}</small></button>
+        {visibleCategories.map(({ label, count }) => <button key={label} type="button" role="option" aria-selected={selectedCategory === label} className={selectedCategory === label ? styles.selectedCategory : ''} onClick={() => choose(label)}><span>{label}</span><small>{count}</small></button>)}
         {!visibleCategories.length && <p>No encontramos categorías.</p>}
       </div>
     </div>}
@@ -199,7 +205,10 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
   const submitSearch = (event) => {
     event.preventDefault();
     const query = search.trim();
-    window.location.hash = query ? `tienda?search=${encodeURIComponent(query)}` : 'tienda';
+    const parameters = new URLSearchParams();
+    if (query) parameters.set('search', query);
+    if (selectedSearchCategory) parameters.set('categoria', selectedSearchCategory);
+    window.location.hash = parameters.size ? `tienda?${parameters.toString()}` : 'tienda';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

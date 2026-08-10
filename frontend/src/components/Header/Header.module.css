@@ -154,7 +154,7 @@
   color: var(--color-text);
   cursor: pointer;
   display: flex;
-  font-weight: 700;
+
   gap: 14px;
   height: 31px;
   justify-content: space-between;
@@ -744,3 +744,4 @@
   transition-delay: 0s;
   visibility: visible;
 }
+.searchCategoryPicker .categorySelect{max-width:205px;min-width:177px}.categoryOptions button{align-items:center;display:flex;gap:12px;justify-content:space-between}.categoryOptions button span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.categoryOptions button small{background:var(--color-surface-soft);border-radius:10px;color:var(--color-text-subtle);font-size:11px;font-weight:800;padding:2px 7px}.categoryOptions .selectedCategory small,.categoryOptions button:hover small{background:rgba(0,108,229,.12);color:var(--color-primary)}
