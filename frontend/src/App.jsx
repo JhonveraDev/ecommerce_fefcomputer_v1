@@ -25,6 +25,7 @@ import { CompareProvider, useCompare } from './context/CompareContext';
 import { CartNotification } from './components/CartNotification/CartNotification';
 import { WishlistNotification } from './components/WishlistNotification/WishlistNotification';
 import { CompareNotification } from './components/CompareNotification/CompareNotification';
+import { WhatsAppChat } from './components/WhatsAppChat/WhatsAppChat';
 import { featuredCategoryItems } from './data/featuredCategories.tsx';
 import { homePromoBanners } from './data/promoBanners';
 import { newsletterOffer } from './data/newsletterOffer';
@@ -72,4 +73,4 @@ function Storefront() {
   return <>{sharedHeader}<Hero /><FeaturedCategories title="Categorías destacadas" items={featuredCategoryItems} visibleItems={8} tabs={featuredCategoryItems.slice(0, 4).map((category, index) => ({ id: category.id, label: category.name, active: index === 0 }))} onCategoryClick={(category) => console.info('CategorÃ­a seleccionada:', category.id)} /><PromoBanners items={homePromoBanners} onBannerClick={(banner) => console.info('Promoción seleccionada:', banner.id)} /><FeaturedProducts products={featuredProducts} onProductClick={openProduct} onAddToCart={addToCart} onAddToWishlist={addToWishlist} onCompare={compare} onQuickView={setQuickViewProduct} /><DealsCarousel products={dailyDealProducts} bannerImage={dailyDealsBanner.image} bannerTitle={dailyDealsBanner.title} bannerCtaLabel={dailyDealsBanner.ctaLabel} onProductClick={openProduct} onAddToCart={addToCart} onAddToWishlist={addToWishlist} onCompare={compare} onQuickView={setQuickViewProduct} /><TimedDeals products={dailyDealProducts} onProductClick={openProduct} onAddToCart={addToCart} /><NewsletterOffer {...newsletterOffer} onSubmit={(email) => console.info('Suscripción solicitada:', email)} /><Footer {...footerData} />{sharedQuickView}</>;
 }
 
-export default function App() { return <AuthProvider><CartProvider><WishlistProvider><CompareProvider><Storefront /><CartNotification /><WishlistNotification /><CompareNotification /></CompareProvider></WishlistProvider></CartProvider></AuthProvider>; }
+export default function App() { return <AuthProvider><CartProvider><WishlistProvider><CompareProvider><Storefront /><CartNotification /><WishlistNotification /><CompareNotification /><WhatsAppChat /></CompareProvider></WishlistProvider></CartProvider></AuthProvider>; }
