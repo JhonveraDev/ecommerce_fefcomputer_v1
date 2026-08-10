@@ -57,7 +57,10 @@ function CategoryBrowser() {
   const [open, setOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const browserRef = useRef(null);
+  const closeTimer = useRef();
   const visibleCategories = showAll ? categoryMenuItems : categoryMenuItems.slice(0, 10);
+  const keepOpen = () => { window.clearTimeout(closeTimer.current); setOpen(true); };
+  const scheduleClose = () => { closeTimer.current = window.setTimeout(() => setOpen(false), 220); };
 
   useEffect(() => {
     if (!open) return undefined;
@@ -81,11 +84,11 @@ function CategoryBrowser() {
     setOpen(false);
   };
 
-  return <div className={styles.categoryBrowser} ref={browserRef}>
+  return <div className={styles.categoryBrowser} ref={browserRef} onMouseEnter={keepOpen} onMouseLeave={scheduleClose}>
     <button className={styles.browseCategories} type="button" aria-expanded={open} aria-controls="header-category-menu" onClick={() => setOpen((value) => !value)}>
       <Grid2X2 size={20} /> Explorar categorías {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
     </button>
-    {open && <section className={styles.categoryMenu} id="header-category-menu" aria-label="Explorar categorías">
+    <section className={`${styles.categoryMenu} ${open ? styles.categoryMenuOpen : ''}`} id="header-category-menu" aria-label="Explorar categorías" aria-hidden={!open} inert={open ? undefined : ''}>
       <div className={styles.categoryGrid}>
         {visibleCategories.map(({ label, Icon }) => <button key={label} type="button" onClick={() => selectCategory(label)}>
           <span className={styles.categoryMenuIcon}><Icon size={22} strokeWidth={1.8} /></span>
@@ -96,7 +99,7 @@ function CategoryBrowser() {
       {categoryMenuItems.length > 10 && <button className={styles.showMoreCategories} type="button" onClick={() => setShowAll((value) => !value)}>
         <Plus size={20} /> {showAll ? 'Ver menos categorías' : 'Ver más categorías'}
       </button>}
-    </section>}
+    </section>
   </div>;
 }
 

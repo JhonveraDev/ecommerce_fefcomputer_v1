@@ -728,3 +728,19 @@
     grid-template-columns: 1fr;
   }
 }
+
+.categoryMenu {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
+  transition: opacity 180ms ease, transform 180ms ease, visibility 0s linear 180ms;
+  visibility: hidden;
+}
+
+.categoryMenuOpen {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition-delay: 0s;
+  visibility: visible;
+}
