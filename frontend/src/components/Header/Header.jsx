@@ -41,6 +41,7 @@ const navigationItems = [
   { label: 'Tienda' },
   { label: 'Nosotros' },
   { label: 'Contacto' },
+  { label: 'Terminos y condiciones', href: 'terminos-y-condiciones' },
 ];
 
 const actionItems = [
@@ -258,8 +259,8 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
         <div className={`${styles.container} ${styles.navigationContent}`}>
           <CategoryBrowser />
           <nav className={styles.primaryNavigation} aria-label="Navegación principal">
-            {navigationItems.map(({ label }) => {
-              const section = label.toLowerCase();
+            {navigationItems.map(({ label, href }) => {
+              const section = href || label.toLowerCase();
               const isActive = currentSection === section;
               return <a key={label} href={`#${section}`} className={isActive ? styles.activeItem : ''} aria-current={isActive ? 'page' : undefined}>{label}</a>;
             })}
