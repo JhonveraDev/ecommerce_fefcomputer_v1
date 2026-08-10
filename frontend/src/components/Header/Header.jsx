@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ChevronDown,
   ChevronRight,
@@ -153,10 +153,39 @@ function AccountHeaderAction() {
   </div>;
 }
 
+function SearchCategoryPicker({ selectedCategory, onSelect }) {
+  const [open, setOpen] = useState(false);
+  const [filter, setFilter] = useState('');
+  const pickerRef = useRef(null);
+  const visibleCategories = productCategories.filter((category) => category.toLocaleLowerCase().includes(filter.toLocaleLowerCase()));
+  useEffect(() => {
+    if (!open) return undefined;
+    const close = (event) => { if (!pickerRef.current?.contains(event.target)) setOpen(false); };
+    const escape = (event) => { if (event.key === 'Escape') setOpen(false); };
+    document.addEventListener('mousedown', close);
+    document.addEventListener('keydown', escape);
+    return () => { document.removeEventListener('mousedown', close); document.removeEventListener('keydown', escape); };
+  }, [open]);
+  const choose = (category) => { onSelect(category); setFilter(''); setOpen(false); };
+  return <div className={styles.searchCategoryPicker} ref={pickerRef}>
+    <button className={styles.categorySelect} type="button" aria-haspopup="listbox" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
+      <span>{selectedCategory || 'Todas las categorías'}</span><ChevronDown size={15} />
+    </button>
+    {open && <div className={styles.searchCategoryMenu}>
+      <div className={styles.categoryFilter}><Search size={17} /><input autoFocus type="search" value={filter} onChange={(event) => setFilter(event.target.value)} placeholder="Buscar categoría" aria-label="Filtrar categorías" /></div>
+      <div className={styles.categoryOptions} role="listbox" aria-label="Categorías de búsqueda">
+        <button type="button" role="option" aria-selected={!selectedCategory} className={!selectedCategory ? styles.selectedCategory : ''} onClick={() => choose('')}>Todas las categorías</button>
+        {visibleCategories.map((category) => <button key={category} type="button" role="option" aria-selected={selectedCategory === category} className={selectedCategory === category ? styles.selectedCategory : ''} onClick={() => choose(category)}>{category}</button>)}
+        {!visibleCategories.length && <p>No encontramos categorías.</p>}
+      </div>
+    </div>}
+  </div>;
+}
 export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
   const { user, isAuthenticated } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [miniCartOpen, setMiniCartOpen] = useState(false);
+  const [selectedSearchCategory, setSelectedSearchCategory] = useState('');
   const getSearchFromUrl = () => new URLSearchParams(window.location.hash.split('?')[1] || window.location.search).get('search') || '';
   const getCurrentSection = () => window.location.hash.split('?')[0].replace(/^#/, '').toLowerCase() || 'inicio';
   const [search, setSearch] = useState(getSearchFromUrl);
@@ -197,9 +226,7 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
         <div className={`${styles.container} ${styles.mainContent}`}>
           <Brand />
           <form className={styles.searchBar} role="search" onSubmit={submitSearch}>
-            <button className={styles.categorySelect} type="button">
-              Todas las categorías <ChevronDown size={15} />
-            </button>
+            <SearchCategoryPicker selectedCategory={selectedSearchCategory} onSelect={setSelectedSearchCategory} />
             <label className="srOnly" htmlFor="product-search">Buscar productos</label>
             <input id="product-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Busca computadores, periféricos y más..." />
             <button className={styles.searchButton} type="submit" aria-label="Buscar"><Search size={24} /></button>
