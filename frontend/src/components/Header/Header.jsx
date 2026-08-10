@@ -3,7 +3,6 @@ import {
   ChevronDown,
   ChevronRight,
   CircleUserRound,
-  Flame,
   Grid2X2,
   Headphones,
   Heart,
@@ -38,14 +37,9 @@ import { useAuth } from '../../context/AuthContext';
 import { productCategories } from '../../data/mockProducts';
 
 const navigationItems = [
-  { label: 'Ofertas', icon: Flame, accent: true },
-  { label: 'Inicio', dropdown: true, active: true },
+  { label: 'Inicio' },
+  { label: 'Tienda' },
   { label: 'Nosotros' },
-  { label: 'Tienda', dropdown: true },
-  { label: 'Marcas', dropdown: true },
-  { label: 'TecnologÃ­a', dropdown: true },
-  { label: 'Blog', dropdown: true },
-  { label: 'PÃ¡ginas', dropdown: true },
   { label: 'Contacto' },
 ];
 
@@ -161,12 +155,14 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [miniCartOpen, setMiniCartOpen] = useState(false);
   const getSearchFromUrl = () => new URLSearchParams(window.location.hash.split('?')[1] || window.location.search).get('search') || '';
+  const getCurrentSection = () => window.location.hash.split('?')[0].replace(/^#/, '').toLowerCase() || 'inicio';
   const [search, setSearch] = useState(getSearchFromUrl);
+  const [currentSection, setCurrentSection] = useState(getCurrentSection);
   useEffect(() => {
-    const syncSearch = () => setSearch(getSearchFromUrl());
-    window.addEventListener('hashchange', syncSearch);
-    window.addEventListener('popstate', syncSearch);
-    return () => { window.removeEventListener('hashchange', syncSearch); window.removeEventListener('popstate', syncSearch); };
+    const syncHeaderState = () => { setSearch(getSearchFromUrl()); setCurrentSection(getCurrentSection()); };
+    window.addEventListener('hashchange', syncHeaderState);
+    window.addEventListener('popstate', syncHeaderState);
+    return () => { window.removeEventListener('hashchange', syncHeaderState); window.removeEventListener('popstate', syncHeaderState); };
   }, []);
   const submitSearch = (event) => {
     event.preventDefault();
@@ -223,11 +219,11 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
         <div className={`${styles.container} ${styles.navigationContent}`}>
           <CategoryBrowser />
           <nav className={styles.primaryNavigation} aria-label="NavegaciÃ³n principal">
-            {navigationItems.map(({ label, icon: Icon, accent, active, dropdown }) => (
-              <a key={label} href={label === 'Contacto' ? '#contacto' : `#${label.toLowerCase()}`} className={`${accent ? styles.accentItem : ''} ${active ? styles.activeItem : ''}`}>
-                {Icon ? <Icon size={20} /> : null}{label}{dropdown ? <ChevronDown size={14} /> : null}
-              </a>
-            ))}
+            {navigationItems.map(({ label }) => {
+              const section = label.toLowerCase();
+              const isActive = currentSection === section;
+              return <a key={label} href={`#${section}`} className={isActive ? styles.activeItem : ''} aria-current={isActive ? 'page' : undefined}>{label}</a>;
+            })}
           </nav>
           <a className={styles.support} href="tel:+573000000000">
             <Headphones size={35} strokeWidth={1.8} />
