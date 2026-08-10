@@ -4,6 +4,7 @@ import type { Product } from '../components/FeaturedProducts/FeaturedProducts';
 import { StoreSidebar } from '../components/StoreSidebar';
 import { RelatedProducts } from '../components/RelatedProducts';
 import { useWishlist } from '../context/WishlistContext';
+import { navigate } from '../utils/navigation';
 import styles from './ProductPage.module.css';
 
 type FullProduct = Product & { description?: string; shortDescription?: string; sku?: string; stock?: number };
@@ -57,7 +58,7 @@ function ProductDetails({ product }: { product: FullProduct }) {
 }
 
 export function ProductPage({ product, onAddToCart, onAddToWishlist, onCompare, onQuickView }: Props) {
-  if (!product) return <main className={styles.notFound}><h1>Producto no encontrado</h1><p>El producto que buscas no está disponible o fue eliminado.</p><a href="#tienda">Volver a la tienda</a></main>;
-  const browseCategory = (category: string) => { window.location.hash = `#tienda?categoria=${encodeURIComponent(category)}`; };
-  return <main className={styles.page}><nav className={styles.breadcrumb} aria-label="Migas de pan"><a href="#inicio"><Home size={16} />Inicio</a><ChevronRight size={15} /><a href="#tienda">Tienda</a><ChevronRight size={15} /><span>{product.category}</span><ChevronRight size={15} /><b>{product.name}</b></nav><div className={styles.productLayout}><StoreSidebar onCategorySelect={browseCategory} onProductClick={(recentProduct) => { window.location.hash = `#producto/${recentProduct.slug}`; window.scrollTo({ top: 0, behavior: 'smooth' }); }} /><div className={styles.productArea}><div className={styles.content}><ProductGallery product={product} /><ProductInformation product={product} onAddToCart={onAddToCart} onAddToWishlist={onAddToWishlist} onCompare={onCompare} /></div><ProductDetails product={product} /><RelatedProducts currentProduct={product} onProductClick={(relatedProduct) => { window.location.hash = `#producto/${relatedProduct.slug}`; window.scrollTo({ top: 0, behavior: 'smooth' }); }} onAddToCart={(relatedProduct) => onAddToCart(relatedProduct, 1)} onAddToWishlist={onAddToWishlist} onCompare={onCompare} onQuickView={onQuickView ?? (() => {})} /></div></div></main>;
+  if (!product) return <main className={styles.notFound}><h1>Producto no encontrado</h1><p>El producto que buscas no está disponible o fue eliminado.</p><a href="/tienda">Volver a la tienda</a></main>;
+  const browseCategory = (category: string) => { navigate('/tienda?categoria=' + encodeURIComponent(category)); };
+  return <main className={styles.page}><nav className={styles.breadcrumb} aria-label="Migas de pan"><a href="/"><Home size={16} />Inicio</a><ChevronRight size={15} /><a href="/tienda">Tienda</a><ChevronRight size={15} /><span>{product.category}</span><ChevronRight size={15} /><b>{product.name}</b></nav><div className={styles.productLayout}><StoreSidebar onCategorySelect={browseCategory} onProductClick={(recentProduct) => { navigate('/producto/' + recentProduct.slug); }} /><div className={styles.productArea}><div className={styles.content}><ProductGallery product={product} /><ProductInformation product={product} onAddToCart={onAddToCart} onAddToWishlist={onAddToWishlist} onCompare={onCompare} /></div><ProductDetails product={product} /><RelatedProducts currentProduct={product} onProductClick={(relatedProduct) => { navigate('/producto/' + relatedProduct.slug); }} onAddToCart={(relatedProduct) => onAddToCart(relatedProduct, 1)} onAddToWishlist={onAddToWishlist} onCompare={onCompare} onQuickView={onQuickView ?? (() => {})} /></div></div></main>;
 }
