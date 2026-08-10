@@ -55,7 +55,6 @@ export function WhatsAppChat() {
     <button type="button" className={styles.trigger} onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-controls="whatsapp-chat-panel">
       <span className={styles.triggerIcon}><MessageCircle size={22} fill="currentColor" /><Phone size={9} /></span>
       <span><b>¿Necesitas ayuda?</b><small><i />Estamos en línea</small></span>
-      <span className={styles.unread} aria-hidden="true" />
     </button>
   </aside>;
 }
