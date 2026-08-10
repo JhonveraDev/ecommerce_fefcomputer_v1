@@ -173,7 +173,7 @@ function SearchCategoryPicker({ selectedCategory, onSelect }) {
     onSelect(category);
     setFilter('');
     setOpen(false);
-    window.location.hash = category ? `tienda?categoria=${encodeURIComponent(category)}` : 'tienda';
+    navigate(category ? '/tienda?categoria=' + encodeURIComponent(category) : '/tienda');
     window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
   };
   return <div className={styles.searchCategoryPicker} ref={pickerRef}>
@@ -200,8 +200,7 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
   useEffect(() => {
     const syncHeaderState = () => { setSearch(getSearchFromUrl()); setCurrentSection(getCurrentSection()); };
     window.addEventListener('popstate', syncHeaderState);
-    window.addEventListener('popstate', syncHeaderState);
-    return () => { window.removeEventListener('popstate', syncHeaderState); window.removeEventListener('popstate', syncHeaderState); };
+    return () => window.removeEventListener('popstate', syncHeaderState);
   }, []);
   const submitSearch = (event) => {
     event.preventDefault();
@@ -209,7 +208,7 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
     const parameters = new URLSearchParams();
     if (query) parameters.set('search', query);
     if (selectedSearchCategory) parameters.set('categoria', selectedSearchCategory);
-    window.location.hash = parameters.size ? `tienda?${parameters.toString()}` : 'tienda';
+    navigate(parameters.size ? '/tienda?' + parameters.toString() : '/tienda');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
