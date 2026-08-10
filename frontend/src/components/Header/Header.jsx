@@ -35,6 +35,7 @@ import { MiniCart } from '../MiniCart/MiniCart';
 import { AccountPopup } from '../AccountPopup/AccountPopup';
 import { useAuth } from '../../context/AuthContext';
 import { mockProducts, productCategories } from '../../data/mockProducts';
+import { navigate } from '../../utils/navigation';
 
 const navigationItems = [
   { label: 'Inicio' },
@@ -81,8 +82,7 @@ function CategoryBrowser() {
   }, [open]);
 
   const selectCategory = (category) => {
-    window.location.hash = `tienda?categoria=${encodeURIComponent(category)}`;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigate('/tienda?categoria=' + encodeURIComponent(category));
     setOpen(false);
   };
 
@@ -107,7 +107,7 @@ function CategoryBrowser() {
 
 function Brand() {
   return (
-    <a className={styles.brand} href="#inicio" aria-label="FEFCOMPUTER, inicio">
+    <a className={styles.brand} href="/" aria-label="FEFCOMPUTER, inicio">
       <span className={styles.brandMark} aria-hidden="true">
         <MonitorSmartphone size={31} strokeWidth={2.2} />
       </span>
@@ -135,7 +135,7 @@ function CartHeaderAction({ value, open, setOpen }) {
   const closeTimer = useRef();
   const keepOpen = () => { window.clearTimeout(closeTimer.current); setOpen(true); };
   const scheduleClose = () => { closeTimer.current = window.setTimeout(() => setOpen(false), 380); };
-  const openCart = () => { window.location.hash = 'carrito'; window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' })); setOpen(false); };
+  const openCart = () => { navigate('/carrito'); setOpen(false); };
   return <div className={styles.cartAction} onMouseEnter={keepOpen} onMouseLeave={scheduleClose}>
     <HeaderAction icon={ShoppingCart} label="Carrito" value={value} onClick={openCart} />
     <MiniCart open={open} onClose={() => setOpen(false)} />
@@ -148,7 +148,7 @@ function AccountHeaderAction() {
   const { user, isAuthenticated } = useAuth();
   const keepOpen = () => { window.clearTimeout(closeTimer.current); setOpen(true); };
   const scheduleClose = () => { closeTimer.current = window.setTimeout(() => setOpen(false), 420); };
-  const openAccount = () => { window.location.hash = isAuthenticated ? 'cuenta' : 'login'; setOpen(false); };
+  const openAccount = () => { navigate(isAuthenticated ? '/cuenta' : '/login'); setOpen(false); };
   return <div className={styles.accountAction} onMouseEnter={keepOpen} onMouseLeave={scheduleClose}>
     <HeaderAction icon={CircleUserRound} label={isAuthenticated ? `Hola, ${user.name}` : "Cuenta"} onClick={openAccount} />
     <AccountPopup open={open} onClose={() => setOpen(false)} />
@@ -193,15 +193,15 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [miniCartOpen, setMiniCartOpen] = useState(false);
   const [selectedSearchCategory, setSelectedSearchCategory] = useState('');
-  const getSearchFromUrl = () => new URLSearchParams(window.location.hash.split('?')[1] || window.location.search).get('search') || '';
-  const getCurrentSection = () => window.location.hash.split('?')[0].replace(/^#/, '').toLowerCase() || 'inicio';
+  const getSearchFromUrl = () => new URLSearchParams(window.location.search).get('search') || '';
+  const getCurrentSection = () => window.location.pathname.split('/')[1].toLowerCase() || 'inicio';
   const [search, setSearch] = useState(getSearchFromUrl);
   const [currentSection, setCurrentSection] = useState(getCurrentSection);
   useEffect(() => {
     const syncHeaderState = () => { setSearch(getSearchFromUrl()); setCurrentSection(getCurrentSection()); };
-    window.addEventListener('hashchange', syncHeaderState);
     window.addEventListener('popstate', syncHeaderState);
-    return () => { window.removeEventListener('hashchange', syncHeaderState); window.removeEventListener('popstate', syncHeaderState); };
+    window.addEventListener('popstate', syncHeaderState);
+    return () => { window.removeEventListener('popstate', syncHeaderState); window.removeEventListener('popstate', syncHeaderState); };
   }, []);
   const submitSearch = (event) => {
     event.preventDefault();
@@ -218,9 +218,9 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
       <div className={styles.topBar}>
         <div className={styles.container}>
           <nav className={styles.utilityLinks} aria-label="Enlaces de utilidad">
-            <a href="#nosotros">Nosotros</a>
-            <a href="#cuenta">Mi cuenta</a>
-            <a href="#favoritos">Favoritos</a>
+            <a href="/nosotros">Nosotros</a>
+            <a href="/cuenta">Mi cuenta</a>
+            <a href="/favoritos">Favoritos</a>
             <a href="#rastrear">Rastrea tu pedido</a>
           </nav>
           <p className={styles.tagline}>Tecnología para potenciar tus ideas</p>
@@ -247,7 +247,7 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
             <ChevronDown size={14} />
           </button>
           <div className={styles.actions}>
-            {actionItems.map((action) => action.label === 'Carrito' ? <CartHeaderAction key={action.label} value={cartCount} open={miniCartOpen} setOpen={setMiniCartOpen} /> : action.label === 'Cuenta' ? <AccountHeaderAction key={action.label} /> : <HeaderAction key={action.label} {...action} value={action.label === 'Favoritos' ? wishlistCount : compareCount} onClick={() => { window.location.hash = action.label === 'Favoritos' ? 'favoritos' : 'comparar'; }} />)}
+            {actionItems.map((action) => action.label === 'Carrito' ? <CartHeaderAction key={action.label} value={cartCount} open={miniCartOpen} setOpen={setMiniCartOpen} /> : action.label === 'Cuenta' ? <AccountHeaderAction key={action.label} /> : <HeaderAction key={action.label} {...action} value={action.label === 'Favoritos' ? wishlistCount : compareCount} onClick={() => { navigate(action.label === 'Favoritos' ? '/favoritos' : '/comparar'); }} />)}
           </div>
           <button className={styles.mobileToggle} type="button" aria-label="Abrir menú" aria-expanded={mobileMenuOpen} onClick={() => setMobileMenuOpen((open) => !open)}>
             {mobileMenuOpen ? <X /> : <Menu />}
@@ -262,7 +262,7 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
             {navigationItems.map(({ label, href }) => {
               const section = href || label.toLowerCase();
               const isActive = currentSection === section;
-              return <a key={label} href={`#${section}`} className={isActive ? styles.activeItem : ''} aria-current={isActive ? 'page' : undefined}>{label}</a>;
+              return <a key={label} href={section === 'inicio' ? '/' : `/${section}`} className={isActive ? styles.activeItem : ''} aria-current={isActive ? 'page' : undefined}>{label}</a>;
             })}
           </nav>
           <a className={styles.support} href="tel:+573000000000">

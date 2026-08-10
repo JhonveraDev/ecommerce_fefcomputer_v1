@@ -3,8 +3,9 @@ import { Heart, MapPin, Package, Pencil, Scale, UserRound } from 'lucide-react';
 import { StoreBanner } from '../components/StoreBanner';
 import { useAuth } from '../context/AuthContext';
 import styles from './AccountPage.module.css';
+import { navigate } from '../utils/navigation';
 
-const go = (hash) => { window.location.hash = hash; window.scrollTo({ top: 0, behavior: 'smooth' }); };
+const go = (path, close) => { navigate(path); close?.(); };
 const money = (value) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(value));
 
 export function AccountPage() {
@@ -32,7 +33,7 @@ export function AddressesPage() {
 }
 export function OrderDetailPage() {
   const { request } = useAuth();
-  const id = window.location.hash.replace('#mis-pedidos/', '').split('?')[0];
+  const id = window.location.pathname.replace('/mis-pedidos/', '').split('?')[0];
   const [order, setOrder] = useState(null);
   const [error, setError] = useState('');
   useEffect(() => { request('/orders/' + id).then((data) => setOrder(data.order)).catch((e) => setError(e.message)); }, [id, request]);

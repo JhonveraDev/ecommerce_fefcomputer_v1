@@ -4,9 +4,10 @@ import { StoreBanner } from '../components/StoreBanner';
 import { authService } from '../services/authService';
 import { useAuth } from '../context/AuthContext';
 import styles from './AuthPage.module.css';
+import { navigate } from '../utils/navigation';
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const go = (hash) => { window.location.hash = hash; window.scrollTo({ top: 0, behavior: 'smooth' }); };
+const go = (path, close) => { navigate(path); close?.(); };
 const field = (label, name, type = 'text', extra = {}) => ({ label, name, type, ...extra });
 
 export function AuthPage({ mode }) {
@@ -22,7 +23,7 @@ export function AuthPage({ mode }) {
     login: { title: 'Iniciar sesión', subtitle: 'Accede a tu cuenta para disfrutar de todos tus beneficios.', submit: 'Iniciar sesión', icon: LogIn, fields: [field('Correo electrónico', 'email', 'email'), field('Contraseña', 'password', 'password')], action: async () => login({ email: values.email, password: values.password }) },
     register: { title: 'Crear cuenta', subtitle: 'Regístrate para gestionar tus compras y beneficios.', submit: 'Crear cuenta', icon: UserPlus, fields: [field('Nombre', 'name'), field('Apellido', 'lastName'), field('Correo electrónico', 'email', 'email'), field('Teléfono', 'phone', 'tel'), field('Contraseña', 'password', 'password'), field('Confirmar contraseña', 'confirmPassword', 'password')], action: async () => register({ name: values.name, lastName: values.lastName, email: values.email, phone: values.phone, password: values.password }) },
     forgot: { title: 'Recuperar contraseña', subtitle: 'Te enviaremos instrucciones para recuperar el acceso a tu cuenta.', submit: 'Enviar instrucciones', icon: KeyRound, fields: [field('Correo electrónico', 'email', 'email')], action: async () => authService.forgotPassword(values.email) },
-    reset: { title: 'Restablecer contraseña', subtitle: 'Elige una contraseña nueva y segura para tu cuenta.', submit: 'Actualizar contraseña', icon: KeyRound, fields: [field('Nueva contraseña', 'password', 'password'), field('Confirmar contraseña', 'confirmPassword', 'password')], action: async () => authService.resetPassword({ token: new URLSearchParams(window.location.hash.split('?')[1] || '').get('token') || '', password: values.password }) },
+    reset: { title: 'Restablecer contraseña', subtitle: 'Elige una contraseña nueva y segura para tu cuenta.', submit: 'Actualizar contraseña', icon: KeyRound, fields: [field('Nueva contraseña', 'password', 'password'), field('Confirmar contraseña', 'confirmPassword', 'password')], action: async () => authService.resetPassword({ token: new URLSearchParams(window.location.search).get('token') || '', password: values.password }) },
   }[mode];
 
   const validate = () => {
@@ -32,7 +33,7 @@ export function AuthPage({ mode }) {
     if ((mode === 'register' || mode === 'reset') && values.password && values.password.length < 10) next.password = 'La contraseña debe tener al menos 10 caracteres.';
     if ((mode === 'register' || mode === 'reset') && values.password !== values.confirmPassword) next.confirmPassword = 'Las contraseñas no coinciden.';
     if (mode === 'register' && !values.accepted) next.accepted = 'Debes aceptar los términos para crear tu cuenta.';
-    if (mode === 'reset' && !new URLSearchParams(window.location.hash.split('?')[1] || '').get('token')) next.form = 'El enlace de restablecimiento no es válido.';
+    if (mode === 'reset' && !new URLSearchParams(window.location.search).get('token')) next.form = 'El enlace de restablecimiento no es válido.';
     return next;
   };
   const submit = async (event) => {

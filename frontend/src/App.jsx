@@ -34,6 +34,7 @@ import { footerData } from './data/footer';
 import { dailyDealsBanner, dailyDealProducts } from './data/dailyDeals';
 import { featuredProducts } from './data/featuredProducts';
 import { mockProducts } from './data/mockProducts';
+import { navigate } from './utils/navigation';
 
 function Storefront() {
   const [quickViewProduct, setQuickViewProduct] = useState(null);
@@ -42,19 +43,32 @@ function Storefront() {
   const wishlist = useWishlist();
   const compareState = useCompare();
   const { wishlistCount } = wishlist;
-  const getPage = (hash = window.location.hash) => hash.startsWith('#tienda') ? 'store' : hash.startsWith('#producto/') ? 'product' : hash === '#carrito' ? 'cart' : hash === '#favoritos' ? 'wishlist' : hash === '#comparar' ? 'compare' : hash === '#contacto' ? 'contact' : hash === '#nosotros' ? 'about' : hash === '#terminos-y-condiciones' ? 'terms' : hash.startsWith('#login') ? 'login' : hash.startsWith('#registro') ? 'register' : hash.startsWith('#recuperar-password') ? 'forgot' : hash.startsWith('#restablecer-password') ? 'reset' : hash.startsWith('#mis-pedidos/') ? 'order-detail' : hash.startsWith('#mis-pedidos') ? 'orders' : hash === '#mis-direcciones' ? 'addresses' : hash === '#cuenta' ? 'account' : 'home';
-  const [locationHash, setLocationHash] = useState(() => window.location.hash);
+  const getPage = (pathname = window.location.pathname) => pathname.startsWith('/tienda') ? 'store' : pathname.startsWith('/producto/') ? 'product' : pathname === '/carrito' ? 'cart' : pathname === '/favoritos' ? 'wishlist' : pathname === '/comparar' ? 'compare' : pathname === '/contacto' ? 'contact' : pathname === '/nosotros' ? 'about' : pathname === '/terminos-y-condiciones' ? 'terms' : pathname.startsWith('/login') ? 'login' : pathname.startsWith('/registro') ? 'register' : pathname.startsWith('/recuperar-password') ? 'forgot' : pathname.startsWith('/restablecer-password') ? 'reset' : pathname.startsWith('/mis-pedidos/') ? 'order-detail' : pathname.startsWith('/mis-pedidos') ? 'orders' : pathname === '/mis-direcciones' ? 'addresses' : pathname === '/cuenta' ? 'account' : 'home';
+  const [locationHash, setLocationHash] = useState(() => window.location.pathname + window.location.search);
   const page = getPage(locationHash);
-  useEffect(() => { const updateLocation = () => setLocationHash(window.location.hash); window.addEventListener('hashchange', updateLocation); return () => window.removeEventListener('hashchange', updateLocation); }, []);
-  const openProduct = (product) => { window.location.hash = `producto/${product.slug}`; window.scrollTo({ top: 0, behavior: 'smooth' }); };
-  const selectedProduct = mockProducts.find((product) => product.slug === decodeURIComponent(locationHash.replace('#producto/', '')));
+  useEffect(() => {
+    const updateLocation = () => setLocationHash(window.location.pathname + window.location.search);
+    const handleInternalLink = (event) => {
+      const link = event.target.closest('a[href^="/"]');
+      if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target === '_blank' || link.hasAttribute('download')) return;
+      const url = new URL(link.href, window.location.origin);
+      if (url.origin !== window.location.origin) return;
+      event.preventDefault();
+      navigate(url.pathname + url.search);
+    };
+    window.addEventListener('popstate', updateLocation);
+    document.addEventListener('click', handleInternalLink);
+    return () => { window.removeEventListener('popstate', updateLocation); document.removeEventListener('click', handleInternalLink); };
+  }, []);
+  const openProduct = (product) => { navigate('/producto/' + product.slug); };
+  const selectedProduct = mockProducts.find((product) => product.slug === decodeURIComponent(locationHash.replace('/producto/', '').split('?')[0]));
   const addToCart = (product, quantity = 1) => addItem(product, quantity);
   const addToWishlist = (product) => console.info('Favorito actualizado:', product.slug);
   const compare = (product) => compareState.toggleCompare(product);
   const sharedHeader = <Header cartCount={itemCount} wishlistCount={wishlistCount} compareCount={compareState.compareCount} />;
   const sharedQuickView = <QuickViewModal product={quickViewProduct} onClose={() => setQuickViewProduct(null)} onAddToCart={addToCart} onAddToWishlist={addToWishlist} onCompare={compare} />;
 
-  if (!isLoading && !isAuthenticated && ['account', 'orders', 'addresses'].includes(page)) { window.location.hash = 'login'; return <>{sharedHeader}</>; }
+  if (!isLoading && !isAuthenticated && ['account', 'orders', 'addresses'].includes(page)) { navigate('/login', { replace: true }); return <>{sharedHeader}</>; }
   if (page === 'login') return <>{sharedHeader}<AuthPage mode="login" /><Footer {...footerData} /></>;
   if (page === 'register') return <>{sharedHeader}<AuthPage mode="register" /><Footer {...footerData} /></>;
   if (page === 'forgot') return <>{sharedHeader}<AuthPage mode="forgot" /><Footer {...footerData} /></>;
@@ -70,7 +84,7 @@ function Storefront() {
   if (page === 'about') return <>{sharedHeader}<AboutPage /><NewsletterOffer {...newsletterOffer} onSubmit={(email) => console.info('Suscripción solicitada:', email)} /><Footer {...footerData} /></>;
   if (page === 'terms') return <>{sharedHeader}<TermsPage /><Footer {...footerData} /></>;
   if (page === 'product') return <>{sharedHeader}<ProductPage product={selectedProduct} onAddToCart={addToCart} onAddToWishlist={addToWishlist} onCompare={compare} onQuickView={setQuickViewProduct} /><NewsletterOffer {...newsletterOffer} onSubmit={(email) => console.info('Suscripción solicitada:', email)} /><Footer {...footerData} />{sharedQuickView}</>;
-  if (page === 'store') return <>{sharedHeader}<StorePage locationHash={locationHash} onQuickView={setQuickViewProduct} onProductClick={openProduct} onAddToCart={addToCart} /><NewsletterOffer {...newsletterOffer} onSubmit={(email) => console.info('Suscripción solicitada:', email)} /><Footer {...footerData} />{sharedQuickView}</>;
+  if (page === 'store') return <>{sharedHeader}<StorePage locationPath={locationHash} onQuickView={setQuickViewProduct} onProductClick={openProduct} onAddToCart={addToCart} /><NewsletterOffer {...newsletterOffer} onSubmit={(email) => console.info('Suscripción solicitada:', email)} /><Footer {...footerData} />{sharedQuickView}</>;
 
   return <>{sharedHeader}<Hero /><FeaturedCategories title="Categorías destacadas" items={featuredCategoryItems} visibleItems={8} tabs={featuredCategoryItems.slice(0, 4).map((category, index) => ({ id: category.id, label: category.name, active: index === 0 }))} onCategoryClick={(category) => console.info('CategorÃ­a seleccionada:', category.id)} /><PromoBanners items={homePromoBanners} onBannerClick={(banner) => console.info('Promoción seleccionada:', banner.id)} /><FeaturedProducts products={featuredProducts} onProductClick={openProduct} onAddToCart={addToCart} onAddToWishlist={addToWishlist} onCompare={compare} onQuickView={setQuickViewProduct} /><DealsCarousel products={dailyDealProducts} bannerImage={dailyDealsBanner.image} bannerTitle={dailyDealsBanner.title} bannerCtaLabel={dailyDealsBanner.ctaLabel} onProductClick={openProduct} onAddToCart={addToCart} onAddToWishlist={addToWishlist} onCompare={compare} onQuickView={setQuickViewProduct} /><TimedDeals products={dailyDealProducts} onProductClick={openProduct} onAddToCart={addToCart} /><NewsletterOffer {...newsletterOffer} onSubmit={(email) => console.info('Suscripción solicitada:', email)} /><Footer {...footerData} />{sharedQuickView}</>;
 }

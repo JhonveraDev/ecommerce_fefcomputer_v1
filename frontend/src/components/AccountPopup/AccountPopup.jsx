@@ -1,8 +1,9 @@
 import { Heart, LogIn, MapPin, Package, Scale, UserRound, LogOut, UserPlus } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import styles from './AccountPopup.module.css';
+import { navigate } from '../../utils/navigation';
 
-const go = (hash, close) => { window.location.hash = hash; close(); };
+const go = (path, close) => { navigate(path); close(); };
 export function AccountPopup({ open, onClose }) {
   const { user, isAuthenticated, logout } = useAuth();
   return <section className={open ? styles.open : styles.panel} aria-label="Opciones de cuenta" aria-hidden={!open}>

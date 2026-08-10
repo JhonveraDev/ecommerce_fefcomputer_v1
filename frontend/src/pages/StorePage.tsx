@@ -7,6 +7,7 @@ import { TimedDeals } from '../components/TimedDeals';
 import { mockProducts } from '../data/mockProducts';
 import { searchProducts } from '../utils/productSearch';
 import styles from './StorePage.module.css';
+import { navigate } from '../utils/navigation';
 
 const pageButtons = (total: number) => total <= 5 ? Array.from({ length: total }, (_, index) => index + 1) : [1, 2, 3, '…', total];
 const displayOptions = [12, 20, 36];
@@ -17,11 +18,11 @@ const sortOptions = [
   { value: 'rating', label: 'Mejor calificación' },
 ];
 
-type Props = { onQuickView: (product: Product) => void; onProductClick: (product: Product) => void; onAddToCart: (product: Product) => void; locationHash: string };
+type Props = { onQuickView: (product: Product) => void; onProductClick: (product: Product) => void; onAddToCart: (product: Product) => void; locationPath: string };
 type SearchResult = { product: Product; score: number };
 
-export function StorePage({ onQuickView, onProductClick, onAddToCart, locationHash }: Props) {
-  const params = useMemo(() => new URLSearchParams(locationHash.split('?')[1] || window.location.search), [locationHash]);
+export function StorePage({ onQuickView, onProductClick, onAddToCart, locationPath }: Props) {
+  const params = useMemo(() => new URLSearchParams(locationPath.split('?')[1] || window.location.search), [locationPath]);
   const search = params.get('search') || '';
   const category = params.get('categoria') || 'Todas';
   const sort = params.get('sort') || 'featured';
@@ -33,7 +34,7 @@ export function StorePage({ onQuickView, onProductClick, onAddToCart, locationHa
   const updateParams = (updates: Record<string, string | null>) => {
     const next = new URLSearchParams(params);
     Object.entries(updates).forEach(([key, value]) => value ? next.set(key, value) : next.delete(key));
-    window.location.hash = `tienda${next.toString() ? `?${next.toString()}` : ''}`;
+    navigate(`tienda${next.toString() ? `?${next.toString()}` : ''}`);
   };
   const filtered = useMemo(() => (searchProducts(mockProducts, search) as SearchResult[])
     .filter(({ product }) => category === 'Todas' || product.category === category)
