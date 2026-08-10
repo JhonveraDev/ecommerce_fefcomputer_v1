@@ -12,6 +12,7 @@ import { TimedDeals } from './components/TimedDeals';
 import { StorePage } from './pages/StorePage';
 import { ProductPage } from './pages/ProductPage';
 import { CartPage } from './pages/CartPage';
+import { CheckoutPage } from './pages/CheckoutPage';
 import { WishlistPage } from './pages/WishlistPage';
 import { ComparePage } from './pages/ComparePage';
 import { ContactPage } from './pages/ContactPage';
@@ -43,7 +44,7 @@ function Storefront() {
   const wishlist = useWishlist();
   const compareState = useCompare();
   const { wishlistCount } = wishlist;
-  const getPage = (pathname = window.location.pathname) => pathname.startsWith('/tienda') ? 'store' : pathname.startsWith('/producto/') ? 'product' : pathname === '/carrito' ? 'cart' : pathname === '/favoritos' ? 'wishlist' : pathname === '/comparar' ? 'compare' : pathname === '/contacto' ? 'contact' : pathname === '/nosotros' ? 'about' : pathname === '/terminos-y-condiciones' ? 'terms' : pathname.startsWith('/login') ? 'login' : pathname.startsWith('/registro') ? 'register' : pathname.startsWith('/recuperar-password') ? 'forgot' : pathname.startsWith('/restablecer-password') ? 'reset' : pathname.startsWith('/mis-pedidos/') ? 'order-detail' : pathname.startsWith('/mis-pedidos') ? 'orders' : pathname === '/mis-direcciones' ? 'addresses' : pathname === '/cuenta' ? 'account' : 'home';
+  const getPage = (pathname = window.location.pathname) => pathname.startsWith('/tienda') ? 'store' : pathname.startsWith('/producto/') ? 'product' : pathname === '/carrito' ? 'cart' : pathname === '/checkout' ? 'checkout' : pathname === '/favoritos' ? 'wishlist' : pathname === '/comparar' ? 'compare' : pathname === '/contacto' ? 'contact' : pathname === '/nosotros' ? 'about' : pathname === '/terminos-y-condiciones' ? 'terms' : pathname.startsWith('/login') ? 'login' : pathname.startsWith('/registro') ? 'register' : pathname.startsWith('/recuperar-password') ? 'forgot' : pathname.startsWith('/restablecer-password') ? 'reset' : pathname.startsWith('/mis-pedidos/') ? 'order-detail' : pathname.startsWith('/mis-pedidos') ? 'orders' : pathname === '/mis-direcciones' ? 'addresses' : pathname === '/cuenta' ? 'account' : 'home';
   const [locationHash, setLocationHash] = useState(() => window.location.pathname + window.location.search);
   const page = getPage(locationHash);
   useEffect(() => {
@@ -78,6 +79,7 @@ function Storefront() {
   if (page === 'orders') return <>{sharedHeader}<OrdersPage /><Footer {...footerData} /></>;
   if (page === 'addresses') return <>{sharedHeader}<AddressesPage /><Footer {...footerData} /></>;
   if (page === 'cart') return <>{sharedHeader}<CartPage onProductClick={openProduct} /><Footer {...footerData} /></>;
+  if (page === 'checkout') return <>{sharedHeader}<CheckoutPage /><Footer {...footerData} /></>;
   if (page === 'compare') return <>{sharedHeader}<ComparePage onProductClick={openProduct} onAddToCart={addToCart} /><Footer {...footerData} /></>;
   if (page === 'wishlist') return <>{sharedHeader}<WishlistPage onProductClick={openProduct} onAddToCart={addToCart} /><NewsletterOffer {...newsletterOffer} onSubmit={(email) => console.info('Suscripción solicitada:', email)} /><Footer {...footerData} /></>;
   if (page === 'contact') return <>{sharedHeader}<ContactPage /><Footer {...footerData} /></>;

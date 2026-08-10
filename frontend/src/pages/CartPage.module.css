@@ -269,7 +269,8 @@
   font-size: 19px;
 }
 
-.summary button {
+.summary button,
+.summary .checkoutButton {
   align-items: center;
   background: var(--color-primary);
   border: 0;
@@ -286,7 +287,8 @@
   width: 100%;
 }
 
-.summary button:hover {
+.summary button:hover,
+.summary .checkoutButton:hover {
   background: var(--color-primary-hover);
 }
 
