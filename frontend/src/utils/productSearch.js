@@ -13,6 +13,9 @@ export function normalizeSearchText(value = '') {
   return String(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
 }
 
+const words = (value) => normalizeSearchText(value).split(' ').filter(Boolean);
+const typoDistance = (word) => word.length <= 5 ? 1 : word.length <= 9 ? 1 : 2;
+
 function distance(first, second) {
   const previous = Array.from({ length: second.length + 1 }, (_, index) => index);
   for (let row = 1; row <= first.length; row += 1) {
@@ -23,31 +26,42 @@ function distance(first, second) {
   return previous[second.length];
 }
 
-const maxTypoDistance = (word) => word.length <= 4 ? 1 : word.length <= 7 ? 2 : 3;
-
-function fieldScore(term, field, weight) {
-  if (!field) return 0;
-  if (field === term) return weight * 1.5;
-  if (field.includes(term)) return weight;
-  const words = field.split(' ');
-  if (words.some((word) => word.startsWith(term))) return weight * 0.8;
-  if (term.length < 3) return 0;
-  const closest = words.reduce((minimum, word) => Math.min(minimum, distance(term, word)), Infinity);
-  return closest <= maxTypoDistance(term) ? weight * (1 - closest / (maxTypoDistance(term) + 1)) * 0.6 : 0;
+function scoreCandidate(term, fields, allowTypo) {
+  let best = 0;
+  fields.forEach(([value, weight]) => {
+    const fieldWords = words(value);
+    if (fieldWords.includes(term)) best = Math.max(best, weight);
+    else if (fieldWords.some((word) => word.startsWith(term))) best = Math.max(best, weight * 0.72);
+    else if (allowTypo && term.length >= 4 && fieldWords.some((word) => distance(term, word) <= typoDistance(term))) best = Math.max(best, weight * 0.42);
+  });
+  return best;
 }
 
-/** Finds relevant products without mutating the original collection. */
+function productFields(product) {
+  return {
+    primary: [[product.name, 180], [product.brand, 105], [product.category, 90], [product.sku, 75]],
+    secondary: [[product.shortDescription, 38], [product.description, 22]],
+  };
+}
+
+/** Finds products by requiring every query term to be relevant. */
 export function searchProducts(products, query) {
   const normalizedQuery = normalizeSearchText(query);
   if (!normalizedQuery) return products.map((product) => ({ product, score: 0 }));
-  const queryTerms = [...new Set(normalizedQuery.split(' ').flatMap((term) => [term, ...(aliases[term] ?? [])]))];
-  return products.map((product) => {
-    const fields = [[normalizeSearchText(product.name), 180], [normalizeSearchText(product.brand), 105], [normalizeSearchText(product.category), 90], [normalizeSearchText(product.shortDescription), 45], [normalizeSearchText(product.description), 30], [normalizeSearchText(product.sku), 75]];
-    const name = fields[0][0];
+  const queryTerms = [...new Set(words(normalizedQuery))];
+  const catalog = products.map((product) => ({ product, fields: productFields(product) }));
+  const directTerms = new Set(queryTerms.filter((term) => catalog.some(({ fields }) => scoreCandidate(term, fields.primary, true) > 0)));
+
+  return catalog.map(({ product, fields }) => {
+    const name = normalizeSearchText(product.name);
     let score = name === normalizedQuery ? 1200 : name.includes(normalizedQuery) ? 700 : 0;
-    let matchedTerms = 0;
-    queryTerms.forEach((term) => { const best = Math.max(...fields.map(([field, weight]) => fieldScore(term, field, weight))); if (best > 0) matchedTerms += 1; score += best; });
-    score += (matchedTerms / queryTerms.length) * 120;
-    return { product, score, matchedTerms };
-  }).filter(({ score, matchedTerms }) => matchedTerms > 0 && score >= 55).sort((first, second) => second.score - first.score || second.product.reviewCount - first.product.reviewCount);
+    const matched = queryTerms.map((term) => {
+      const candidates = directTerms.has(term) ? [term] : [term, ...(aliases[term] ?? [])];
+      const candidateScore = Math.max(...candidates.map((candidate) => scoreCandidate(candidate, fields.primary, true) || scoreCandidate(candidate, fields.secondary, false)));
+      score += candidateScore;
+      return candidateScore > 0;
+    });
+    return { product, score, matchedTerms: matched.filter(Boolean).length };
+  }).filter(({ matchedTerms }) => matchedTerms === queryTerms.length)
+    .sort((first, second) => second.score - first.score || second.product.reviewCount - first.product.reviewCount);
 }
