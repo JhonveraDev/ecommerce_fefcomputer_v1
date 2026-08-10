@@ -1,13 +1,45 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+﻿import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { useAuth } from './AuthContext';
 
 const WishlistContext = createContext(null);
 const STORAGE_KEY = 'fefcomputer-wishlist';
 const readWishlist = () => { try { return JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; } };
 
 export function WishlistProvider({ children }) {
+  const { isAuthenticated, isLoading, request } = useAuth();
   const [productIds, setProductIds] = useState(readWishlist);
   const [notice, setNotice] = useState(null);
-  useEffect(() => { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(productIds)); }, [productIds]);
+  const [remoteReady, setRemoteReady] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    if (isLoading) return () => { active = false; };
+    if (!isAuthenticated) {
+      setRemoteReady(false);
+      return () => { active = false; };
+    }
+
+    setRemoteReady(false);
+    request('/account/shopping-state')
+      .then((data) => {
+        if (!active) return;
+        setProductIds(Array.isArray(data.wishlist) ? data.wishlist : []);
+        setRemoteReady(true);
+      })
+      .catch(() => { if (active) setRemoteReady(false); });
+    return () => { active = false; };
+  }, [isAuthenticated, isLoading, request]);
+
+  useEffect(() => {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(productIds));
+    if (isAuthenticated && remoteReady) {
+      request('/account/shopping-state/wishlist', {
+        method: 'PUT',
+        body: JSON.stringify({ items: productIds }),
+      }).catch(() => {});
+    }
+  }, [productIds, isAuthenticated, remoteReady, request]);
+
   const isFavorite = (productId) => productIds.includes(productId);
   const toggleWishlist = (product) => setProductIds((current) => {
     const added = !current.includes(product.id);

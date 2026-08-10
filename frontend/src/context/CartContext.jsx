@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+﻿import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { useAuth } from './AuthContext';
 
 const CartContext = createContext(null);
 const STORAGE_KEY = 'fefcomputer-cart';
@@ -11,9 +12,39 @@ const readCart = () => {
 };
 
 export function CartProvider({ children }) {
+  const { isAuthenticated, isLoading, request } = useAuth();
   const [items, setItems] = useState(readCart);
   const [notice, setNotice] = useState(null);
-  useEffect(() => { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }, [items]);
+  const [remoteReady, setRemoteReady] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    if (isLoading) return () => { active = false; };
+    if (!isAuthenticated) {
+      setRemoteReady(false);
+      return () => { active = false; };
+    }
+
+    setRemoteReady(false);
+    request('/account/shopping-state')
+      .then((data) => {
+        if (!active) return;
+        setItems(Array.isArray(data.cart) ? data.cart : []);
+        setRemoteReady(true);
+      })
+      .catch(() => { if (active) setRemoteReady(false); });
+    return () => { active = false; };
+  }, [isAuthenticated, isLoading, request]);
+
+  useEffect(() => {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    if (isAuthenticated && remoteReady) {
+      request('/account/shopping-state/cart', {
+        method: 'PUT',
+        body: JSON.stringify({ items }),
+      }).catch(() => {});
+    }
+  }, [items, isAuthenticated, remoteReady, request]);
 
   const addItem = (product, quantity = 1) => {
     const acceptedQuantity = Math.min(product.stock ?? Infinity, Math.max(1, quantity));
