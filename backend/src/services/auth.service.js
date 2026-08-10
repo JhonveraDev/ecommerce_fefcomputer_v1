@@ -47,6 +47,8 @@ export const register = async (input, request) => {
   const user = await prisma.user.create({
     data: {
       name: input.name,
+      lastName: input.lastName,
+      phone: input.phone,
       email: input.email,
       passwordHash: await bcrypt.hash(input.password, 12),
       status: 'ACTIVE',
@@ -109,4 +111,24 @@ export const revokeRefreshToken = async (refreshToken) => {
     where: { tokenHash: hashToken(refreshToken), revokedAt: null },
     data: { revokedAt: new Date() },
   });
+};
+
+export const createPasswordReset = async (email) => {
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) return null;
+  const token = crypto.randomBytes(32).toString('hex');
+  await prisma.passwordResetToken.deleteMany({ where: { userId: user.id, usedAt: null } });
+  await prisma.passwordResetToken.create({ data: { userId: user.id, tokenHash: hashToken(token), expiresAt: new Date(Date.now() + 60 * 60 * 1000) } });
+  // La entrega del enlace se delega al proveedor de correo transaccional de producción.
+  return token;
+};
+
+export const resetPassword = async ({ token, password }) => {
+  const record = await prisma.passwordResetToken.findUnique({ where: { tokenHash: hashToken(token) } });
+  if (!record || record.usedAt || record.expiresAt < new Date()) throw new ApiError(400, 'INVALID_RESET_TOKEN', 'El enlace de restablecimiento no es válido o expiró.');
+  await prisma.$transaction([
+    prisma.user.update({ where: { id: record.userId }, data: { passwordHash: await bcrypt.hash(password, 12) } }),
+    prisma.passwordResetToken.update({ where: { id: record.id }, data: { usedAt: new Date() } }),
+    prisma.session.updateMany({ where: { userId: record.userId, revokedAt: null }, data: { revokedAt: new Date() } }),
+  ]);
 };

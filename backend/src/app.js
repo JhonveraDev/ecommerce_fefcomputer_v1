@@ -8,6 +8,8 @@ import { allowedOrigins, env } from './config/env.js';
 import { errorHandler, notFoundHandler } from './middleware/error-handler.js';
 import { requestId } from './middleware/request-id.js';
 import { authRouter } from './routes/auth.routes.js';
+import { accountRouter } from './routes/account.routes.js';
+import { orderRouter } from './routes/order.routes.js';
 import { healthRouter } from './routes/health.routes.js';
 
 export const app = express();
@@ -24,6 +26,8 @@ app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 500, standardHeaders: 'draf
 app.get('/', (_request, response) => response.json({ success: true, data: { name: 'FEFCOMPUTER API', version: 'v1' } }));
 app.use('/api/v1/health', healthRouter);
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/account', accountRouter);
+app.use('/api/v1/orders', orderRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

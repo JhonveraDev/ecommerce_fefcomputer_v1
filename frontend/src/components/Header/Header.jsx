@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import styles from './Header.module.css';
 import { MiniCart } from '../MiniCart/MiniCart';
+import { AccountPopup } from '../AccountPopup/AccountPopup';
+import { useAuth } from '../../context/AuthContext';
 
 const navigationItems = [
   { label: 'Ofertas', icon: Flame, accent: true },
@@ -74,6 +76,19 @@ function CartHeaderAction({ value, open, setOpen }) {
   </div>;
 }
 
+function AccountHeaderAction() {
+  const closeTimer = useRef();
+  const [open, setOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const keepOpen = () => { window.clearTimeout(closeTimer.current); setOpen(true); };
+  const scheduleClose = () => { closeTimer.current = window.setTimeout(() => setOpen(false), 420); };
+  const openAccount = () => { window.location.hash = isAuthenticated ? 'cuenta' : 'login'; setOpen(false); };
+  return <div className={styles.accountAction} onMouseEnter={keepOpen} onMouseLeave={scheduleClose}>
+    <HeaderAction icon={CircleUserRound} label="Cuenta" onClick={openAccount} />
+    <AccountPopup open={open} onClose={() => setOpen(false)} />
+  </div>;
+}
+
 export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [miniCartOpen, setMiniCartOpen] = useState(false);
@@ -128,7 +143,7 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
             <ChevronDown size={14} />
           </button>
           <div className={styles.actions}>
-            {actionItems.map((action) => action.label === 'Carrito' ? <CartHeaderAction key={action.label} value={cartCount} open={miniCartOpen} setOpen={setMiniCartOpen} /> : <HeaderAction key={action.label} {...action} value={action.label === 'Favoritos' ? wishlistCount : action.label === 'Comparar' ? compareCount : action.value} onClick={action.label === 'Favoritos' ? () => { window.location.hash = 'favoritos'; } : action.label === 'Comparar' ? () => { window.location.hash = 'comparar'; } : undefined} />)}
+            {actionItems.map((action) => action.label === 'Carrito' ? <CartHeaderAction key={action.label} value={cartCount} open={miniCartOpen} setOpen={setMiniCartOpen} /> : action.label === 'Cuenta' ? <AccountHeaderAction key={action.label} /> : <HeaderAction key={action.label} {...action} value={action.label === 'Favoritos' ? wishlistCount : compareCount} onClick={() => { window.location.hash = action.label === 'Favoritos' ? 'favoritos' : 'comparar'; }} />)}
           </div>
           <button className={styles.mobileToggle} type="button" aria-label="Abrir menú" aria-expanded={mobileMenuOpen} onClick={() => setMobileMenuOpen((open) => !open)}>
             {mobileMenuOpen ? <X /> : <Menu />}

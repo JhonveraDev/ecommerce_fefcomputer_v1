@@ -15,6 +15,8 @@ export const authRouter = Router();
 
 authRouter.post('/register', authRateLimit, authController.register);
 authRouter.post('/login', authRateLimit, authController.login);
+authRouter.post('/forgot-password', authRateLimit, authController.forgotPassword);
+authRouter.post('/reset-password', authRateLimit, authController.resetPassword);
 authRouter.post('/refresh', authController.refresh);
 authRouter.post('/logout', authController.logout);
 authRouter.get('/me', authenticate, authController.me);
