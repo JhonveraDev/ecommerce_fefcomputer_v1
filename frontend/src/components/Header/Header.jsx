@@ -111,7 +111,7 @@ function Brand() {
       </span>
       <span>
         <strong>FEF</strong><b>COMPUTER</b>
-        <small>TECNOLOGÃA Y CONFIANZA</small>
+        <small>TECNOLOGÍA Y CONFIANZA</small>
       </span>
     </a>
   );
@@ -184,10 +184,10 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
             <a href="#favoritos">Favoritos</a>
             <a href="#rastrear">Rastrea tu pedido</a>
           </nav>
-          <p className={styles.tagline}>TecnologÃ­a para potenciar tus ideas</p>
+          <p className={styles.tagline}>Tecnología para potenciar tus ideas</p>
           <div className={styles.topControls}>
-            <span>Â¿Necesitas ayuda? <a href="tel:+573000000000">LlÃ¡manos: <b>+57 311 8961906</b></a></span>
-            <button type="button">EspaÃ±ol <ChevronDown size={12} /></button>
+            <span>¿Necesitas ayuda? <a href="tel:+573000000000">Llámanos: <b>+57 311 8961906</b></a></span>
+            <button type="button">Español <ChevronDown size={12} /></button>
             <button type="button">COP <ChevronDown size={12} /></button>
           </div>
         </div>
@@ -198,21 +198,21 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
           <Brand />
           <form className={styles.searchBar} role="search" onSubmit={submitSearch}>
             <button className={styles.categorySelect} type="button">
-              Todas las categorÃ­as <ChevronDown size={15} />
+              Todas las categorías <ChevronDown size={15} />
             </button>
             <label className="srOnly" htmlFor="product-search">Buscar productos</label>
-            <input id="product-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Busca computadores, perifÃ©ricos y mÃ¡s..." />
+            <input id="product-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Busca computadores, periféricos y más..." />
             <button className={styles.searchButton} type="submit" aria-label="Buscar"><Search size={24} /></button>
           </form>
           <button className={styles.location} type="button">
             <MapPin size={19} />
-            <span><b>Tu ubicaciÃ³n</b><small>Selecciona tu ciudad</small></span>
+            <span><b>Tu ubicación</b><small>Selecciona tu ciudad</small></span>
             <ChevronDown size={14} />
           </button>
           <div className={styles.actions}>
             {actionItems.map((action) => action.label === 'Carrito' ? <CartHeaderAction key={action.label} value={cartCount} open={miniCartOpen} setOpen={setMiniCartOpen} /> : action.label === 'Cuenta' ? <AccountHeaderAction key={action.label} /> : <HeaderAction key={action.label} {...action} value={action.label === 'Favoritos' ? wishlistCount : compareCount} onClick={() => { window.location.hash = action.label === 'Favoritos' ? 'favoritos' : 'comparar'; }} />)}
           </div>
-          <button className={styles.mobileToggle} type="button" aria-label="Abrir menÃº" aria-expanded={mobileMenuOpen} onClick={() => setMobileMenuOpen((open) => !open)}>
+          <button className={styles.mobileToggle} type="button" aria-label="Abrir menú" aria-expanded={mobileMenuOpen} onClick={() => setMobileMenuOpen((open) => !open)}>
             {mobileMenuOpen ? <X /> : <Menu />}
           </button>
         </div>
@@ -221,7 +221,7 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
       <div className={`${styles.navigationBar} ${mobileMenuOpen ? styles.menuOpen : ''}`}>
         <div className={`${styles.container} ${styles.navigationContent}`}>
           <CategoryBrowser />
-          <nav className={styles.primaryNavigation} aria-label="NavegaciÃ³n principal">
+          <nav className={styles.primaryNavigation} aria-label="Navegación principal">
             {navigationItems.map(({ label }) => {
               const section = label.toLowerCase();
               const isActive = currentSection === section;
@@ -232,7 +232,7 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
             <Headphones size={35} strokeWidth={1.8} />
             <span><b>+57 311 896 1906</b><small>Soporte al cliente</small></span>
           </a>
-          <a className={styles.mobileBrowse} href="#categorias">Ver todas las categorÃ­as <ChevronRight size={16} /></a>
+          <a className={styles.mobileBrowse} href="#categorias">Ver todas las categorías <ChevronRight size={16} /></a>
         </div>
       </div>
     </header>
