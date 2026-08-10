@@ -79,17 +79,18 @@ function CartHeaderAction({ value, open, setOpen }) {
 function AccountHeaderAction() {
   const closeTimer = useRef();
   const [open, setOpen] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const keepOpen = () => { window.clearTimeout(closeTimer.current); setOpen(true); };
   const scheduleClose = () => { closeTimer.current = window.setTimeout(() => setOpen(false), 420); };
   const openAccount = () => { window.location.hash = isAuthenticated ? 'cuenta' : 'login'; setOpen(false); };
   return <div className={styles.accountAction} onMouseEnter={keepOpen} onMouseLeave={scheduleClose}>
-    <HeaderAction icon={CircleUserRound} label="Cuenta" onClick={openAccount} />
+    <HeaderAction icon={CircleUserRound} label={isAuthenticated ? `Hola, ${user.name}` : "Cuenta"} onClick={openAccount} />
     <AccountPopup open={open} onClose={() => setOpen(false)} />
   </div>;
 }
 
 export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
+  const { user, isAuthenticated } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [miniCartOpen, setMiniCartOpen] = useState(false);
   const getSearchFromUrl = () => new URLSearchParams(window.location.hash.split('?')[1] || window.location.search).get('search') || '';
@@ -113,6 +114,7 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
         <div className={styles.container}>
           <nav className={styles.utilityLinks} aria-label="Enlaces de utilidad">
             <a href="#nosotros">Nosotros</a>
+            {isAuthenticated && <a className={styles.userGreeting} href="#cuenta">Hola, {user.name}</a>}
             <a href="#cuenta">Mi cuenta</a>
             <a href="#favoritos">Favoritos</a>
             <a href="#rastrear">Rastrea tu pedido</a>
