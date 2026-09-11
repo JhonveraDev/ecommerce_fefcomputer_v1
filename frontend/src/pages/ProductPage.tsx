@@ -8,7 +8,7 @@ import { navigate } from '../utils/navigation';
 import styles from './ProductPage.module.css';
 
 type FullProduct = Product & { description?: string; shortDescription?: string; sku?: string; stock?: number };
-type Props = { product: FullProduct | undefined; onAddToCart: (product: FullProduct, quantity: number) => void; onAddToWishlist: (product: FullProduct) => void; onCompare: (product: FullProduct) => void; onQuickView?: (product: FullProduct) => void };
+type Props = { products: FullProduct[]; product: FullProduct | undefined; onAddToCart: (product: FullProduct, quantity: number) => void; onAddToWishlist: (product: FullProduct) => void; onCompare: (product: FullProduct) => void; onQuickView?: (product: FullProduct) => void };
 const money = (value: number) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(value);
 
 function ProductGallery({ product }: { product: FullProduct }) {
@@ -28,7 +28,7 @@ function Rating({ product }: { product: FullProduct }) {
   </div>;
 }
 
-function ProductInformation({ product, onAddToCart, onAddToWishlist, onCompare }: Omit<Props, 'product'> & { product: FullProduct }) {
+function ProductInformation({ product, onAddToCart, onAddToWishlist, onCompare }: Omit<Props, 'product' | 'products'> & { product: FullProduct }) {
   const [quantity, setQuantity] = useState(1);
   const { isFavorite, toggleWishlist } = useWishlist() as any;
   const wishlisted = isFavorite(product.id);
@@ -57,8 +57,8 @@ function ProductDetails({ product }: { product: FullProduct }) {
   return <section className={styles.details}><h2>Detalles del producto</h2><p>{product.description || product.shortDescription || 'No hay información adicional disponible para este producto.'}</p><div><span>Marca <b>{product.brand}</b></span><span>Categoría <b>{product.category}</b></span>{product.sku && <span>SKU <b>{product.sku}</b></span>}</div></section>;
 }
 
-export function ProductPage({ product, onAddToCart, onAddToWishlist, onCompare, onQuickView }: Props) {
+export function ProductPage({ products, product, onAddToCart, onAddToWishlist, onCompare, onQuickView }: Props) {
   if (!product) return <main className={styles.notFound}><h1>Producto no encontrado</h1><p>El producto que buscas no está disponible o fue eliminado.</p><a href="/tienda">Volver a la tienda</a></main>;
   const browseCategory = (category: string) => { navigate('/tienda?categoria=' + encodeURIComponent(category)); };
-  return <main className={styles.page}><nav className={styles.breadcrumb} aria-label="Migas de pan"><a href="/"><Home size={16} />Inicio</a><ChevronRight size={15} /><a href="/tienda">Tienda</a><ChevronRight size={15} /><span>{product.category}</span><ChevronRight size={15} /><b>{product.name}</b></nav><div className={styles.productLayout}><StoreSidebar onCategorySelect={browseCategory} onProductClick={(recentProduct) => { navigate('/producto/' + recentProduct.slug); }} /><div className={styles.productArea}><div className={styles.content}><ProductGallery product={product} /><ProductInformation product={product} onAddToCart={onAddToCart} onAddToWishlist={onAddToWishlist} onCompare={onCompare} /></div><ProductDetails product={product} /><RelatedProducts currentProduct={product} onProductClick={(relatedProduct) => { navigate('/producto/' + relatedProduct.slug); }} onAddToCart={(relatedProduct) => onAddToCart(relatedProduct, 1)} onAddToWishlist={onAddToWishlist} onCompare={onCompare} onQuickView={onQuickView ?? (() => {})} /></div></div></main>;
+  return <main className={styles.page}><nav className={styles.breadcrumb} aria-label="Migas de pan"><a href="/"><Home size={16} />Inicio</a><ChevronRight size={15} /><a href="/tienda">Tienda</a><ChevronRight size={15} /><span>{product.category}</span><ChevronRight size={15} /><b>{product.name}</b></nav><div className={styles.productLayout}><StoreSidebar products={products} onCategorySelect={browseCategory} onProductClick={(recentProduct) => { navigate('/producto/' + recentProduct.slug); }} /><div className={styles.productArea}><div className={styles.content}><ProductGallery product={product} /><ProductInformation product={product} onAddToCart={onAddToCart} onAddToWishlist={onAddToWishlist} onCompare={onCompare} /></div><ProductDetails product={product} /><RelatedProducts products={products} currentProduct={product} onProductClick={(relatedProduct) => { navigate('/producto/' + relatedProduct.slug); }} onAddToCart={(relatedProduct) => onAddToCart(relatedProduct, 1)} onAddToWishlist={onAddToWishlist} onCompare={onCompare} onQuickView={onQuickView ?? (() => {})} /></div></div></main>;
 }

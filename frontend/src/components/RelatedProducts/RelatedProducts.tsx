@@ -1,8 +1,8 @@
 import { ProductCard, type Product } from '../FeaturedProducts/FeaturedProducts';
-import { mockProducts } from '../../data/mockProducts';
 import styles from './RelatedProducts.module.css';
 
 type Props = {
+  products: Product[];
   currentProduct: Product;
   onProductClick: (product: Product) => void;
   onAddToCart: (product: Product) => void;
@@ -11,8 +11,8 @@ type Props = {
   onQuickView: (product: Product) => void;
 };
 
-export function RelatedProducts({ currentProduct, onProductClick, onAddToCart, onAddToWishlist, onCompare, onQuickView }: Props) {
-  const related = mockProducts
+export function RelatedProducts({ products, currentProduct, onProductClick, onAddToCart, onAddToWishlist, onCompare, onQuickView }: Props) {
+  const related = products
     .filter((product) => product.id !== currentProduct.id)
     .sort((first, second) => {
       const score = (product: typeof first) => (product.category === currentProduct.category ? 4 : 0) + (product.brand === currentProduct.brand ? 2 : 0) + product.rating / 10 + product.reviewCount / 10000;

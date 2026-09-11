@@ -1,17 +1,18 @@
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
-import { mockProducts, productCategories } from '../../data/mockProducts';
+import type { Product } from '../FeaturedProducts/FeaturedProducts';
 import styles from './StoreSidebar.module.css';
 
 const INITIAL_CATEGORY_COUNT = 8;
 
-type Props = { selectedCategory?: string; onCategorySelect: (category: string) => void };
+type Props = { products: Product[]; selectedCategory?: string; onCategorySelect: (category: string) => void };
 
-export function CategoryFilter({ selectedCategory = 'Todas', onCategorySelect }: Props) {
+export function CategoryFilter({ products, selectedCategory = 'Todas', onCategorySelect }: Props) {
   const [expanded, setExpanded] = useState(false);
+  const productCategories = [...new Set(products.map((product) => product.category))].sort();
   const visibleCategories = productCategories.slice(0, INITIAL_CATEGORY_COUNT);
   const extraCategories = productCategories.slice(INITIAL_CATEGORY_COUNT);
-  const count = (category: string) => category === 'Todas' ? mockProducts.length : mockProducts.filter((product) => product.category === category).length;
+  const count = (category: string) => category === 'Todas' ? products.length : products.filter((product) => product.category === category).length;
   const categoryButton = (category: string) => <button key={category} className={selectedCategory === category ? styles.selected : ''} type="button" onClick={() => onCategorySelect(category)}>{category}<span>{count(category)}</span></button>;
 
   return <section className={styles.filters} aria-label="Filtrar por categorías">

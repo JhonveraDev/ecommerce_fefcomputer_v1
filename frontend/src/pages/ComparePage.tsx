@@ -1,7 +1,6 @@
 ﻿import { Fragment } from 'react';
 import { AlignLeft, BadgeCheck, Barcode, Boxes, ChevronRight, CircleDollarSign, Home, LayoutGrid, PackageCheck, Plus, ShoppingCart, Sparkles, Star, Tag, Trash2, X } from 'lucide-react';
 import { useCompare } from '../context/CompareContext';
-import { mockProducts } from '../data/mockProducts';
 import styles from './ComparePage.module.css';
 
 const money = (value: number) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(value);
@@ -19,9 +18,9 @@ function AttributeLabel({ label, hint, Icon }: { label: string; hint: string; Ic
   return <div className={styles.label}><span className={styles.labelIcon}><Icon size={16} strokeWidth={2} /></span><span className={styles.labelCopy}><b>{label}</b><small>{hint}</small></span></div>;
 }
 
-export function ComparePage({ onProductClick, onAddToCart }: { onProductClick: (p: any) => void; onAddToCart: (p: any) => void }) {
+export function ComparePage({ products: catalogProducts, onProductClick, onAddToCart }: { products: any[]; onProductClick: (p: any) => void; onAddToCart: (p: any) => void }) {
   const { productIds, removeFromCompare, clearCompare } = useCompare() as any;
-  const products = mockProducts.filter((product) => productIds.includes(product.id));
+  const products = catalogProducts.filter((product) => productIds.includes(product.id));
 
   if (!products.length) return <main className={styles.page}><nav className={styles.breadcrumb} aria-label="Migas de pan"><a href="#inicio"><Home size={16} />Inicio</a><ChevronRight size={15} /><b>Comparar</b></nav><section className={styles.empty}><Sparkles size={52} /><h1>Compara productos</h1><p>Selecciona hasta 4 productos desde la tienda para comparar sus características.</p><a href="#tienda">Explorar tienda</a></section></main>;
 
