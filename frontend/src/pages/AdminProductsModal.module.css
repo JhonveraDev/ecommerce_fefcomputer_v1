@@ -1,0 +1,1 @@
+.backdrop{overscroll-behavior:contain;scrollbar-width:none}.backdrop::-webkit-scrollbar{display:none}.dialog{max-height:calc(100dvh - 84px);overflow-y:auto;scrollbar-width:none}.dialog::-webkit-scrollbar{display:none}@media(max-width:680px){.dialog{max-height:calc(100dvh - 32px)}}
