@@ -5,4 +5,4 @@ export const productInputSchema = z.object({
   basePrice: z.coerce.number().finite().nonnegative(), compareAtPrice: z.coerce.number().finite().nonnegative().optional().nullable(),
   physicalQuantity: z.coerce.number().int().nonnegative(), reorderPoint: z.coerce.number().int().nonnegative().default(0),
   shortDescription: optionalText(500), description: optionalText(10000), imageUrl: z.string().trim().url().max(2000).optional().or(z.literal('')), status: z.enum(['DRAFT', 'ACTIVE', 'INACTIVE']).default('ACTIVE'),
-}).superRefine((value, ctx) => { if (value.compareAtPrice != null && value.compareAtPrice < value.basePrice) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['compareAtPrice'], message: 'El precio anterior debe ser igual o mayor al precio de venta.' }); });
+});

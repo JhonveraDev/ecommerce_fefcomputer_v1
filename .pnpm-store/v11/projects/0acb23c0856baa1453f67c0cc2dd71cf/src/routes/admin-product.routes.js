@@ -8,4 +8,4 @@ adminProductRouter.get('/options', controller.productOptions);
 adminProductRouter.get('/', controller.listProducts);
 adminProductRouter.post('/', controller.createProduct);
 adminProductRouter.put('/:id', controller.updateProduct);
-adminProductRouter.delete('/:id', controller.archiveProduct);
+adminProductRouter.delete('/:id', controller.deleteProduct);
