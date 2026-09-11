@@ -19,6 +19,7 @@ import { ContactPage } from './pages/ContactPage';
 import { AboutPage } from './pages/AboutPage';
 import { TermsPage } from './pages/TermsPage';
 import { AuthPage } from './pages/AuthPage';
+import { AdminProductsPage } from './pages/AdminProductsPage';
 import { AccountPage, AddressesPage, OrderDetailPage, OrdersPage } from './pages/AccountPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider, useCart } from './context/CartContext';
@@ -45,7 +46,7 @@ function Storefront() {
   const wishlist = useWishlist();
   const compareState = useCompare();
   const { wishlistCount } = wishlist;
-  const getPage = (pathname = window.location.pathname) => pathname.startsWith('/tienda') ? 'store' : pathname.startsWith('/producto/') ? 'product' : pathname === '/carrito' ? 'cart' : pathname === '/checkout' ? 'checkout' : pathname === '/favoritos' ? 'wishlist' : pathname === '/comparar' ? 'compare' : pathname === '/contacto' ? 'contact' : pathname === '/nosotros' ? 'about' : pathname === '/terminos-y-condiciones' ? 'terms' : pathname.startsWith('/login') ? 'login' : pathname.startsWith('/registro') ? 'register' : pathname.startsWith('/recuperar-password') ? 'forgot' : pathname.startsWith('/restablecer-password') ? 'reset' : pathname.startsWith('/mis-pedidos/') ? 'order-detail' : pathname.startsWith('/mis-pedidos') ? 'orders' : pathname === '/mis-direcciones' ? 'addresses' : pathname === '/cuenta' ? 'account' : 'home';
+  const getPage = (pathname = window.location.pathname) => pathname === '/admin/productos' ? 'admin-products' : pathname.startsWith('/tienda') ? 'store' : pathname.startsWith('/producto/') ? 'product' : pathname === '/carrito' ? 'cart' : pathname === '/checkout' ? 'checkout' : pathname === '/favoritos' ? 'wishlist' : pathname === '/comparar' ? 'compare' : pathname === '/contacto' ? 'contact' : pathname === '/nosotros' ? 'about' : pathname === '/terminos-y-condiciones' ? 'terms' : pathname.startsWith('/login') ? 'login' : pathname.startsWith('/registro') ? 'register' : pathname.startsWith('/recuperar-password') ? 'forgot' : pathname.startsWith('/restablecer-password') ? 'reset' : pathname.startsWith('/mis-pedidos/') ? 'order-detail' : pathname.startsWith('/mis-pedidos') ? 'orders' : pathname === '/mis-direcciones' ? 'addresses' : pathname === '/cuenta' ? 'account' : 'home';
   const [locationHash, setLocationHash] = useState(() => window.location.pathname + window.location.search);
   const page = getPage(locationHash);
   useEffect(() => {
@@ -72,7 +73,7 @@ function Storefront() {
   const welcomeOfferProduct = dailyDealProducts[0];
   const sharedWelcomeOffer = <WelcomeOffer product={welcomeOfferProduct} onAddToCart={addToCart} onViewProduct={openProduct} />;
 
-  if (!isLoading && !isAuthenticated && ['account', 'orders', 'addresses'].includes(page)) { navigate('/login', { replace: true }); return <>{sharedHeader}</>; }
+  if (!isLoading && !isAuthenticated && ['account', 'orders', 'addresses', 'admin-products'].includes(page)) { navigate('/login', { replace: true }); return <>{sharedHeader}</>; }
   if (page === 'login') return <>{sharedHeader}<AuthPage mode="login" /><Footer {...footerData} /></>;
   if (page === 'register') return <>{sharedHeader}<AuthPage mode="register" /><Footer {...footerData} /></>;
   if (page === 'forgot') return <>{sharedHeader}<AuthPage mode="forgot" /><Footer {...footerData} /></>;
@@ -81,6 +82,7 @@ function Storefront() {
   if (page === 'order-detail') return <>{sharedHeader}<OrderDetailPage /><Footer {...footerData} /></>;
   if (page === 'orders') return <>{sharedHeader}<OrdersPage /><Footer {...footerData} /></>;
   if (page === 'addresses') return <>{sharedHeader}<AddressesPage /><Footer {...footerData} /></>;
+  if (page === 'admin-products') return <>{sharedHeader}<AdminProductsPage /><Footer {...footerData} /></>;
   if (page === 'cart') return <>{sharedHeader}<CartPage onProductClick={openProduct} /><Footer {...footerData} /></>;
   if (page === 'checkout') return <>{sharedHeader}<CheckoutPage /><Footer {...footerData} /></>;
   if (page === 'compare') return <>{sharedHeader}<ComparePage onProductClick={openProduct} onAddToCart={addToCart} /><Footer {...footerData} /></>;

@@ -1,3 +1,22 @@
+/*
+[
+  'gaming-aurora-r5', // 0: slug o identificador URL único
+  'PC Gaming Aurora R5', // 1: nombre del producto
+  'Computadores Gaming', // 2: categoría
+  'Aorus', // 3: marca
+  6499900, // 4: precio actual/de oferta
+  7199900, // 5: precio original antes del descuento
+  'Torre gaming con RTX y refrigeración optimizada.', // 6: descripción corta
+  'Equipo gaming ficticio...', // 7: descripción detallada
+  'Oferta', // 8: etiqueta o badge comercial
+  'FEF-GAM-001', // 9: SKU / código interno
+  7, // 10: unidades disponibles (stock)
+  4.8, // 11: calificación promedio
+  38 // 12: número de reseñas o valoraciones
+]
+*/
+
+
 import gamingPcImage from '../assets/products/gaming-pc.png';
 import laptopImage from '../assets/products/laptop.png';
 import monitorImage from '../assets/products/monitor.png';
@@ -62,6 +81,7 @@ export const productCategories = [
 
 /** @type {Product[]} */
 export const mockProducts = [
+  ['gaming-aurora-r8', 'Diademas MJ', 'Computadores Gaming', 'Aorus', 6499900, 7199900, 'Torre gaming con RTX y refrigeración optimizada.', 'Equipo gaming ficticio con procesador de alto rendimiento, gráficos dedicados y componentes seleccionados para pruebas de catálogo.', 'Nuevo', 'FEF-GAM-001', 7, 4.8, 38],
   ['gaming-aurora-r5', 'PC Gaming Aurora R5', 'Computadores Gaming', 'Aorus', 6499900, 7199900, 'Torre gaming con RTX y refrigeración optimizada.', 'Equipo gaming ficticio con procesador de alto rendimiento, gráficos dedicados y componentes seleccionados para pruebas de catálogo.', 'Oferta', 'FEF-GAM-001', 7, 4.8, 38],
   ['gaming-nexus-x7', 'PC Gaming Nexus X7', 'Computadores Gaming', 'ASUS', 8299900, null, 'Potencia extrema para gaming y streaming.', 'Computador de demostración con arquitectura de última generación, iluminación configurable y amplio espacio de expansión.', 'Nuevo', 'FEF-GAM-002', 4, 4.9, 21],
   ['gaming-orbit-pro', 'PC Gaming Orbit Pro', 'Computadores Gaming', 'MSI', 5699900, 6199900, 'Configuración equilibrada para jugar en alta resolución.', 'Torre ficticia pensada para ejecutar títulos actuales, editar video y realizar tareas creativas exigentes.', 'Disponible', 'FEF-GAM-003', 11, 4.7, 54],

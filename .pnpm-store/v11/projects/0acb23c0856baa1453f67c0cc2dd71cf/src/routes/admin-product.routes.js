@@ -1,0 +1,11 @@
+import { Router } from 'express';
+import { authorize, authenticate } from '../middleware/auth.js';
+import { ROLES } from '../constants/roles.js';
+import * as controller from '../controllers/admin-product.controller.js';
+export const adminProductRouter = Router();
+adminProductRouter.use(authenticate, authorize(ROLES.ADMIN, ROLES.EMPLOYEE));
+adminProductRouter.get('/options', controller.productOptions);
+adminProductRouter.get('/', controller.listProducts);
+adminProductRouter.post('/', controller.createProduct);
+adminProductRouter.put('/:id', controller.updateProduct);
+adminProductRouter.delete('/:id', controller.archiveProduct);

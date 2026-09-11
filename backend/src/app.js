@@ -12,6 +12,7 @@ import { accountRouter } from './routes/account.routes.js';
 import { orderRouter } from './routes/order.routes.js';
 import { shoppingStateRouter } from './routes/shopping-state.routes.js';
 import { healthRouter } from './routes/health.routes.js';
+import { adminProductRouter } from './routes/admin-product.routes.js';
 
 export const app = express();
 
@@ -30,6 +31,7 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/account', accountRouter);
 app.use('/api/v1/orders', orderRouter);
 app.use('/api/v1/account/shopping-state', shoppingStateRouter);
+app.use('/api/v1/admin/products', adminProductRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
