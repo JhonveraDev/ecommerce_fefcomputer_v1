@@ -9,8 +9,8 @@ const serialize = (product) => {
     id: product.id, slug: product.slug, name: product.name, sku: product.sku || '',
     category: product.categories[0]?.category.name || 'Sin categoría', brand: product.brand?.name || 'Sin marca',
     price: Number(product.basePrice), previousPrice: product.compareAtPrice == null ? null : Number(product.compareAtPrice),
-    shortDescription: product.shortDescription || '', description: product.description || '', image: product.images[0]?.url || '/product-placeholder.svg',
-    stock, status: stock === 0 ? 'Agotado' : product.compareAtPrice ? 'Oferta' : isNew ? 'Nuevo' : 'Disponible', rating: 0, reviewCount: 0,
+    shortDescription: product.shortDescription || '', description: product.description || '', image: product.images[0]?.url || '/product-placeholder.svg', offerStartsAt: product.offerStartsAt, offerEndsAt: product.offerEndsAt,
+    stock, status: stock === 0 ? 'Agotado' : product.compareAtPrice ? 'Oferta' : isNew ? 'Nuevo' : 'Disponible', isFeatured: product.isFeatured, rating: 0, reviewCount: 0,
   };
 };
 

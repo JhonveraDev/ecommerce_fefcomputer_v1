@@ -231,9 +231,12 @@ model Product {
   description   String?
   basePrice     Decimal       @map("base_price") @db.Decimal(14, 2)
   compareAtPrice Decimal?     @map("compare_at_price") @db.Decimal(14, 2)
+  offerStartsAt  DateTime?    @map("offer_starts_at")
+  offerEndsAt    DateTime?    @map("offer_ends_at")
   weightGrams   Int?          @map("weight_grams")
   specifications Json?
   status        ProductStatus @default(DRAFT)
+  isFeatured    Boolean       @default(false) @map("is_featured")
   createdAt     DateTime      @default(now()) @map("created_at")
   updatedAt     DateTime      @updatedAt @map("updated_at")
   deletedAt     DateTime?     @map("deleted_at")
