@@ -115,19 +115,6 @@
   margin: 18px 0 15px;
 }
 
-.rating {
-  align-items: center;
-  color: var(--color-warning);
-  display: flex;
-  gap: 3px;
-}
-
-.rating span {
-  color: var(--color-text-subtle);
-  font-size: 14px;
-  margin-left: 6px;
-}
-
 .priceRow {
   align-items: center;
   display: flex;

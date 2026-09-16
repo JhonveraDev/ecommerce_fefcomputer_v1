@@ -1,4 +1,4 @@
-import { ShoppingCart, Star } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { ProductCardActions } from '../ProductCardActions';
 import styles from './FeaturedProducts.module.css';
@@ -12,9 +12,10 @@ export type Product = {
   price: number;
   previousPrice: number | null;
   image: string;
+  baseStock?: number;
+  variantStock?: number;
+  stock?: number;
   status: 'Disponible' | 'Agotado' | 'Oferta' | 'Nuevo';
-  rating: number;
-  reviewCount: number;
   tags?: string[];
   hasVariants?: boolean;
 };
@@ -38,7 +39,6 @@ const tabs = [
   { id: 'all', label: 'Todos' },
   { id: 'offer', label: 'Ofertas' },
   { id: 'new', label: 'Novedades' },
-  { id: 'popular', label: 'Más populares' },
 ];
 
 export function ProductCard({ product, onProductClick, onAddToCart, onAddToWishlist, onCompare, onQuickView, compact = false }: {
@@ -64,12 +64,6 @@ export function ProductCard({ product, onProductClick, onAddToCart, onAddToWishl
         <p className={styles.category}>{product.category}</p>
         <h3>{product.name}</h3>
       </button>
-      <div className={styles.rating} aria-label={`${product.rating} de 5 estrellas`}>
-        {Array.from({ length: 5 }, (_, index) => (
-          <Star key={index} size={14} fill={index < Math.round(product.rating) ? 'currentColor' : 'none'} />
-        ))}
-        <span>({product.reviewCount})</span>
-      </div>
       <p className={styles.brand}>Por {product.brand}</p>
       <div className={styles.footer}>
         <div className={styles.prices}>
@@ -88,10 +82,9 @@ export function ProductCard({ product, onProductClick, onAddToCart, onAddToWishl
 export function FeaturedProducts({ products, onProductClick, onAddToCart, onAddToWishlist, onCompare, onQuickView }: Props) {
   const [activeTab, setActiveTab] = useState('all');
   const visibleProducts = useMemo(() => {
-    const ordered = [...products].sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount);
+    const ordered = [...products];
     if (activeTab === 'offer') return ordered.filter((product) => product.previousPrice !== null);
     if (activeTab === 'new') return ordered.filter((product) => product.status === 'Nuevo');
-    if (activeTab === 'popular') return ordered.sort((a, b) => b.reviewCount - a.reviewCount);
     return ordered;
   }, [activeTab, products]);
   const filledProducts = visibleProducts.length ? visibleProducts.slice(0, 10) : products.slice(0, 10);

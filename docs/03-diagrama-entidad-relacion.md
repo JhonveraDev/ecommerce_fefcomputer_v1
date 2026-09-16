@@ -12,7 +12,6 @@ erDiagram
     USER ||--o{ ADDRESS : guarda
     USER ||--o{ CART : posee
     USER o|--o{ ORDER : realiza
-    USER ||--o{ REVIEW : publica
     USER ||--o{ INVENTORY_MOVEMENT : ejecuta
     USER o|--o{ ORDER_STATUS_HISTORY : cambia
 
@@ -34,7 +33,6 @@ erDiagram
     ORDER ||--|{ ORDER_STATUS_HISTORY : historiza
     ORDER ||--o{ PAYMENT : cobra
     ORDER ||--o| SHIPMENT : despacha
-    PRODUCT o|--o{ REVIEW : recibe
 
     USER {
         uuid id PK
@@ -193,14 +191,6 @@ erDiagram
         string tracking_number
         string status
     }
-    REVIEW {
-        uuid id PK
-        uuid user_id FK
-        uuid product_id FK
-        int rating
-        string status
-        boolean verified_purchase
-    }
 ```
 
 ## Restricciones imprescindibles
@@ -213,7 +203,6 @@ erDiagram
 - Un `ORDER_ITEM` no debe depender de una clave foránea activa al producto: sus campos snapshot garantizan el historial incluso si el producto se archiva.
 - La dirección del pedido se almacena como snapshot estructurado, no como referencia viva a `ADDRESS`.
 - `PAYMENT.provider + PAYMENT.provider_reference` debe ser único para impedir procesar dos veces el mismo evento externo.
-- `REVIEW` debe permitir a lo sumo una reseña activa por producto y usuario, salvo que se apruebe otra política.
 
 ## Entidades previstas, no incluidas en el MVP del diagrama
 

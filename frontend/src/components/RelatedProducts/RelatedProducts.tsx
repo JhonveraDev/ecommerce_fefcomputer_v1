@@ -15,7 +15,7 @@ export function RelatedProducts({ products, currentProduct, onProductClick, onAd
   const related = products
     .filter((product) => product.id !== currentProduct.id)
     .sort((first, second) => {
-      const score = (product: typeof first) => (product.category === currentProduct.category ? 4 : 0) + (product.brand === currentProduct.brand ? 2 : 0) + product.rating / 10 + product.reviewCount / 10000;
+      const score = (product: typeof first) => (product.category === currentProduct.category ? 4 : 0) + (product.brand === currentProduct.brand ? 2 : 0);
       return score(second) - score(first);
     })
     .slice(0, 4) as Product[];

@@ -135,20 +135,6 @@
   margin: 0;
 }
 
-.rating {
-  align-items: center;
-  color: var(--color-warning);
-  display: flex;
-  gap: 1px;
-  margin: 17px 0;
-}
-
-.rating span {
-  color: var(--color-text-subtle);
-  font-size: 12px;
-  margin-left: 6px;
-}
-
 .prices {
   align-items: baseline;
   display: flex;

@@ -30,7 +30,7 @@ Este documento convierte la planeación inicial en decisiones funcionales y de d
 
 ### Posterior al MVP
 
-- Pasarela de pagos, cupones, favoritos, reseñas verificadas y notificaciones.
+- Pasarela de pagos, cupones, favoritos y notificaciones.
 - Integración de transportadoras, facturación electrónica y reportes avanzados.
 - Multiidioma, multimoneda, multitienda y ventas B2B.
 
@@ -38,7 +38,7 @@ Este documento convierte la planeación inicial en decisiones funcionales y de d
 
 ### Identidad
 
-**Usuario**: id, nombre, email normalizado, hash de contraseña, estado, fecha de verificación, último acceso y auditoría temporal. El email es único. Un usuario puede tener varios roles, direcciones, sesiones, pedidos y reseñas.
+**Usuario**: id, nombre, email normalizado, hash de contraseña, estado, fecha de verificación, último acceso y auditoría temporal. El email es único. Un usuario puede tener varios roles, direcciones, sesiones y pedidos.
 
 **Rol**: id, nombre estable y descripción. Se crean `ADMIN`, `EMPLOYEE` y `CUSTOMER`. La relación con usuario es muchos a muchos para evitar rediseño cuando un empleado también compre como cliente.
 
@@ -82,11 +82,11 @@ Este documento convierte la planeación inicial en decisiones funcionales y de d
 
 ```text
 Usuario  N:M  Rol
-Usuario  1:N  Dirección / Sesión / Pedido / Reseña
+Usuario  1:N  Dirección / Sesión / Pedido
 Categoría 1:N Categoría (padre-hija)
 Producto N:M Categoría
 Marca    1:N Producto
-Producto 1:N Imagen / Variante / Reseña
+Producto 1:N Imagen / Variante
 SKU vendible 1:1 Inventario
 Inventario 1:N MovimientoInventario
 Carrito  1:N ÍtemCarrito

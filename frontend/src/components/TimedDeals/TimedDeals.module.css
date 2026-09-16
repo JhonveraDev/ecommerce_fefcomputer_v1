@@ -137,20 +137,6 @@
   min-height: 39px;
 }
 
-.rating {
-  align-items: center;
-  color: var(--color-warning);
-  display: flex;
-  gap: 1px;
-  margin: 8px 0 7px;
-}
-
-.rating small {
-  color: var(--color-text-subtle);
-  font-size: 11px;
-  margin-left: 5px;
-}
-
 .content>p {
   color: var(--color-text-subtle);
   font-size: 12px;

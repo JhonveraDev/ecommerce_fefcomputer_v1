@@ -1,4 +1,4 @@
-import { Eye, Heart, Minus, Plus, ShoppingCart, Star, X } from 'lucide-react';
+import { Eye, Heart, Minus, Plus, ShoppingCart, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useWishlist } from '../../context/WishlistContext';
@@ -6,8 +6,7 @@ import styles from './QuickViewModal.module.css';
 
 type Product = {
   id: string; name: string; image: string; price: number; slug: string;
-  previousPrice?: number | null; category?: string; brand?: string; rating?: number;
-  reviewCount?: number; stock?: number; status?: string; description?: string; shortDescription?: string;
+  previousPrice?: number | null; category?: string; brand?: string; stock?: number; status?: string; description?: string; shortDescription?: string;
 };
 
 type Props = {
@@ -71,7 +70,6 @@ export function QuickViewModal({ product, onClose, onAddToCart, onAddToWishlist,
           {discount > 0 && <span className={styles.discount}>Oferta {discount}%</span>}
           <p className={styles.category}>{product.category ?? product.brand ?? 'Producto destacado'}</p>
           <h2 id="quick-view-title">{product.name}</h2>
-          <div className={styles.rating} aria-label={`${product.rating ?? 0} de 5 estrellas`}>{Array.from({ length: 5 }, (_, index) => <Star key={index} size={15} fill={index < Math.round(product.rating ?? 0) ? 'currentColor' : 'none'} />)}<span>({product.reviewCount ?? 0} reseñas)</span></div>
           <div className={styles.prices}><strong>{money(product.price)}</strong>{product.previousPrice && <del>{money(product.previousPrice)}</del>}{discount > 0 && <small>{discount}% de descuento</small>}</div>
           <p className={`${styles.stock} ${isOutOfStock ? styles.outOfStock : ''}`}>{isOutOfStock ? 'Agotado' : `Disponible${product.stock ? `: ${product.stock} unidades` : ''}`}</p>
           <p className={styles.description}>{product.description ?? product.shortDescription ?? 'Información detallada de este producto disponible próximamente.'}</p>

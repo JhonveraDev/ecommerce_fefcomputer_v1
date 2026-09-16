@@ -14,7 +14,6 @@ const sortOptions = [
   { value: 'featured', label: 'Destacados' },
   { value: 'price', label: 'Precio: menor a mayor' },
   { value: 'price-high', label: 'Precio: mayor a menor' },
-  { value: 'rating', label: 'Mejor calificación' },
 ];
 
 type Props = { products: Product[]; onQuickView: (product: Product) => void; onProductClick: (product: Product) => void; onAddToCart: (product: Product) => void; locationPath: string };
@@ -37,7 +36,7 @@ export function StorePage({ products, onQuickView, onProductClick, onAddToCart, 
   };
   const filtered = useMemo(() => (searchProducts(products, search) as SearchResult[])
     .filter(({ product }) => category === 'Todas' || product.category === category)
-    .sort((first, second) => sort === 'price' ? first.product.price - second.product.price : sort === 'price-high' ? second.product.price - first.product.price : sort === 'rating' ? second.product.rating - first.product.rating : search ? second.score - first.score : second.product.reviewCount - first.product.reviewCount)
+    .sort((first, second) => sort === 'price' ? first.product.price - second.product.price : sort === 'price-high' ? second.product.price - first.product.price : search ? second.score - first.score : 0)
     .map(({ product }) => product), [products, search, category, sort]);
   const total = Math.max(1, Math.ceil(filtered.length / limit));
   const requestedPage = Number(params.get('page')) || 1;

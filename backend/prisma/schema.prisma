@@ -70,13 +70,6 @@ enum InventoryMovementType {
   SALE
 }
 
-enum ReviewStatus {
-  PENDING
-  PUBLISHED
-  REJECTED
-  HIDDEN
-}
-
 model User {
   id                String                 @id @default(uuid()) @db.Uuid
   name              String                 @db.VarChar(120)
@@ -97,7 +90,6 @@ model User {
   addresses         Address[]
   carts             Cart[]
   orders            Order[]
-  reviews           Review[]
   inventoryMoves    InventoryMovement[]    @relation("InventoryMovementActor")
   orderStatusChanges OrderStatusHistory[]  @relation("OrderStatusActor")
 
@@ -254,7 +246,6 @@ model Product {
   variants      ProductVariant[]
   inventory     Inventory?    @relation("ProductInventory")
   cartItems     CartItem[]
-  reviews       Review[]
 
   @@index([brandId, status])
   @@index([status, createdAt])
@@ -539,22 +530,4 @@ model ShippingRestriction {
 
   @@index([shippingZoneId, isActive])
   @@map("shipping_restrictions")
-}
-
-model Review {
-  id               String       @id @default(uuid()) @db.Uuid
-  userId           String       @map("user_id") @db.Uuid
-  productId        String       @map("product_id") @db.Uuid
-  rating           Int
-  comment          String?
-  status           ReviewStatus @default(PENDING)
-  verifiedPurchase Boolean      @default(false) @map("verified_purchase")
-  createdAt        DateTime     @default(now()) @map("created_at")
-  updatedAt        DateTime     @updatedAt @map("updated_at")
-  user             User         @relation(fields: [userId], references: [id], onDelete: Restrict)
-  product          Product      @relation(fields: [productId], references: [id], onDelete: Restrict)
-
-  @@unique([userId, productId])
-  @@index([productId, status, createdAt])
-  @@map("reviews")
 }

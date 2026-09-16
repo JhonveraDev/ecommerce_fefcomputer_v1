@@ -1,6 +1,6 @@
 # Decisiones del schema de Prisma
 
-El schema inicial está disponible en `backend/prisma/schema.prisma`. Implementa las entidades del diagrama ER para el MVP: usuarios y roles, catálogo, variantes, imágenes, inventario, carrito, pedidos, pagos, envíos y reseñas.
+El schema inicial está disponible en `backend/prisma/schema.prisma`. Implementa las entidades del diagrama ER para el MVP: usuarios y roles, catálogo, variantes, imágenes, inventario, carrito, pedidos, pagos y envíos.
 
 ## Supuestos aplicados
 
@@ -20,7 +20,7 @@ Estas restricciones deben reforzarse mediante validación de servicio y una migr
 - Cada imagen debe estar asociada a producto o variante.
 - Un producto solo puede tener una categoría marcada como principal.
 - Cada usuario solo puede mantener un carrito activo.
-- Las cantidades, precios y calificaciones deben tener límites y no pueden ser negativos.
+- Las cantidades y precios deben tener límites y no pueden ser negativos.
 - Las transiciones de estado de pedido deben validarse en la capa de servicio.
 - La cobertura de envío sólo puede usarse si departamento, municipio, zona y sus restricciones vigentes lo permiten.
 - Las fechas de restricción deben ser coherentes y el intervalo de entrega mínimo no puede superar el máximo.

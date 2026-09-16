@@ -26,7 +26,6 @@ export const deleteProduct = asyncHandler(async (req, res) => {
     if (!row) throw new ApiError(404, 'PRODUCT_NOT_FOUND', 'No encontramos ese producto.');
     await tx.inventoryMovement.deleteMany({ where: { inventory: { OR: [{ productId: row.id }, { variant: { productId: row.id } }] } } });
     await tx.cartItem.deleteMany({ where: { productId: row.id } });
-    await tx.review.deleteMany({ where: { productId: row.id } });
     await tx.product.delete({ where: { id: row.id } });
   });
   res.status(204).send();

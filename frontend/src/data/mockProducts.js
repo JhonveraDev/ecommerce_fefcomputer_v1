@@ -10,9 +10,7 @@
   'Equipo gaming ficticio...', // 7: descripción detallada
   'Oferta', // 8: etiqueta o badge comercial
   'FEF-GAM-001', // 9: SKU / código interno
-  7, // 10: unidades disponibles (stock)
-  4.8, // 11: calificación promedio
-  38 // 12: número de reseñas o valoraciones
+  7 // 10: unidades disponibles (stock)
 ]
 */
 
@@ -48,8 +46,6 @@ import upsImage from '../assets/products/ups.png';
  * @property {ProductStatus} status
  * @property {string} sku
  * @property {number} stock
- * @property {number} rating
- * @property {number} reviewCount
  */
 
 export const PRODUCT_PLACEHOLDER = '/product-placeholder.svg';
@@ -151,7 +147,7 @@ export const mockProducts = [
   ['energy-powerstation-1k', 'Estación de Energía 1 kWh', 'Energía y UPS', 'EcoFlow', 4299900, null, 'Energía portátil para trabajo y respaldo.', 'Estación ficticia para cargar dispositivos, respaldar equipos y apoyar actividades fuera de la red.', 'Nuevo', 'FEF-ENE-002', 6, 4.7, 28],
   ['energy-regulator-1200', 'Regulador Pro 1200 W', 'Energía y UPS', 'Forza', 279900, 329900, 'Protección estable para electrónicos sensibles.', 'Regulador de voltaje ficticio con múltiples salidas para organizar y proteger el escritorio.', 'Disponible', 'FEF-ENE-003', 25, 4.5, 47],
   ['energy-rack-pdu', 'PDU Rack Inteligente', 'Energía y UPS', 'Tripp Lite', 749900, null, 'Distribución de energía para infraestructura.', 'Unidad PDU ficticia para racks de comunicaciones, servidores y equipos empresariales.', 'Disponible', 'FEF-ENE-004', 9, 4.6, 20],
-].map(([slug, name, category, brand, price, previousPrice, shortDescription, description, status, sku, stock, rating, reviewCount], index) => ({
+].map(([slug, name, category, brand, price, previousPrice, shortDescription, description, status, sku, stock], index) => ({
   id: `mock-product-${index + 1}`,
   slug,
   name,
@@ -165,6 +161,4 @@ export const mockProducts = [
   status,
   sku,
   stock,
-  rating,
-  reviewCount,
 }));

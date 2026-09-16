@@ -1,4 +1,4 @@
-import { ChevronRight, Heart, Home, Minus, Plus, ShoppingCart, Sparkles, Star } from 'lucide-react';
+import { ChevronRight, Heart, Home, Minus, Plus, ShoppingCart, Sparkles } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import type { Product } from '../components/FeaturedProducts/FeaturedProducts';
 import { StoreSidebar } from '../components/StoreSidebar';
@@ -7,7 +7,7 @@ import { useWishlist } from '../context/WishlistContext';
 import { navigate } from '../utils/navigation';
 import styles from './ProductPage.module.css';
 
-type FullProduct = Product & { description?: string; shortDescription?: string; sku?: string; stock?: number; variantId?: string; selectedVariant?: Record<string, string>; imageUrls?: string[]; specifications?: Record<string, string>; warranty?: string | null; condition?: string | null; tags?: string[]; seoTitle?: string | null; seoDescription?: string | null; variants?: Array<{ id: string; sku: string; attributes: Record<string, string>; priceOverride: number | null; stock: number }>; weightGrams?: number | null; lengthCm?: number | null; widthCm?: number | null; heightCm?: number | null };
+type FullProduct = Product & { description?: string; shortDescription?: string; sku?: string; stock?: number; baseStock?: number; variantId?: string; selectedVariant?: Record<string, string>; imageUrls?: string[]; specifications?: Record<string, string>; warranty?: string | null; condition?: string | null; tags?: string[]; seoTitle?: string | null; seoDescription?: string | null; variants?: Array<{ id: string; sku: string; attributes: Record<string, string>; priceOverride: number | null; stock: number }>; weightGrams?: number | null; lengthCm?: number | null; widthCm?: number | null; heightCm?: number | null };
 type Props = { products: FullProduct[]; product: FullProduct | undefined; onAddToCart: (product: FullProduct, quantity: number) => void; onAddToWishlist: (product: FullProduct) => void; onCompare: (product: FullProduct) => void; onQuickView?: (product: FullProduct) => void };
 const money = (value: number) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(value);
 
@@ -21,13 +21,6 @@ function ProductGallery({ product }: { product: FullProduct }) {
   </section>;
 }
 
-function Rating({ product }: { product: FullProduct }) {
-  return <div className={styles.rating} aria-label={`${product.rating} de 5 estrellas`}>
-    {Array.from({ length: 5 }, (_, index) => <Star key={index} size={17} fill={index < Math.round(product.rating) ? 'currentColor' : 'none'} />)}
-    <span>({product.reviewCount} reseñas)</span>
-  </div>;
-}
-
 function ProductInformation({ product, onAddToCart, onAddToWishlist, onCompare }: Omit<Props, 'product' | 'products'> & { product: FullProduct }) {
   const [quantity, setQuantity] = useState(1);
   const [variantId, setVariantId] = useState('');
@@ -35,18 +28,16 @@ function ProductInformation({ product, onAddToCart, onAddToWishlist, onCompare }
   const wishlisted = isFavorite(product.id);
   useEffect(() => { setQuantity(1); setVariantId(''); }, [product.id]);
   const variant = product.variants?.find((item) => item.id === variantId);
-  const selectedProduct: FullProduct = variant ? { ...product, variantId: variant.id, selectedVariant: variant.attributes, sku: variant.sku, price: variant.priceOverride ?? product.price, previousPrice: null, stock: variant.stock } : product;
+  const selectedProduct: FullProduct = variant ? { ...product, variantId: variant.id, selectedVariant: variant.attributes, sku: variant.sku, price: variant.priceOverride ?? product.price, previousPrice: null, stock: variant.stock } : { ...product, stock: product.baseStock ?? product.stock };
   const outOfStock = selectedProduct.status === 'Agotado' || !selectedProduct.stock;
   const discount = selectedProduct.previousPrice && selectedProduct.previousPrice > selectedProduct.price ? Math.round((1 - selectedProduct.price / selectedProduct.previousPrice) * 100) : 0;
   const increment = () => setQuantity((value) => Math.min(selectedProduct.stock || 1, value + 1));
   return <section className={styles.info}>
     <div className={styles.eyebrow}><span>{product.status === 'Oferta' ? 'Oferta especial' : product.category}</span>{product.brand && <span>Marca: <b>{product.brand}</b></span>}</div>
     <h1>{product.name}</h1>
-    <Rating product={product} />
     <div className={styles.priceRow}><strong>{money(selectedProduct.price)}</strong>{selectedProduct.previousPrice && <del>{money(selectedProduct.previousPrice)}</del>}{discount > 0 && <small>{discount}% OFF</small>}</div>
     {product.variants?.length ? <div className={styles.variantPicker}><b>Elige una variante</b><div>{product.variants.map((item) => { const selected = variantId === item.id; return <button key={item.id} type="button" aria-pressed={selected} title={selected ? 'Quitar selección de variante' : 'Seleccionar variante'} className={selected ? styles.variantSelected : ''} onClick={() => { setVariantId(selected ? '' : item.id); setQuantity(1); }}>{Object.values(item.attributes).join(' · ') || item.sku}<small>{selected ? 'Seleccionada · pulsa de nuevo para quitarla' : `${item.stock} disponibles`}</small></button>; })}</div></div> : null}
     <p className={`${styles.availability} ${outOfStock ? styles.unavailable : ''}`}>{outOfStock ? 'Agotado' : `Disponible · ${selectedProduct.stock} unidades`}</p>
-    {(product.description || product.shortDescription) && <p className={styles.description}>{product.description || product.shortDescription}</p>}
     <div className={styles.purchase}>
       <div className={styles.quantity} aria-label="Seleccionar cantidad"><button type="button" aria-label="Reducir cantidad" disabled={quantity === 1} onClick={() => setQuantity((value) => Math.max(1, value - 1))}><Minus size={17} /></button><span>{quantity}</span><button type="button" aria-label="Aumentar cantidad" disabled={outOfStock || quantity >= (selectedProduct.stock || 1)} onClick={increment}><Plus size={17} /></button></div>
       <button className={styles.add} type="button" disabled={outOfStock} onClick={() => onAddToCart(selectedProduct, quantity)}><ShoppingCart size={19} />Agregar al carrito</button>

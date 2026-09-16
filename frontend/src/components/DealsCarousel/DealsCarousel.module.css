@@ -196,20 +196,6 @@
   min-height: 42px
 }
 
-.rating {
-  align-items: center;
-  color: var(--color-warning);
-  display: flex;
-  gap: 1px;
-  margin: 8px 0 12px
-}
-
-.rating small {
-  color: var(--color-text-subtle);
-  font-size: 11px;
-  margin-left: 4px
-}
-
 .prices {
   align-items: baseline;
   display: flex;

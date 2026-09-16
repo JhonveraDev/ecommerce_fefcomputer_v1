@@ -26,7 +26,6 @@ La primera migración crearía la estructura fundacional aprobada para FEFCOMPUT
 - Inventario y movimientos auditables.
 - Carritos de invitado y clientes autenticados.
 - Pedidos, snapshots, pagos, envíos e historial de estados.
-- Reseñas moderables.
 
 Antes de generar la migración se añadirá al schema el módulo de cobertura de envío para Colombia:
 

@@ -63,5 +63,5 @@ export function searchProducts(products, query) {
     });
     return { product, score, matchedTerms: matched.filter(Boolean).length };
   }).filter(({ matchedTerms }) => matchedTerms === queryTerms.length)
-    .sort((first, second) => second.score - first.score || second.product.reviewCount - first.product.reviewCount);
+    .sort((first, second) => second.score - first.score);
 }

@@ -1,4 +1,4 @@
-import { ArrowRight, ShoppingCart, Star, X } from 'lucide-react';
+import { ArrowRight, ShoppingCart, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './WelcomeOffer.module.css';
@@ -52,7 +52,6 @@ export function WelcomeOffer({ product, onAddToCart, onViewProduct }) {
           <p id="welcome-offer-description" className={styles.description}>Aprovecha este precio especial por tiempo limitado.</p>
           <p className={styles.category}>{product.category}</p>
           <h3>{product.name}</h3>
-          <div className={styles.rating} aria-label={`${product.rating} de 5 estrellas`}>{Array.from({ length: 5 }, (_, index) => <Star key={index} size={15} fill={index < Math.round(product.rating) ? 'currentColor' : 'none'} />)}<span>({product.reviewCount} reseñas)</span></div>
           <div className={styles.prices}><strong>{money(product.price)}</strong>{product.previousPrice && <del>{money(product.previousPrice)}</del>}</div>
           {discount > 0 && <span className={styles.discount}>Ahorra {discount}%</span>}
           <div className={styles.actions}>
