@@ -59,12 +59,14 @@ export function ProductCard({ product, onProductClick, onAddToCart, onAddToWishl
     <article className={`${styles.card} ${compact ? styles.compact : ''}`}>
       {label && <span className={`${styles.badge} ${product.status === 'Nuevo' ? styles.newBadge : ''}`}>{label}</span>}
       <ProductCardActions className={styles.actions} product={product} onAddToWishlist={onAddToWishlist} onCompare={onCompare} onQuickView={onQuickView} />
-      <button className={styles.product} type="button" onClick={() => onProductClick?.(product)}>
+      <button className={styles.media} type="button" onClick={() => onProductClick?.(product)} aria-label={`Ver ${product.name}`}>
         <img src={product.image} alt={product.name} />
-        <p className={styles.category}>{product.category}</p>
-        <h3>{product.name}</h3>
       </button>
-      <p className={styles.brand}>Por {product.brand}</p>
+      <div className={styles.details}>
+        <p className={styles.category}>{product.category}</p>
+        <button className={styles.product} type="button" onClick={() => onProductClick?.(product)}><h3>{product.name}</h3></button>
+        <p className={styles.brand}>Por {product.brand}</p>
+      </div>
       <div className={styles.footer}>
         <div className={styles.prices}>
           <strong>{money(product.price)}</strong>
