@@ -237,6 +237,11 @@ model Product {
   lengthCm      Int?          @map("length_cm")
   widthCm       Int?          @map("width_cm")
   heightCm      Int?          @map("height_cm")
+  warranty      String?       @db.VarChar(255)
+  condition     String?       @db.VarChar(40)
+  tags          Json?
+  seoTitle      String?       @map("seo_title") @db.VarChar(255)
+  seoDescription String?      @map("seo_description") @db.VarChar(500)
   specifications Json?
   status        ProductStatus @default(DRAFT)
   isFeatured    Boolean       @default(false) @map("is_featured")

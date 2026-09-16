@@ -39,7 +39,7 @@ function scoreCandidate(term, fields, allowTypo) {
 
 function productFields(product) {
   return {
-    primary: [[product.name, 180], [product.brand, 105], [product.category, 90], [product.sku, 75]],
+    primary: [[product.name, 180], [product.brand, 105], [product.category, 90], [product.sku, 75], [product.tags?.join(' '), 58]],
     secondary: [[product.shortDescription, 38], [product.description, 22]],
   };
 }

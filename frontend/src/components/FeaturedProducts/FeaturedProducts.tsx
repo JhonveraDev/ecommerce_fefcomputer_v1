@@ -15,6 +15,8 @@ export type Product = {
   status: 'Disponible' | 'Agotado' | 'Oferta' | 'Nuevo';
   rating: number;
   reviewCount: number;
+  tags?: string[];
+  hasVariants?: boolean;
 };
 
 type Props = {
@@ -74,9 +76,9 @@ export function ProductCard({ product, onProductClick, onAddToCart, onAddToWishl
           <strong>{money(product.price)}</strong>
           {product.previousPrice && <del>{money(product.previousPrice)}</del>}
         </div>
-        <button className={styles.add} type="button" onClick={() => onAddToCart?.(product)}>
+        <button className={styles.add} type="button" onClick={() => product.hasVariants ? onProductClick?.(product) : onAddToCart?.(product)}>
           <ShoppingCart size={17} aria-hidden="true" />
-          Agregar
+          {product.hasVariants ? 'Elegir versión' : 'Agregar'}
         </button>
       </div>
     </article>

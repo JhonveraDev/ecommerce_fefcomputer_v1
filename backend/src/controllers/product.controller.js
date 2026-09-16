@@ -9,8 +9,8 @@ const serialize = (product) => {
     id: product.id, slug: product.slug, name: product.name, sku: product.sku || '',
     category: product.categories[0]?.category.name || 'Sin categoría', brand: product.brand?.name || 'Sin marca',
     price: Number(product.basePrice), previousPrice: product.compareAtPrice == null ? null : Number(product.compareAtPrice),
-    shortDescription: product.shortDescription || '', description: product.description || '', image: product.images[0]?.url || '/product-placeholder.svg', imageUrls: product.images.map((image) => image.url), specifications: product.specifications || {}, weightGrams: product.weightGrams, lengthCm: product.lengthCm, widthCm: product.widthCm, heightCm: product.heightCm, offerStartsAt: product.offerStartsAt, offerEndsAt: product.offerEndsAt,
-    stock, status: stock === 0 ? 'Agotado' : product.compareAtPrice ? 'Oferta' : isNew ? 'Nuevo' : 'Disponible', isFeatured: product.isFeatured, rating: 0, reviewCount: 0,
+    shortDescription: product.shortDescription || '', description: product.description || '', image: product.images[0]?.url || '/product-placeholder.svg', imageUrls: product.images.map((image) => image.url), specifications: product.specifications || {}, warranty: product.warranty, condition: product.condition, tags: Array.isArray(product.tags) ? product.tags : [], seoTitle: product.seoTitle, seoDescription: product.seoDescription, weightGrams: product.weightGrams, lengthCm: product.lengthCm, widthCm: product.widthCm, heightCm: product.heightCm, offerStartsAt: product.offerStartsAt, offerEndsAt: product.offerEndsAt,
+    hasVariants: product.variants.some((variant) => variant.status === 'ACTIVE'), variants: product.variants.filter((variant) => variant.status === 'ACTIVE').map((variant) => ({ id: variant.id, sku: variant.sku, attributes: variant.attributes, priceOverride: variant.priceOverride == null ? null : Number(variant.priceOverride), stock: variant.inventory?.physicalQuantity ?? 0 })), stock, status: stock === 0 ? 'Agotado' : product.compareAtPrice ? 'Oferta' : isNew ? 'Nuevo' : 'Disponible', isFeatured: product.isFeatured, rating: 0, reviewCount: 0,
   };
 };
 

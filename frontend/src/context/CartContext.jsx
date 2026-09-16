@@ -49,14 +49,15 @@ export function CartProvider({ children }) {
   const addItem = (product, quantity = 1) => {
     const acceptedQuantity = Math.min(product.stock ?? Infinity, Math.max(1, quantity));
     setItems((current) => {
-      const existing = current.find((item) => item.product.id === product.id);
-      if (existing) return current.map((item) => item.product.id === product.id ? { ...item, quantity: Math.min(product.stock ?? Infinity, item.quantity + acceptedQuantity) } : item);
+      const sameProduct = (item) => item.product.id === product.id && (item.product.variantId || null) === (product.variantId || null);
+      const existing = current.find(sameProduct);
+      if (existing) return current.map((item) => sameProduct(item) ? { ...item, quantity: Math.min(product.stock ?? Infinity, item.quantity + acceptedQuantity) } : item);
       return [...current, { product, quantity: acceptedQuantity }];
     });
     setNotice({ id: Date.now(), product, quantity: acceptedQuantity });
   };
-  const updateQuantity = (productId, quantity) => setItems((current) => current.map((item) => item.product.id === productId ? { ...item, quantity: Math.min(item.product.stock ?? Infinity, Math.max(1, quantity)) } : item));
-  const removeItem = (productId) => setItems((current) => current.filter((item) => item.product.id !== productId));
+  const updateQuantity = (productId, quantity, variantId = null) => setItems((current) => current.map((item) => item.product.id === productId && (item.product.variantId || null) === variantId ? { ...item, quantity: Math.min(item.product.stock ?? Infinity, Math.max(1, quantity)) } : item));
+  const removeItem = (productId, variantId = null) => setItems((current) => current.filter((item) => item.product.id !== productId || (item.product.variantId || null) !== variantId));
   const clearCart = () => setItems([]);
   const itemCount = items.reduce((total, item) => total + item.quantity, 0);
   const subtotal = items.reduce((total, item) => total + item.product.price * item.quantity, 0);
