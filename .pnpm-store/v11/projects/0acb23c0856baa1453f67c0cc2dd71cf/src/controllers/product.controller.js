@@ -2,13 +2,12 @@ import { prisma } from '../config/prisma.js';
 import { asyncHandler } from '../utils/async-handler.js';
 
 const include = { brand: true, categories: { include: { category: true }, orderBy: { isPrimary: 'desc' }, take: 1 }, images: { orderBy: { position: 'asc' } }, inventory: true, variants: { include: { inventory: true } } };
-const serialize = (product) => {
+const serialize = (product, isNew = false) => {
   const baseStock = product.inventory?.physicalQuantity ?? 0;
   const variantStock = product.variants.reduce((total, variant) => total + (variant.inventory?.physicalQuantity ?? 0), 0);
   const stock = baseStock + variantStock;
   const now = Date.now();
   const offerIsActive = product.compareAtPrice != null && product.offerStartsAt != null && product.offerEndsAt != null && product.offerStartsAt.getTime() <= now && product.offerEndsAt.getTime() > now;
-  const isNew = now - product.createdAt.getTime() < 1000 * 60 * 60 * 24 * 30;
   return {
     id: product.id, slug: product.slug, name: product.name, sku: product.sku || '',
     category: product.categories[0]?.category.name || 'Sin categoría', brand: product.brand?.name || 'Sin marca',
@@ -20,5 +19,5 @@ const serialize = (product) => {
 
 export const listPublicProducts = asyncHandler(async (_request, response) => {
   const products = await prisma.product.findMany({ where: { status: 'ACTIVE', deletedAt: null }, include, orderBy: { createdAt: 'desc' } });
-  response.json({ success: true, data: { products: products.map(serialize) } });
+  response.json({ success: true, data: { products: products.map((product, index) => serialize(product, index < 4)) } });
 });
