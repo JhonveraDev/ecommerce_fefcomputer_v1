@@ -1,4 +1,5 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
 const messageFor = (error) => {
   const code = error?.error?.code;
@@ -14,7 +15,19 @@ const messageFor = (error) => {
 
 export async function apiRequest(path, options = {}, accessToken) {
   const headers = { ...(options.body ? { 'Content-Type': 'application/json' } : {}), ...(options.headers || {}), ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) };
-  const response = await fetch(`${API_URL}${path}`, { ...options, headers, credentials: 'include' });
+  const request = () => fetch(`${API_URL}${path}`, { ...options, headers, credentials: 'include' });
+  let response;
+  try {
+    response = await request();
+  } catch {
+    // El backend local puede estar terminando de arrancar o reiniciándose tras un cambio.
+    await wait(500);
+    try {
+      response = await request();
+    } catch {
+      throw new Error('No fue posible conectar con el servidor. Verifica que el backend esté ejecutándose e inténtalo nuevamente.');
+    }
+  }
   const body = response.status === 204 ? null : await response.json().catch(() => null);
   if (!response.ok) {
     const error = new Error(messageFor(body));

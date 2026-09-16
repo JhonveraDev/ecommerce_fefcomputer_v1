@@ -234,6 +234,9 @@ model Product {
   offerStartsAt  DateTime?    @map("offer_starts_at")
   offerEndsAt    DateTime?    @map("offer_ends_at")
   weightGrams   Int?          @map("weight_grams")
+  lengthCm      Int?          @map("length_cm")
+  widthCm       Int?          @map("width_cm")
+  heightCm      Int?          @map("height_cm")
   specifications Json?
   status        ProductStatus @default(DRAFT)
   isFeatured    Boolean       @default(false) @map("is_featured")

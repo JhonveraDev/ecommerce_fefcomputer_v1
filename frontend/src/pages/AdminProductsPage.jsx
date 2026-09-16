@@ -7,6 +7,7 @@ import confirmStyles from './AdminProductsConfirm.module.css';
 import dashboardStyles from './AdminProductsDashboard.module.css';
 import modalStyles from './AdminProductsModal.module.css';
 import noticeStyles from './AdminProductNotice.module.css';
+import { ProductFormDialog } from './ProductFormDialog';
 
 const blankProduct = { name: '', sku: '', category: '', brand: '', basePrice: '', compareAtPrice: '', offerStartsAt: '', offerEndsAt: '', physicalQuantity: 0, reorderPoint: 0, shortDescription: '', description: '', imageUrl: '', status: 'ACTIVE', isFeatured: false };
 const money = (value) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(value));
@@ -80,7 +81,7 @@ export function AdminProductsPage() {
       {error && <p className={styles.error}>{error}</p>}
       {loading ? <p className={styles.loading}>Cargando productos…</p> : <div className={styles.tableWrap}><table><thead><tr><th>Producto</th><th>SKU</th><th>Categoría / Marca</th><th>Precio</th><th>Inventario</th><th>Estado</th><th aria-label="Acciones" /></tr></thead><tbody>{filtered.map((product) => <tr key={product.id}><td><div className={styles.productCell}>{product.imageUrl ? <img src={product.imageUrl} alt="" /> : <span><ImageIcon size={18} /></span>}<div className={dashboardStyles.tableProduct}><b>{product.name}</b><small>{product.shortDescription || 'Sin descripción corta'}</small></div></div></td><td>{product.sku || '—'}</td><td>{product.category}<small>{product.brand || 'Sin marca'}</small></td><td>{money(product.basePrice)}{product.compareAtPrice && <small>Antes: {money(product.compareAtPrice)}</small>}</td><td><b className={product.physicalQuantity <= product.reorderPoint ? dashboardStyles.lowStock : ''}>{product.physicalQuantity} unidades</b><small>Reposición: {product.reorderPoint}</small></td><td><span className={`${styles.status} ${styles[product.status.toLowerCase()]}`}>{product.status === 'ARCHIVED' ? 'Archivado' : product.status === 'ACTIVE' ? 'Activo' : product.status === 'DRAFT' ? 'Borrador' : 'Inactivo'}</span></td><td><div className={styles.actions}><button type="button" title="Editar" disabled={product.status === 'ARCHIVED'} onClick={() => setEditing(product)}><Pencil size={17} /></button><button type="button" title="Eliminar definitivamente" onClick={() => setPendingDelete(product)}><Trash2 size={17} /></button></div></td></tr>)}{!filtered.length && <tr><td colSpan="7"><div className={dashboardStyles.empty}><Search size={30} /><h2>No encontramos productos</h2><p>Ajusta la búsqueda o limpia los filtros para ver el catálogo.</p></div></td></tr>}</tbody></table></div>}
     </section>
-    {editing && <ProductForm product={editing} options={options} onCancel={() => setEditing(null)} onSaved={save} onFailed={(message) => setNotice({ type: 'error', message })} />}
+    {editing && <ProductFormDialog product={editing} options={options} onCancel={() => setEditing(null)} onSaved={save} onFailed={(message) => setNotice({ type: 'error', message })} />}
     <DeleteProductDialog product={pendingDelete} deleting={deleting} onCancel={() => setPendingDelete(null)} onConfirm={remove} />
     <ProductNotice notice={notice} onClose={() => setNotice(null)} />
   </main>;

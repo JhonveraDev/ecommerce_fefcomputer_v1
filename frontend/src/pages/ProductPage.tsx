@@ -7,12 +7,12 @@ import { useWishlist } from '../context/WishlistContext';
 import { navigate } from '../utils/navigation';
 import styles from './ProductPage.module.css';
 
-type FullProduct = Product & { description?: string; shortDescription?: string; sku?: string; stock?: number };
+type FullProduct = Product & { description?: string; shortDescription?: string; sku?: string; stock?: number; imageUrls?: string[]; specifications?: Record<string, string>; weightGrams?: number | null; lengthCm?: number | null; widthCm?: number | null; heightCm?: number | null };
 type Props = { products: FullProduct[]; product: FullProduct | undefined; onAddToCart: (product: FullProduct, quantity: number) => void; onAddToWishlist: (product: FullProduct) => void; onCompare: (product: FullProduct) => void; onQuickView?: (product: FullProduct) => void };
 const money = (value: number) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(value);
 
 function ProductGallery({ product }: { product: FullProduct }) {
-  const images = useMemo(() => [product.image], [product.image]);
+  const images = useMemo(() => product.imageUrls?.length ? product.imageUrls : [product.image], [product.image, product.imageUrls]);
   const [selected, setSelected] = useState(0);
   useEffect(() => setSelected(0), [product.id]);
   return <section className={styles.gallery} aria-label={`Galería de ${product.name}`}>
@@ -54,7 +54,8 @@ function ProductInformation({ product, onAddToCart, onAddToWishlist, onCompare }
 }
 
 function ProductDetails({ product }: { product: FullProduct }) {
-  return <section className={styles.details}><h2>Detalles del producto</h2><p>{product.description || product.shortDescription || 'No hay información adicional disponible para este producto.'}</p><div><span>Marca <b>{product.brand}</b></span><span>Categoría <b>{product.category}</b></span>{product.sku && <span>SKU <b>{product.sku}</b></span>}</div></section>;
+  const dimensions = [product.lengthCm, product.widthCm, product.heightCm].every((value) => value != null) ? `${product.lengthCm} × ${product.widthCm} × ${product.heightCm} cm` : null;
+  return <section className={styles.details}><h2>Detalles del producto</h2><p>{product.description || product.shortDescription || 'No hay información adicional disponible para este producto.'}</p><div><span>Marca <b>{product.brand}</b></span><span>Categoría <b>{product.category}</b></span>{product.sku && <span>SKU <b>{product.sku}</b></span>}{product.weightGrams != null && <span>Peso <b>{product.weightGrams} g</b></span>}{dimensions && <span>Dimensiones <b>{dimensions}</b></span>}{Object.entries(product.specifications || {}).map(([key, value]) => <span key={key}>{key} <b>{value}</b></span>)}</div></section>;
 }
 
 export function ProductPage({ products, product, onAddToCart, onAddToWishlist, onCompare, onQuickView }: Props) {
