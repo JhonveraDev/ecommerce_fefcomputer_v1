@@ -8,7 +8,8 @@ export const errorHandler = (error, request, response, _next) => {
   const isValidationError = error?.name === 'ZodError';
   const statusCode = error instanceof ApiError ? error.statusCode : isValidationError ? 422 : isKnownPrismaError ? 409 : 500;
   const code = error instanceof ApiError ? error.code : isValidationError ? 'VALIDATION_ERROR' : isKnownPrismaError ? 'DATABASE_CONFLICT' : 'INTERNAL_ERROR';
-  const message = error instanceof ApiError ? error.message : isValidationError ? 'Revisa los datos enviados.' : 'Ocurrió un error inesperado.';
+  const validationMessage = error?.issues?.[0]?.message;
+  const message = error instanceof ApiError ? error.message : isValidationError ? validationMessage || 'Revisa los datos enviados.' : 'Ocurrió un error inesperado.';
   const details = error instanceof ApiError ? error.details : isValidationError ? error.issues : [];
 
   if (statusCode >= 500) {
