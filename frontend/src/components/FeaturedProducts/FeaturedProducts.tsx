@@ -74,7 +74,7 @@ export function ProductCard({ product, onProductClick, onAddToCart, onAddToWishl
         </div>
         <button className={styles.add} type="button" onClick={() => product.hasVariants ? onProductClick?.(product) : onAddToCart?.(product)}>
           <ShoppingCart size={17} aria-hidden="true" />
-          {product.hasVariants ? 'Elegir versión' : 'Agregar'}
+          Agregar
         </button>
       </div>
     </article>
