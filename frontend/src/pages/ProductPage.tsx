@@ -36,6 +36,7 @@ function ProductInformation({ product, onAddToCart, onAddToWishlist, onCompare }
     <div className={styles.eyebrow}><span>{product.status === 'Oferta' ? 'Oferta especial' : product.category}</span>{product.brand && <span>Marca: <b>{product.brand}</b></span>}</div>
     <h1>{product.name}</h1>
     <div className={styles.priceRow}><strong>{money(selectedProduct.price)}</strong>{selectedProduct.previousPrice && <del>{money(selectedProduct.previousPrice)}</del>}{discount > 0 && <small>{discount}% OFF</small>}</div>
+    {product.shortDescription && <p className={styles.shortDescription}>{product.shortDescription}</p>}
     {product.variants?.length ? <div className={styles.variantPicker}><b>Elige una variante</b><div>{product.variants.map((item) => { const selected = variantId === item.id; return <button key={item.id} type="button" aria-pressed={selected} title={selected ? 'Quitar selección de variante' : 'Seleccionar variante'} className={selected ? styles.variantSelected : ''} onClick={() => { setVariantId(selected ? '' : item.id); setQuantity(1); }}>{Object.values(item.attributes).join(' · ') || item.sku}<small>{selected ? 'Seleccionada · pulsa de nuevo para quitarla' : `${item.stock} disponibles`}</small></button>; })}</div></div> : null}
     <p className={`${styles.availability} ${outOfStock ? styles.unavailable : ''}`}>{outOfStock ? 'Agotado' : `Disponible · ${selectedProduct.stock} unidades`}</p>
     <div className={styles.purchase}>

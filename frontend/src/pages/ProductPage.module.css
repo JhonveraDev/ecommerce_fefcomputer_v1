@@ -115,12 +115,20 @@
   margin: 18px 0 15px;
 }
 
+.shortDescription {
+  color: var(--color-text-muted);
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 560px;
+}
+
 .priceRow {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
   gap: 13px;
-  margin: 28px 0 10px;
+  margin: 22px 0 10px;
 }
 
 .priceRow strong {
