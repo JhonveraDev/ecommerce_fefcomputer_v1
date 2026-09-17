@@ -17,6 +17,7 @@ export type Product = {
   stock?: number;
   status: 'Disponible' | 'Agotado' | 'Oferta' | 'Nuevo';
   tags?: string[];
+  relatedProductIds?: string[];
   hasVariants?: boolean;
 };
 

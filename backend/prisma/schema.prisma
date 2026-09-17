@@ -246,10 +246,25 @@ model Product {
   variants      ProductVariant[]
   inventory     Inventory?    @relation("ProductInventory")
   cartItems     CartItem[]
+  relatedFrom   ProductRelation[] @relation("RelatedProductSource")
+  relatedTo     ProductRelation[] @relation("RelatedProductTarget")
 
   @@index([brandId, status])
   @@index([status, createdAt])
   @@map("products")
+}
+
+model ProductRelation {
+  productId        String   @map("product_id") @db.Uuid
+  relatedProductId String   @map("related_product_id") @db.Uuid
+  position         Int      @default(0)
+  createdAt        DateTime @default(now()) @map("created_at")
+  product          Product  @relation("RelatedProductSource", fields: [productId], references: [id], onDelete: Cascade)
+  relatedProduct   Product  @relation("RelatedProductTarget", fields: [relatedProductId], references: [id], onDelete: Cascade)
+
+  @@id([productId, relatedProductId])
+  @@index([relatedProductId])
+  @@map("product_relations")
 }
 
 model ProductCategory {

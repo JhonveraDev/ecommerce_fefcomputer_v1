@@ -12,7 +12,8 @@ type Props = {
 };
 
 export function RelatedProducts({ products, currentProduct, onProductClick, onAddToCart, onAddToWishlist, onCompare, onQuickView }: Props) {
-  const related = products
+  const manualRelated = (currentProduct.relatedProductIds || []).map((id) => products.find((product) => product.id === id)).filter(Boolean) as Product[];
+  const related = manualRelated.length ? manualRelated : products
     .filter((product) => product.id !== currentProduct.id)
     .sort((first, second) => {
       const score = (product: typeof first) => (product.category === currentProduct.category ? 4 : 0) + (product.brand === currentProduct.brand ? 2 : 0);
