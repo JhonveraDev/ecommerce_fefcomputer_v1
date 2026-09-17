@@ -10,6 +10,11 @@ const environmentSchema = z.object({
   JWT_REFRESH_SECRET: z.string().min(32),
   JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
+  FRONTEND_URL: z.string().url().default('http://localhost:5173'),
+  WOMPI_PUBLIC_KEY: z.string().startsWith('pub_').optional(),
+  WOMPI_INTEGRITY_SECRET: z.string().min(1).optional(),
+  WOMPI_EVENTS_SECRET: z.string().min(1).optional(),
+  WOMPI_ENVIRONMENT: z.enum(['sandbox', 'production']).default('sandbox'),
 });
 
 const parsedEnvironment = environmentSchema.safeParse(process.env);

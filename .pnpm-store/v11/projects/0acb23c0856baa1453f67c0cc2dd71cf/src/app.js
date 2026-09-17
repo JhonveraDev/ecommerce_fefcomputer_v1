@@ -14,6 +14,7 @@ import { shoppingStateRouter } from './routes/shopping-state.routes.js';
 import { healthRouter } from './routes/health.routes.js';
 import { adminProductRouter } from './routes/admin-product.routes.js';
 import { productRouter } from './routes/product.routes.js';
+import { paymentRouter } from './routes/payment.routes.js';
 
 export const app = express();
 
@@ -34,6 +35,7 @@ app.use('/api/v1/orders', orderRouter);
 app.use('/api/v1/account/shopping-state', shoppingStateRouter);
 app.use('/api/v1/admin/products', adminProductRouter);
 app.use('/api/v1/products', productRouter);
+app.use('/api/v1/payments', paymentRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
