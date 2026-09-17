@@ -20,7 +20,10 @@ export const createWompiCheckout = asyncHandler(async (request, response) => {
   const integrity = crypto.createHash('sha256').update(`${reference}${amountInCents}${currency}${env.WOMPI_INTEGRITY_SECRET}`).digest('hex');
   const redirectUrl = new URL('/checkout', env.FRONTEND_URL);
   redirectUrl.searchParams.set('payment', 'wompi');
-  response.json({ success: true, data: { checkoutUrl: 'https://checkout.wompi.co/p/', fields: { 'public-key': env.WOMPI_PUBLIC_KEY, currency, 'amount-in-cents': String(amountInCents), reference, 'signature:integrity': integrity, 'redirect-url': redirectUrl.toString(), 'customer-data:email': customerEmail } } });
+  const isPublicHttpsUrl = redirectUrl.protocol === 'https:' && !['localhost', '127.0.0.1'].includes(redirectUrl.hostname);
+  const fields = { 'public-key': env.WOMPI_PUBLIC_KEY, currency, 'amount-in-cents': String(amountInCents), reference, 'signature:integrity': integrity, 'customer-data:email': customerEmail };
+  if (isPublicHttpsUrl) fields['redirect-url'] = redirectUrl.toString();
+  response.json({ success: true, data: { checkoutUrl: 'https://checkout.wompi.co/p/', fields } });
 });
 
 export const receiveWompiEvent = asyncHandler(async (request, response) => {
