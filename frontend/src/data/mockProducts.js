@@ -14,7 +14,6 @@
 ]
 */
 
-
 import gamingPcImage from '../assets/products/gaming-pc.png';
 import laptopImage from '../assets/products/laptop.png';
 import monitorImage from '../assets/products/monitor.png';
