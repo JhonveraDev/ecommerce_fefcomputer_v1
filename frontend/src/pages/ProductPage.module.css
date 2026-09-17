@@ -109,7 +109,7 @@
 
 .info h1 {
   color: var(--color-navy);
-  font-size: 42px;
+  font-size: 36px;
   letter-spacing: -.045em;
   line-height: 1.12;
   margin: 18px 0 15px;
@@ -133,7 +133,7 @@
 
 .priceRow strong {
   color: var(--color-primary);
-  font-size: 40px;
+  font-size: 34px;
   letter-spacing: -.04em;
 }
 
@@ -406,11 +406,11 @@
   }
 
   .info h1 {
-    font-size: 31px;
+    font-size: 28px;
   }
 
   .priceRow strong {
-    font-size: 32px;
+    font-size: 28px;
   }
 
   .purchase {
