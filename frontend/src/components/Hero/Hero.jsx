@@ -35,9 +35,9 @@ export function Hero() {
         ))}
         <div className={styles.overlay} aria-hidden="true" />
         <section className={styles.content} aria-labelledby="hero-title">
-          <p className={styles.eyebrow}><ShieldCheck size={18} /> Tecnología que sí responde</p>
-          <h1 id="hero-title">Potencia tus ideas con la tecnología correcta.</h1>
-          <p className={styles.description}>Equipos, conectividad y soluciones confiables para tu hogar, negocio o próximo gran proyecto.</p>
+          <p className={styles.eyebrow}><ShieldCheck size={16} /> Tecnología para avanzar</p>
+          <h1 id="hero-title">Tecnología para <span>cada proyecto.</span></h1>
+          <p className={styles.description}>Equipos, conectividad y soluciones confiables para tu hogar, tu negocio o el siguiente paso de tu empresa.</p>
           <div className={styles.actions}>
             <a className={styles.primaryAction} href="#tienda">Explorar productos <ArrowRight size={18} /></a>
             <a className={styles.secondaryAction} href="#ofertas">Ver ofertas</a>

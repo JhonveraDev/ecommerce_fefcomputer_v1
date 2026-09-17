@@ -51,8 +51,18 @@ body {
 }
 
 body {
+  font-weight: 400;
   margin: 0;
   min-width: 320px;
+}
+
+/* Sistema tipográfico: una jerarquía más ligera y consistente en toda la interfaz. */
+body :where(p, span, small, li, dt, dd, input, select, textarea) {
+  font-weight: 400 !important;
+}
+
+body :where(h1, h2, h3, h4, h5, h6, button, a, label, b, strong, th) {
+  font-weight: 600 !important;
 }
 
 button,
