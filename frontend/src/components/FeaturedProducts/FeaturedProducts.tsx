@@ -37,10 +37,12 @@ const money = (value: number) => new Intl.NumberFormat('es-CO', {
 }).format(value);
 
 const tabs = [
-  { id: 'all', label: 'Todos' },
+  { id: 'all', label: 'Selección' },
   { id: 'offer', label: 'Ofertas' },
   { id: 'new', label: 'Novedades' },
 ];
+
+const HOME_FEATURED_LIMIT = 5;
 
 export function ProductCard({ product, onProductClick, onAddToCart, onAddToWishlist, onCompare, onQuickView, compact = false }: {
   product: Product;
@@ -85,35 +87,28 @@ export function ProductCard({ product, onProductClick, onAddToCart, onAddToWishl
 export function FeaturedProducts({ products, onProductClick, onAddToCart, onAddToWishlist, onCompare, onQuickView }: Props) {
   const [activeTab, setActiveTab] = useState('all');
   const visibleProducts = useMemo(() => {
-    const ordered = [...products];
+    const ordered = [...products].sort((first, second) => {
+      const priority = (product: Product) => product.previousPrice !== null ? 0 : product.status === 'Nuevo' ? 1 : 2;
+      return priority(first) - priority(second);
+    });
     if (activeTab === 'offer') return ordered.filter((product) => product.previousPrice !== null);
     if (activeTab === 'new') return ordered.filter((product) => product.status === 'Nuevo');
     return ordered;
   }, [activeTab, products]);
-  const filledProducts = visibleProducts.length ? visibleProducts.slice(0, 10) : products.slice(0, 10);
+  const featuredProducts = visibleProducts.slice(0, HOME_FEATURED_LIMIT);
 
   return (
     <section className={styles.section} aria-labelledby="featured-products-title">
       <header className={styles.header}>
-        <h2 id="featured-products-title">Productos destacados</h2>
-        <nav aria-label="Filtrar productos destacados">
-          {tabs.map((tab) => (
-            <button
-              className={activeTab === tab.id ? styles.active : ''}
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </nav>
+        <div><p className={styles.eyebrow}>Selección de la semana</p><h2 id="featured-products-title">Productos destacados</h2></div>
+        <div className={styles.headerActions}><nav aria-label="Filtrar productos destacados">{tabs.map((tab) => <button className={activeTab === tab.id ? styles.active : ''} key={tab.id} type="button" onClick={() => setActiveTab(tab.id)}>{tab.label}</button>)}</nav><a className={styles.viewAll} href="/tienda?sort=featured">Ver todos</a></div>
       </header>
       <div className={styles.grid}>
-        {filledProducts.map((product) => (
+        {featuredProducts.map((product) => (
           <ProductCard key={product.id} product={product} onProductClick={onProductClick} onAddToCart={onAddToCart} onAddToWishlist={onAddToWishlist} onCompare={onCompare} onQuickView={onQuickView} />
         ))}
       </div>
+      {!featuredProducts.length && <p className={styles.empty}>No hay productos destacados en esta categoría por ahora.</p>}
     </section>
   );
 }

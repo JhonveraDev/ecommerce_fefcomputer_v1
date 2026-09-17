@@ -17,6 +17,21 @@
   margin: 0;
 }
 
+.eyebrow {
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  margin: 0 0 5px;
+  text-transform: uppercase;
+}
+
+.headerActions {
+  align-items: center;
+  display: flex;
+  gap: 22px;
+}
+
 .header nav {
   display: flex;
   gap: 28px;
@@ -41,11 +56,31 @@
   font-weight: 700;
 }
 
+.viewAll {
+  color: var(--color-primary);
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.viewAll:hover { text-decoration: underline; }
+
 .grid {
   align-items: start;
   display: grid;
   gap: 24px;
   grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.empty {
+  background: var(--color-surface-soft);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  margin: 0;
+  padding: 26px;
+  text-align: center;
 }
 
 .card {
@@ -245,6 +280,12 @@
 
   .header h2 {
     font-size: 28px;
+  }
+
+  .headerActions {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
   }
 
   .header nav {
