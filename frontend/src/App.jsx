@@ -34,15 +34,14 @@ import { featuredCategoryItems } from './data/featuredCategories.tsx';
 import { homePromoBanners } from './data/promoBanners';
 import { newsletterOffer } from './data/newsletterOffer';
 import { footerData } from './data/footer';
-import { dailyDealsBanner, dailyDealProducts } from './data/dailyDeals';
+import { dailyDealsBanner } from './data/dailyDeals';
 import { featuredProducts } from './data/featuredProducts';
-import { mockProducts } from './data/mockProducts';
 import { navigate } from './utils/navigation';
 import { catalogService } from './services/catalogService';
 
 function Storefront() {
   const [quickViewProduct, setQuickViewProduct] = useState(null);
-  const [catalogProducts, setCatalogProducts] = useState(mockProducts);
+  const [catalogProducts, setCatalogProducts] = useState([]);
   const { isAuthenticated, isLoading } = useAuth();
   const { itemCount, addItem } = useCart();
   const wishlist = useWishlist();
@@ -79,9 +78,9 @@ function Storefront() {
   const compare = (product) => compareState.toggleCompare(product);
   const sharedHeader = <Header products={catalogProducts} cartCount={itemCount} wishlistCount={wishlistCount} compareCount={compareState.compareCount} />;
   const sharedQuickView = <QuickViewModal product={quickViewProduct} onClose={() => setQuickViewProduct(null)} onAddToCart={addToCart} onAddToWishlist={addToWishlist} onCompare={compare} />;
-  const welcomeOfferProduct = catalogProducts[0] || dailyDealProducts[0];
+  const welcomeOfferProduct = catalogProducts[0] || null;
   const featuredCatalogProducts = catalogProducts.filter((product) => product.isFeatured);
-  const sharedWelcomeOffer = <WelcomeOffer product={welcomeOfferProduct} onAddToCart={addToCart} onViewProduct={openProduct} />;
+  const sharedWelcomeOffer = welcomeOfferProduct ? <WelcomeOffer product={welcomeOfferProduct} onAddToCart={addToCart} onViewProduct={openProduct} /> : null;
 
   if (!isLoading && !isAuthenticated && ['account', 'orders', 'addresses', 'admin-products'].includes(page)) { navigate('/login', { replace: true }); return <>{sharedHeader}</>; }
   if (page === 'login') return <>{sharedHeader}<AuthPage mode="login" /><Footer {...footerData} /></>;
