@@ -1,12 +1,13 @@
-import { Eye, Heart, Minus, Plus, ShoppingCart, X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight, Heart, Minus, Plus, ShoppingCart, X, ZoomIn, ZoomOut } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { PointerEvent as ReactPointerEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { useWishlist } from '../../context/WishlistContext';
 import styles from './QuickViewModal.module.css';
 
 type Product = {
   id: string; name: string; image: string; price: number; slug: string;
-  previousPrice?: number | null; category?: string; brand?: string; stock?: number; status?: string; description?: string; shortDescription?: string;
+  previousPrice?: number | null; category?: string; brand?: string; stock?: number; status?: string; description?: string; shortDescription?: string; imageUrls?: string[];
 };
 
 type Props = {
@@ -23,9 +24,13 @@ export function QuickViewModal({ product, onClose, onAddToCart, onAddToWishlist,
   const [quantity, setQuantity] = useState(1);
   const { toggleWishlist } = useWishlist() as any;
   const [isClosing, setIsClosing] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [zoomOrigin, setZoomOrigin] = useState('50% 50%');
   const closeButton = useRef<HTMLButtonElement>(null);
   const modalRef = useRef<HTMLElement>(null);
   const closeTimer = useRef<number>();
+  const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
     if (!product) return;
@@ -43,7 +48,13 @@ export function QuickViewModal({ product, onClose, onAddToCart, onAddToWishlist,
     return () => { window.clearTimeout(closeTimer.current); window.removeEventListener('keydown', onKeyDown); };
   }, [product]);
 
-  useEffect(() => { setQuantity(1); setIsClosing(false); }, [product?.id]);
+  useEffect(() => { setQuantity(1); setIsClosing(false); setSelectedImage(0); setIsZoomed(false); setZoomOrigin('50% 50%'); }, [product?.id]);
+
+  const images = useMemo(() => {
+    if (!product) return [];
+    const available = product.imageUrls?.filter(Boolean) ?? [];
+    return available.length ? available : [product.image];
+  }, [product]);
 
   if (!product) return null;
   const discount = product.previousPrice && product.previousPrice > product.price
@@ -54,16 +65,38 @@ export function QuickViewModal({ product, onClose, onAddToCart, onAddToWishlist,
     setIsClosing(true);
     closeTimer.current = window.setTimeout(onClose, 180);
   };
-  const images = Array.from({ length: 4 }, () => product.image);
+  const hasMultipleImages = images.length > 1;
+  const changeImage = (direction: -1 | 1) => {
+    setSelectedImage((current) => (current + direction + images.length) % images.length);
+    setIsZoomed(false);
+    setZoomOrigin('50% 50%');
+  };
+  const selectImage = (index: number) => {
+    setSelectedImage(index);
+    setIsZoomed(false);
+    setZoomOrigin('50% 50%');
+  };
+  const updateZoomOrigin = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!isZoomed) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = Math.min(100, Math.max(0, ((event.clientX - bounds.left) / bounds.width) * 100));
+    const y = Math.min(100, Math.max(0, ((event.clientY - bounds.top) / bounds.height) * 100));
+    setZoomOrigin(`${x}% ${y}%`);
+  };
 
   return createPortal(
     <div className={`${styles.overlay} ${isClosing ? styles.closing : ''}`} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) requestClose(); }}>
       <section ref={modalRef} className={styles.modal} role="dialog" aria-modal="true" aria-labelledby="quick-view-title">
         <button ref={closeButton} className={styles.close} type="button" aria-label="Cerrar vista rápida" onClick={requestClose}><X size={23} /></button>
         <div className={styles.gallery}>
-          <div className={styles.mainImage}><img src={product.image} alt={product.name} /><Eye size={21} aria-hidden="true" /></div>
+          <div className={styles.mainImage} role="group" aria-label={`Imagen ${selectedImage + 1} de ${images.length} de ${product.name}`} onPointerMove={updateZoomOrigin} onPointerLeave={() => isZoomed && setZoomOrigin('50% 50%')} onPointerDown={(event) => { touchStartX.current = event.pointerType === 'touch' ? event.clientX : null; }} onPointerUp={(event) => { if (touchStartX.current === null) return; const distance = event.clientX - touchStartX.current; touchStartX.current = null; if (Math.abs(distance) > 40 && hasMultipleImages) changeImage(distance > 0 ? -1 : 1); }}>
+            <img className={isZoomed ? styles.zoomed : ''} style={isZoomed ? { transformOrigin: zoomOrigin } : undefined} src={images[selectedImage]} alt={product.name} />
+            {hasMultipleImages && <><button className={`${styles.imageNavigation} ${styles.previousImage}`} type="button" aria-label="Ver imagen anterior" onClick={() => changeImage(-1)}><ChevronLeft size={22} /></button><button className={`${styles.imageNavigation} ${styles.nextImage}`} type="button" aria-label="Ver imagen siguiente" onClick={() => changeImage(1)}><ChevronRight size={22} /></button></>}
+            <button className={styles.zoomControl} type="button" aria-label={isZoomed ? 'Reducir zoom' : 'Ampliar imagen'} aria-pressed={isZoomed} onClick={() => { setIsZoomed((value) => !value); setZoomOrigin('50% 50%'); }}>{isZoomed ? <ZoomOut size={20} /> : <ZoomIn size={20} />}</button>
+            <span className={styles.zoomHint}>{isZoomed ? 'Mueve el cursor para explorar' : 'Ampliar imagen'}</span>
+          </div>
           <div className={styles.thumbnails} aria-label="Galería del producto">
-            {images.map((image, index) => <button type="button" className={index === 0 ? styles.selected : ''} key={index} aria-label={`Ver imagen ${index + 1} de ${product.name}`}><img src={image} alt="" /></button>)}
+            {images.map((image, index) => <button type="button" className={index === selectedImage ? styles.selected : ''} key={`${image}-${index}`} aria-label={`Ver imagen ${index + 1} de ${product.name}`} aria-current={index === selectedImage} onClick={() => selectImage(index)}><img src={image} alt="" /></button>)}
           </div>
         </div>
         <div className={styles.details}>
