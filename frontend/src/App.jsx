@@ -77,7 +77,7 @@ function Storefront() {
   const addToCart = (product, quantity = 1) => addItem(product, quantity);
   const addToWishlist = (product) => console.info('Favorito actualizado:', product.slug);
   const compare = (product) => compareState.toggleCompare(product);
-  const sharedHeader = <Header cartCount={itemCount} wishlistCount={wishlistCount} compareCount={compareState.compareCount} />;
+  const sharedHeader = <Header products={catalogProducts} cartCount={itemCount} wishlistCount={wishlistCount} compareCount={compareState.compareCount} />;
   const sharedQuickView = <QuickViewModal product={quickViewProduct} onClose={() => setQuickViewProduct(null)} onAddToCart={addToCart} onAddToWishlist={addToWishlist} onCompare={compare} />;
   const welcomeOfferProduct = catalogProducts[0] || dailyDealProducts[0];
   const featuredCatalogProducts = catalogProducts.filter((product) => product.isFeatured);

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ChevronDown,
   ChevronRight,
@@ -34,7 +34,6 @@ import styles from './Header.module.css';
 import { MiniCart } from '../MiniCart/MiniCart';
 import { AccountPopup } from '../AccountPopup/AccountPopup';
 import { useAuth } from '../../context/AuthContext';
-import { mockProducts, productCategories } from '../../data/mockProducts';
 import { navigate } from '../../utils/navigation';
 
 const navigationItems = [
@@ -53,8 +52,6 @@ const actionItems = [
 ];
 
 const categoryIcons = [Gamepad2, Laptop, Monitor, SunMedium, ShieldCheck, Network, Server, Cpu, Cable, Keyboard, HardDrive, Printer, BriefcaseBusiness, BatteryCharging];
-const categoryMenuItems = productCategories.map((label, index) => ({ label, Icon: categoryIcons[index] ?? Grid2X2 }));
-const searchCategoryItems = productCategories.map((label) => ({ label, count: mockProducts.filter((product) => product.category === label).length }));
 const colombianDepartments = ['Amazonas', 'Antioquia', 'Arauca', 'Atlantico', 'Bolivar', 'Boyaca', 'Caldas', 'Caqueta', 'Casanare', 'Cauca', 'Cesar', 'Choco', 'Cordoba', 'Cundinamarca', 'Guainia', 'Guaviare', 'Huila', 'La Guajira', 'Magdalena', 'Meta', 'Narino', 'Norte de Santander', 'Putumayo', 'Quindio', 'Risaralda', 'San Andres, Providencia y Santa Catalina', 'Santander', 'Sucre', 'Tolima', 'Valle del Cauca', 'Vaupes', 'Vichada'];
 function LocationPicker() {
   const [open, setOpen] = useState(false); const [filter, setFilter] = useState(''); const [location, setLocation] = useState(() => window.localStorage.getItem('fefcomputer-location') || 'Selecciona tu departamento'); const pickerRef = useRef(null); const normalizedFilter = filter.trim().toLocaleLowerCase(); const departments = colombianDepartments.filter((department) => department.toLocaleLowerCase().includes(normalizedFilter));
@@ -63,12 +60,12 @@ function LocationPicker() {
   return <div className={styles.locationPicker} ref={pickerRef}><button className={styles.location} type="button" aria-haspopup="listbox" aria-expanded={open} onClick={() => setOpen((value) => !value)}><MapPin size={19} /><span><b>Tu ubicacion</b><small>{location}</small></span><ChevronDown size={14} /></button>{open && <section className={styles.locationMenu} aria-label="Selecciona tu departamento"><div className={styles.locationSearch}><Search size={17} /><input autoFocus type="search" value={filter} onChange={(event) => setFilter(event.target.value)} placeholder="Buscar departamento" aria-label="Buscar departamento" /></div><div className={styles.locationOptions} role="listbox">{departments.map((department) => <button type="button" role="option" aria-selected={location === department} className={location === department ? styles.selectedLocation : ''} key={department} onClick={() => select(department)}>{department}</button>)}{!departments.length && <p>No encontramos departamentos.</p>}</div><small className={styles.locationCount}>{departments.length} de 32 departamentos</small></section>}</div>;
 }
 
-function CategoryBrowser() {
+function CategoryBrowser({ categories }) {
   const [open, setOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const browserRef = useRef(null);
   const closeTimer = useRef();
-  const visibleCategories = showAll ? categoryMenuItems : categoryMenuItems.slice(0, 10);
+  const visibleCategories = showAll ? categories : categories.slice(0, 10);
   const keepOpen = () => { window.clearTimeout(closeTimer.current); setOpen(true); };
   const scheduleClose = () => { closeTimer.current = window.setTimeout(() => setOpen(false), 220); };
 
@@ -105,7 +102,7 @@ function CategoryBrowser() {
           <ChevronRight size={16} aria-hidden="true" />
         </button>)}
       </div>
-      {categoryMenuItems.length > 10 && <button className={styles.showMoreCategories} type="button" onClick={() => setShowAll((value) => !value)}>
+      {categories.length > 10 && <button className={styles.showMoreCategories} type="button" onClick={() => setShowAll((value) => !value)}>
         <Plus size={20} /> {showAll ? 'Ver menos categorías' : 'Ver más categorías'}
       </button>}
     </section>
@@ -162,12 +159,12 @@ function AccountHeaderAction() {
   </div>;
 }
 
-function SearchCategoryPicker({ selectedCategory, onSelect }) {
+function SearchCategoryPicker({ categories, productCount, selectedCategory, onSelect }) {
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState('');
   const pickerRef = useRef(null);
   const normalizedFilter = filter.trim().toLocaleLowerCase();
-  const visibleCategories = searchCategoryItems.filter(({ label }) => label.toLocaleLowerCase().includes(normalizedFilter));
+  const visibleCategories = categories.filter(({ label }) => label.toLocaleLowerCase().includes(normalizedFilter));
   useEffect(() => {
     if (!open) return undefined;
     const close = (event) => { if (!pickerRef.current?.contains(event.target)) setOpen(false); };
@@ -188,14 +185,14 @@ function SearchCategoryPicker({ selectedCategory, onSelect }) {
     {open && <div className={styles.searchCategoryMenu}>
       <div className={styles.categoryFilter}><Search size={17} /><input autoFocus type="search" value={filter} onChange={(event) => setFilter(event.target.value)} placeholder="Buscar categoría" aria-label="Filtrar categorías" /></div>
       <div className={styles.categoryOptions} role="listbox" aria-label="Categorías de búsqueda">
-        <button type="button" role="option" aria-selected={!selectedCategory} className={!selectedCategory ? styles.selectedCategory : ''} onClick={() => choose('')}><span>Todas las categorías</span><small>{mockProducts.length}</small></button>
+        <button type="button" role="option" aria-selected={!selectedCategory} className={!selectedCategory ? styles.selectedCategory : ''} onClick={() => choose('')}><span>Todas las categorías</span><small>{productCount}</small></button>
         {visibleCategories.map(({ label, count }) => <button key={label} type="button" role="option" aria-selected={selectedCategory === label} className={selectedCategory === label ? styles.selectedCategory : ''} onClick={() => choose(label)}><span>{label}</span><small>{count}</small></button>)}
         {!visibleCategories.length && <p>No encontramos categorías.</p>}
       </div>
     </div>}
   </div>;
 }
-export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
+export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0, products = [] }) {
   const { user, isAuthenticated } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [miniCartOpen, setMiniCartOpen] = useState(false);
@@ -204,6 +201,16 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
   const getCurrentSection = () => window.location.pathname.split('/')[1].toLowerCase() || 'inicio';
   const [search, setSearch] = useState(getSearchFromUrl);
   const [currentSection, setCurrentSection] = useState(getCurrentSection);
+  const categories = useMemo(() => {
+    const counts = products.reduce((result, product) => {
+      const label = product.category?.trim();
+      if (label && label !== 'Sin categoría') result.set(label, (result.get(label) || 0) + 1);
+      return result;
+    }, new Map());
+    return [...counts.entries()]
+      .sort(([first], [second]) => first.localeCompare(second, 'es'))
+      .map(([label, count], index) => ({ label, count, Icon: categoryIcons[index] ?? Grid2X2 }));
+  }, [products]);
   useEffect(() => {
     const syncHeaderState = () => { setSearch(getSearchFromUrl()); setCurrentSection(getCurrentSection()); };
     window.addEventListener('popstate', syncHeaderState);
@@ -242,7 +249,7 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
         <div className={`${styles.container} ${styles.mainContent}`}>
           <Brand />
           <form className={styles.searchBar} role="search" onSubmit={submitSearch}>
-            <SearchCategoryPicker selectedCategory={selectedSearchCategory} onSelect={setSelectedSearchCategory} />
+            <SearchCategoryPicker categories={categories} productCount={products.length} selectedCategory={selectedSearchCategory} onSelect={setSelectedSearchCategory} />
             <label className="srOnly" htmlFor="product-search">Buscar productos</label>
             <input id="product-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Busca computadores, periféricos y más..." />
             <button className={styles.searchButton} type="submit" aria-label="Buscar"><Search size={24} /></button>
@@ -259,7 +266,7 @@ export function Header({ cartCount = 0, wishlistCount = 0, compareCount = 0 }) {
 
       <div className={`${styles.navigationBar} ${mobileMenuOpen ? styles.menuOpen : ''}`}>
         <div className={`${styles.container} ${styles.navigationContent}`}>
-          <CategoryBrowser />
+          <CategoryBrowser categories={categories} />
           <nav className={styles.primaryNavigation} aria-label="Navegación principal">
             {navigationItems.map(({ label, href }) => {
               const section = href || label.toLowerCase();
