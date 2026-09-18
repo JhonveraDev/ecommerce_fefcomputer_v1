@@ -3,6 +3,7 @@ import { AlertTriangle, Boxes, CheckCircle2, Eye, FilePenLine, Image as ImageIco
 import { StoreBanner } from '../components/StoreBanner';
 import { useAuth } from '../context/AuthContext';
 import styles from './AdminProductsPage.module.css';
+import './AdminProductsTable.css';
 import confirmStyles from './AdminProductsConfirm.module.css';
 import dashboardStyles from './AdminProductsDashboard.module.css';
 import noticeStyles from './AdminProductNotice.module.css';

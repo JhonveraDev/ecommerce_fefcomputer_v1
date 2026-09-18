@@ -1,0 +1,10 @@
+[class*="productCell"] > div {
+  flex: 1;
+  min-width: 0;
+}
+
+[class*="productCell"] small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
