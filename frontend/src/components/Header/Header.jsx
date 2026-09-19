@@ -152,9 +152,9 @@ function AccountHeaderAction() {
   const { user, isAuthenticated } = useAuth();
   const keepOpen = () => { window.clearTimeout(closeTimer.current); setOpen(true); };
   const scheduleClose = () => { closeTimer.current = window.setTimeout(() => setOpen(false), 420); };
-  const openAccount = () => { navigate(isAuthenticated ? '/cuenta' : '/login'); setOpen(false); };
+  const openMenu = () => { window.clearTimeout(closeTimer.current); setOpen(true); };
   return <div className={styles.accountAction} onMouseEnter={keepOpen} onMouseLeave={scheduleClose}>
-    <HeaderAction icon={CircleUserRound} label={isAuthenticated ? `Hola, ${user.name}` : "Cuenta"} onClick={openAccount} />
+    <HeaderAction icon={CircleUserRound} label={isAuthenticated ? `Hola, ${user.name}` : "Cuenta"} onClick={openMenu} />
     <AccountPopup open={open} onClose={() => setOpen(false)} />
   </div>;
 }
