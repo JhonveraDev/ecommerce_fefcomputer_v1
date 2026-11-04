@@ -140,8 +140,9 @@ export async function buildProductImportTemplate(categories = []) {
     ['DEMO-CAM-005', 'Cámara Secure 4 MP', categoryAt(4), 'Secure', 219000, 0, 'Cámara IP de seguridad.', 'Cámara IP con visión nocturna y detección de movimiento.', 'https://placehold.co/800x600/png?text=Camara+Secure+4MP', '', 480, 11, 11, 10, '12 meses', 'Reacondicionado', 'cámara, seguridad', 'Inactivo', 'No', '', '', '', 'camara-secure-4mp', 'Cámara Secure 4 MP', 'Cámara IP de seguridad.'],
     ['DEMO-DOCK-006', 'Dock USB-C 12 en 1', categoryAt(5), 'Connect', 329000, 15, 'Base USB-C para productividad.', 'Dock con HDMI, Ethernet, lectores de tarjetas y puertos USB.', 'https://placehold.co/800x600/png?text=Dock+USB-C+12en1', '', 320, 14, 6, 2, '12 meses', 'Usado', 'dock, usb-c', 'Borrador', 'No', '', '', '', 'dock-usb-c-12-en-1', 'Dock USB-C 12 en 1', 'Dock USB-C con HDMI y Ethernet.'],
   ];
-  applyProductTableDesign(examples, exampleRows.length);
+  applyProductTableDesign(examples, 0);
   examples.addRows(exampleRows);
+  applyProductTableDesign(examples, exampleRows.length);
   for (let row = 2; row <= exampleRows.length + 1; row += 1) { examples.getCell(row, 5).numFmt = '#,##0'; examples.getCell(row, 6).numFmt = '#,##0'; examples.getCell(row, 20).numFmt = '#,##0'; examples.getCell(row, 21).numFmt = 'yyyy-mm-dd hh:mm'; examples.getCell(row, 22).numFmt = 'yyyy-mm-dd hh:mm'; }
   const variantHeaders = ['SKU producto', 'SKU variante', 'Atributos', 'Precio especial', 'Stock']; variantHeaders.forEach((name, index) => { const cell = variants.getCell(1, index + 1); cell.value = name; Object.assign(cell, index < 2 ? headerStyle : optionalHeaderStyle); variants.getColumn(index + 1).width = [22, 25, 48, 18, 12][index]; }); variants.autoFilter = { from: 'A1', to: 'E1' }; variants.getRow(1).height = 32;
   for (let row = 2; row <= MAX_PRODUCTS + 1; row += 1) { [4, 5].forEach((column) => { variants.getCell(row, column).numFmt = '#,##0'; variants.getCell(row, column).dataValidation = { type: 'decimal', operator: 'greaterThanOrEqual', formulae: [0], allowBlank: true, errorTitle: 'Número inválido', error: 'Usa un número igual o mayor a cero.', showErrorMessage: true }; }); }
