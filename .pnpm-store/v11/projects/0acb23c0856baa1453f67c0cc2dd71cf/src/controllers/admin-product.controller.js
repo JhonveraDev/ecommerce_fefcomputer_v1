@@ -19,7 +19,36 @@ async function inventory(tx, productId, input, actorId, before = 0, created = fa
 async function variants(tx, productId, values, actorId, existing = []) { const existingIds = new Set(existing.map((variant) => variant.id)); const retained = new Set(); for (const value of values) { const data = { sku: value.sku, attributes: value.attributes, priceOverride: value.priceOverride ?? null, status: 'ACTIVE' }; const variant = value.id && existingIds.has(value.id) ? await tx.productVariant.update({ where: { id: value.id }, data }) : await tx.productVariant.create({ data: { ...data, productId } }); retained.add(variant.id); const before = existing.find((item) => item.id === variant.id)?.inventory?.physicalQuantity ?? 0; const stock = await tx.inventory.upsert({ where: { variantId: variant.id }, create: { variantId: variant.id, physicalQuantity: value.physicalQuantity }, update: { physicalQuantity: value.physicalQuantity } }); if (before !== value.physicalQuantity) await tx.inventoryMovement.create({ data: { inventoryId: stock.id, actorId, type: before ? 'ADJUSTMENT' : 'INBOUND', quantity: value.physicalQuantity - before, resultingQuantity: value.physicalQuantity, reason: 'Ajuste de variante desde panel administrativo' } }); } const removed = existing.filter((variant) => !retained.has(variant.id)).map((variant) => variant.id); if (removed.length) { await tx.inventoryMovement.deleteMany({ where: { inventory: { variantId: { in: removed } } } }); await tx.productVariant.deleteMany({ where: { id: { in: removed } } }); } }
 const productData = (input, brandId, slug) => ({ name: input.name, sku: input.sku, slug, brandId: brandId || null, shortDescription: clean(input.shortDescription), description: clean(input.description), basePrice: input.basePrice, compareAtPrice: input.compareAtPrice ?? null, offerStartsAt: input.offerStartsAt ?? null, offerEndsAt: input.offerEndsAt ?? null, weightGrams: input.weightGrams ?? null, lengthCm: input.lengthCm ?? null, widthCm: input.widthCm ?? null, heightCm: input.heightCm ?? null, warranty: clean(input.warranty), condition: input.condition || null, tags: input.tags, seoTitle: clean(input.seoTitle), seoDescription: clean(input.seoDescription), specifications: input.specifications, status: input.status, isFeatured: input.isFeatured });
 
-export const listProducts = asyncHandler(async (req, res) => { const q = String(req.query.q || '').trim(); const products = await prisma.product.findMany({ where: { ...(req.query.includeArchived === 'true' ? {} : { status: { not: 'ARCHIVED' } }), ...(q ? { OR: [{ name: { contains: q, mode: 'insensitive' } }, { sku: { contains: q, mode: 'insensitive' } }, { brand: { name: { contains: q, mode: 'insensitive' } } }, { categories: { some: { category: { name: { contains: q, mode: 'insensitive' } } } } }] } : {}) }, include, orderBy: { updatedAt: 'desc' } }); res.json({ success: true, data: { products: products.map(serialize) } }); });
+export const listProducts = asyncHandler(async (req, res) => {
+  const q = String(req.query.q || '').trim();
+  const requestedPage = Number(req.query.page);
+  const requestedSize = Number(req.query.pageSize);
+  const paginated = Number.isInteger(requestedPage) && requestedPage > 0;
+  const pageSize = Math.min(Math.max(Number.isInteger(requestedSize) ? requestedSize : 12, 1), 100);
+  const allowedStatuses = ['ACTIVE', 'DRAFT', 'INACTIVE', 'ARCHIVED'];
+  const status = allowedStatuses.includes(req.query.status) ? req.query.status : null;
+  const where = {
+    ...(req.query.includeArchived === 'true' ? {} : { status: { not: 'ARCHIVED' } }),
+    ...(status ? { status } : {}),
+    ...(q ? { OR: [
+      { name: { contains: q, mode: 'insensitive' } },
+      { sku: { contains: q, mode: 'insensitive' } },
+      { brand: { name: { contains: q, mode: 'insensitive' } } },
+      { categories: { some: { category: { name: { contains: q, mode: 'insensitive' } } } } },
+    ] } : {}),
+  };
+  if (!paginated) {
+    const products = await prisma.product.findMany({ where, include, orderBy: { updatedAt: 'desc' } });
+    return res.json({ success: true, data: { products: products.map(serialize) } });
+  }
+  const [total, products, groups] = await prisma.$transaction([
+    prisma.product.count({ where }),
+    prisma.product.findMany({ where, include, orderBy: { updatedAt: 'desc' }, skip: (requestedPage - 1) * pageSize, take: pageSize }),
+    prisma.product.groupBy({ by: ['status'], _count: { _all: true } }),
+  ]);
+  const summary = Object.fromEntries(groups.map((group) => [group.status, group._count._all]));
+  res.json({ success: true, data: { products: products.map(serialize), pagination: { page: requestedPage, pageSize, total, totalPages: Math.max(1, Math.ceil(total / pageSize)), summary } } });
+});
 export const productOptions = asyncHandler(async (_req, res) => { const [categories, brands] = await Promise.all([prisma.category.findMany({ where: { status: 'ACTIVE', deletedAt: null }, select: { id: true, name: true }, orderBy: { name: 'asc' } }), prisma.brand.findMany({ where: { status: 'ACTIVE', deletedAt: null }, select: { id: true, name: true }, orderBy: { name: 'asc' } })]); res.json({ success: true, data: { categories, brands } }); });
 export const createProduct = asyncHandler(async (req, res) => { const input = productInputSchema.parse(req.body); ensureOfferStartIsValid(input); const product = await prisma.$transaction(async (tx) => { const cat = await category(tx, input.categoryName); const br = await brand(tx, input.brandName); const row = await tx.product.create({ data: productData(input, br?.id, input.slug ? await uniqueSlug(tx, 'product', input.slug) : await uniqueSlug(tx, 'product', input.name)) }); await tx.productCategory.create({ data: { productId: row.id, categoryId: cat.id, isPrimary: true } }); await images(tx, row.id, input.imageUrls, input.name); await relatedProducts(tx, row.id, input.relatedProductIds); await inventory(tx, row.id, input, req.auth.userId, 0, true); await variants(tx, row.id, input.variants, req.auth.userId); return tx.product.findUnique({ where: { id: row.id }, include }); }); res.status(201).json({ success: true, data: { product: serialize(product) } }); });
 
