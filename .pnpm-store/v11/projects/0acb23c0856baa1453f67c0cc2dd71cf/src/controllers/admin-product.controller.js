@@ -61,11 +61,12 @@ export const confirmImport = asyncHandler(async (req, res) => {
   res.status(201).json({ success: true, data: { imported: ids.length } });
 });
 
-export const downloadImportTemplate = (_req, res) => {
-  const file = buildProductImportTemplate();
+export const downloadImportTemplate = asyncHandler(async (_req, res) => {
+  const categories = await prisma.category.findMany({ where: { status: 'ACTIVE', deletedAt: null }, select: { name: true }, orderBy: { name: 'asc' } });
+  const file = await buildProductImportTemplate(categories.map((category) => category.name));
   res.set({ 'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Content-Disposition': 'attachment; filename="plantilla-importacion-productos.xlsx"' });
   res.send(file);
-};
+});
 export const updateProduct = asyncHandler(async (req, res) => { const input = productInputSchema.parse(req.body); const product = await prisma.$transaction(async (tx) => { const current = await tx.product.findUnique({ where: { id: req.params.id }, include: { inventory: true, variants: { include: { inventory: true } } } }); if (!current || current.status === 'ARCHIVED') throw new ApiError(404, 'PRODUCT_NOT_FOUND', 'No encontramos ese producto activo.'); ensureOfferStartIsValid(input, current); const cat = await category(tx, input.categoryName); const br = await brand(tx, input.brandName); await tx.product.update({ where: { id: current.id }, data: productData(input, br?.id, input.slug ? await uniqueSlug(tx, 'product', input.slug, current.id) : await uniqueSlug(tx, 'product', input.name, current.id)) }); await tx.productCategory.deleteMany({ where: { productId: current.id } }); await tx.productCategory.create({ data: { productId: current.id, categoryId: cat.id, isPrimary: true } }); await images(tx, current.id, input.imageUrls, input.name); await relatedProducts(tx, current.id, input.relatedProductIds); await inventory(tx, current.id, input, req.auth.userId, current.inventory?.physicalQuantity || 0); await variants(tx, current.id, input.variants, req.auth.userId, current.variants); return tx.product.findUnique({ where: { id: current.id }, include }); }); res.json({ success: true, data: { product: serialize(product) } }); });
 export const deleteProduct = asyncHandler(async (req, res) => {
   await prisma.$transaction(async (tx) => {
