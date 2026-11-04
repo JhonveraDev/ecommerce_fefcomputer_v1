@@ -4,7 +4,7 @@ import { productInputSchema } from '../validators/admin-product.validator.js';
 import { ApiError } from '../utils/api-error.js';
 
 const MAX_PRODUCTS = 500;
-const header = (value) => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
+const header = (value) => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s*\*\s*$/, '').trim().toLowerCase();
 const valueFor = (row, names) => {
   const key = Object.keys(row).find((candidate) => names.includes(header(candidate)));
   return key == null ? '' : row[key];
@@ -117,9 +117,12 @@ export async function buildProductImportTemplate(categories = []) {
   ];
   guide.forEach(([value], index) => { const cell = instructions.getCell(index + 3, 1); cell.value = value; cell.alignment = { wrapText: true, vertical: 'middle' }; if ([0, 7].includes(index)) { cell.font = { bold: true, color: { argb: 'FF006CE5' } }; } });
   instructions.getColumn(1).width = 110;
-  productColumns.forEach(([name, required, width], index) => { const cell = products.getCell(1, index + 1); cell.value = name; Object.assign(cell, required ? headerStyle : optionalHeaderStyle); products.getColumn(index + 1).width = width; });
-  products.autoFilter = { from: 'A1', to: 'Y1' }; products.getRow(1).height = 32;
-  for (let row = 2; row <= MAX_PRODUCTS + 1; row += 1) { productColumns.forEach(([, required], index) => { const cell = products.getCell(row, index + 1); cell.alignment = { vertical: 'middle' }; if (required) cell.fill = requiredFill; }); }
+  const applyProductTableDesign = (sheet, rows) => {
+    productColumns.forEach(([name, required, width], index) => { const cell = sheet.getCell(1, index + 1); cell.value = required ? `${name} *` : name; Object.assign(cell, required ? headerStyle : optionalHeaderStyle); sheet.getColumn(index + 1).width = width; });
+    sheet.autoFilter = { from: 'A1', to: 'Y1' }; sheet.getRow(1).height = 32;
+    for (let row = 2; row <= rows + 1; row += 1) { productColumns.forEach(([, required], index) => { const cell = sheet.getCell(row, index + 1); cell.alignment = { vertical: 'middle' }; if (required) cell.fill = requiredFill; }); }
+  };
+  applyProductTableDesign(products, MAX_PRODUCTS);
   const categoryValues = categories.length ? categories : ['Sin categorías configuradas'];
   options.getColumn(1).values = ['Categorías', ...categoryValues]; options.getColumn(2).values = ['Condición', 'Nuevo', 'Reacondicionado', 'Usado']; options.getColumn(3).values = ['Estado', 'Activo', 'Borrador', 'Inactivo']; options.getColumn(4).values = ['Destacado', 'Sí', 'No'];
   const validationRange = `2:${MAX_PRODUCTS + 1}`;
@@ -137,8 +140,8 @@ export async function buildProductImportTemplate(categories = []) {
     ['DEMO-CAM-005', 'Cámara Secure 4 MP', categoryAt(4), 'Secure', 219000, 0, 'Cámara IP de seguridad.', 'Cámara IP con visión nocturna y detección de movimiento.', 'https://placehold.co/800x600/png?text=Camara+Secure+4MP', '', 480, 11, 11, 10, '12 meses', 'Reacondicionado', 'cámara, seguridad', 'Inactivo', 'No', '', '', '', 'camara-secure-4mp', 'Cámara Secure 4 MP', 'Cámara IP de seguridad.'],
     ['DEMO-DOCK-006', 'Dock USB-C 12 en 1', categoryAt(5), 'Connect', 329000, 15, 'Base USB-C para productividad.', 'Dock con HDMI, Ethernet, lectores de tarjetas y puertos USB.', 'https://placehold.co/800x600/png?text=Dock+USB-C+12en1', '', 320, 14, 6, 2, '12 meses', 'Usado', 'dock, usb-c', 'Borrador', 'No', '', '', '', 'dock-usb-c-12-en-1', 'Dock USB-C 12 en 1', 'Dock USB-C con HDMI y Ethernet.'],
   ];
-  productColumns.forEach(([name, required, width], index) => { const cell = examples.getCell(1, index + 1); cell.value = name; Object.assign(cell, required ? headerStyle : optionalHeaderStyle); examples.getColumn(index + 1).width = width; });
-  examples.addRows(exampleRows); examples.autoFilter = { from: 'A1', to: 'Y1' }; examples.getRow(1).height = 32;
+  applyProductTableDesign(examples, exampleRows.length);
+  examples.addRows(exampleRows);
   for (let row = 2; row <= exampleRows.length + 1; row += 1) { examples.getCell(row, 5).numFmt = '#,##0'; examples.getCell(row, 6).numFmt = '#,##0'; examples.getCell(row, 20).numFmt = '#,##0'; examples.getCell(row, 21).numFmt = 'yyyy-mm-dd hh:mm'; examples.getCell(row, 22).numFmt = 'yyyy-mm-dd hh:mm'; }
   const variantHeaders = ['SKU producto', 'SKU variante', 'Atributos', 'Precio especial', 'Stock']; variantHeaders.forEach((name, index) => { const cell = variants.getCell(1, index + 1); cell.value = name; Object.assign(cell, index < 2 ? headerStyle : optionalHeaderStyle); variants.getColumn(index + 1).width = [22, 25, 48, 18, 12][index]; }); variants.autoFilter = { from: 'A1', to: 'E1' }; variants.getRow(1).height = 32;
   for (let row = 2; row <= MAX_PRODUCTS + 1; row += 1) { [4, 5].forEach((column) => { variants.getCell(row, column).numFmt = '#,##0'; variants.getCell(row, column).dataValidation = { type: 'decimal', operator: 'greaterThanOrEqual', formulae: [0], allowBlank: true, errorTitle: 'Número inválido', error: 'Usa un número igual o mayor a cero.', showErrorMessage: true }; }); }
