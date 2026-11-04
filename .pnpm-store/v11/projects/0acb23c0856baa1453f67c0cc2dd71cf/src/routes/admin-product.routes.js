@@ -1,11 +1,15 @@
 import { Router } from 'express';
+import multer from 'multer';
 import { authorize, authenticate } from '../middleware/auth.js';
 import { ROLES } from '../constants/roles.js';
 import * as controller from '../controllers/admin-product.controller.js';
 export const adminProductRouter = Router();
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024, files: 1 } });
 adminProductRouter.use(authenticate, authorize(ROLES.ADMIN, ROLES.EMPLOYEE));
 adminProductRouter.get('/options', controller.productOptions);
 adminProductRouter.get('/', controller.listProducts);
+adminProductRouter.post('/import/preview', upload.single('file'), controller.previewImport);
+adminProductRouter.post('/import/confirm', controller.confirmImport);
 adminProductRouter.post('/', controller.createProduct);
 adminProductRouter.put('/:id', controller.updateProduct);
 adminProductRouter.delete('/:id', controller.deleteProduct);

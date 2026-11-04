@@ -14,7 +14,8 @@ const messageFor = (error) => {
 };
 
 export async function apiRequest(path, options = {}, accessToken) {
-  const headers = { ...(options.body ? { 'Content-Type': 'application/json' } : {}), ...(options.headers || {}), ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) };
+  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+  const headers = { ...(options.body && !isFormData ? { 'Content-Type': 'application/json' } : {}), ...(options.headers || {}), ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}) };
   const request = () => fetch(`${API_URL}${path}`, { ...options, headers, credentials: 'include' });
   let response;
   try {

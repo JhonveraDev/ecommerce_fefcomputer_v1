@@ -13,6 +13,7 @@ import { orderRouter } from './routes/order.routes.js';
 import { shoppingStateRouter } from './routes/shopping-state.routes.js';
 import { healthRouter } from './routes/health.routes.js';
 import { adminProductRouter } from './routes/admin-product.routes.js';
+import * as adminProductController from './controllers/admin-product.controller.js';
 import { productRouter } from './routes/product.routes.js';
 import { paymentRouter } from './routes/payment.routes.js';
 
@@ -29,6 +30,7 @@ app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 500, standardHeaders: 'draf
 
 app.get('/', (_request, response) => response.json({ success: true, data: { name: 'FEFCOMPUTER API', version: 'v1' } }));
 app.use('/api/v1/health', healthRouter);
+app.get('/api/v1/product-import-template', adminProductController.downloadImportTemplate);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/account', accountRouter);
 app.use('/api/v1/orders', orderRouter);

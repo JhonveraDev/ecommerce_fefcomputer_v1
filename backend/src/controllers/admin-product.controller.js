@@ -1,7 +1,9 @@
 import { prisma } from '../config/prisma.js';
+import crypto from 'node:crypto';
 import { ApiError } from '../utils/api-error.js';
 import { asyncHandler } from '../utils/async-handler.js';
 import { productInputSchema } from '../validators/admin-product.validator.js';
+import { buildProductImportTemplate, parseProductWorkbook } from '../services/product-import.service.js';
 
 const include = { brand: true, categories: { include: { category: true }, orderBy: { isPrimary: 'desc' } }, images: { orderBy: { position: 'asc' } }, inventory: true, variants: { include: { inventory: true }, orderBy: { createdAt: 'asc' } }, relatedFrom: { select: { relatedProductId: true }, orderBy: { position: 'asc' } } };
 const slugify = (value) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 280) || 'producto';
@@ -20,6 +22,50 @@ const productData = (input, brandId, slug) => ({ name: input.name, sku: input.sk
 export const listProducts = asyncHandler(async (req, res) => { const q = String(req.query.q || '').trim(); const products = await prisma.product.findMany({ where: { ...(req.query.includeArchived === 'true' ? {} : { status: { not: 'ARCHIVED' } }), ...(q ? { OR: [{ name: { contains: q, mode: 'insensitive' } }, { sku: { contains: q, mode: 'insensitive' } }, { brand: { name: { contains: q, mode: 'insensitive' } } }, { categories: { some: { category: { name: { contains: q, mode: 'insensitive' } } } } }] } : {}) }, include, orderBy: { updatedAt: 'desc' } }); res.json({ success: true, data: { products: products.map(serialize) } }); });
 export const productOptions = asyncHandler(async (_req, res) => { const [categories, brands] = await Promise.all([prisma.category.findMany({ where: { status: 'ACTIVE', deletedAt: null }, select: { id: true, name: true }, orderBy: { name: 'asc' } }), prisma.brand.findMany({ where: { status: 'ACTIVE', deletedAt: null }, select: { id: true, name: true }, orderBy: { name: 'asc' } })]); res.json({ success: true, data: { categories, brands } }); });
 export const createProduct = asyncHandler(async (req, res) => { const input = productInputSchema.parse(req.body); ensureOfferStartIsValid(input); const product = await prisma.$transaction(async (tx) => { const cat = await category(tx, input.categoryName); const br = await brand(tx, input.brandName); const row = await tx.product.create({ data: productData(input, br?.id, input.slug ? await uniqueSlug(tx, 'product', input.slug) : await uniqueSlug(tx, 'product', input.name)) }); await tx.productCategory.create({ data: { productId: row.id, categoryId: cat.id, isPrimary: true } }); await images(tx, row.id, input.imageUrls, input.name); await relatedProducts(tx, row.id, input.relatedProductIds); await inventory(tx, row.id, input, req.auth.userId, 0, true); await variants(tx, row.id, input.variants, req.auth.userId); return tx.product.findUnique({ where: { id: row.id }, include }); }); res.status(201).json({ success: true, data: { product: serialize(product) } }); });
+
+const importPreviews = new Map();
+const previewKey = () => crypto.randomUUID();
+const importProducts = async (products, actorId) => prisma.$transaction(async (tx) => {
+  const created = [];
+  for (const input of products) {
+    const cat = await category(tx, input.categoryName); const br = await brand(tx, input.brandName);
+    const row = await tx.product.create({ data: productData(input, br?.id, input.slug ? await uniqueSlug(tx, 'product', input.slug) : await uniqueSlug(tx, 'product', input.name)) });
+    await tx.productCategory.create({ data: { productId: row.id, categoryId: cat.id, isPrimary: true } }); await images(tx, row.id, input.imageUrls, input.name); await inventory(tx, row.id, input, actorId, 0, true); await variants(tx, row.id, input.variants, actorId);
+    created.push(row.id);
+  }
+  return created;
+});
+
+export const previewImport = asyncHandler(async (req, res) => {
+  if (!req.file) throw new ApiError(422, 'IMPORT_FILE_REQUIRED', 'Selecciona un archivo Excel (.xlsx) para continuar.');
+  const rows = parseProductWorkbook(req.file.buffer);
+  const validProducts = rows.filter((row) => row.product).map((row) => row.product);
+  const skus = validProducts.map((product) => product.sku);
+  const existing = skus.length ? await prisma.product.findMany({ where: { sku: { in: skus } }, select: { sku: true } }) : [];
+  const existingSkus = new Set(existing.map((product) => product.sku.toLowerCase()));
+  rows.forEach((row) => { if (row.sku && existingSkus.has(row.sku.toLowerCase())) row.errors.push('Ya existe un producto con este SKU.'); });
+  const invalid = rows.filter((row) => row.errors.length);
+  const token = invalid.length ? null : previewKey();
+  if (token) importPreviews.set(token, { expiresAt: Date.now() + 10 * 60 * 1000, actorId: req.auth.userId, products: validProducts });
+  res.json({ success: true, data: { token, canConfirm: Boolean(token), total: rows.length, valid: rows.length - invalid.length, invalid: invalid.length, rows: rows.map(({ product, ...row }) => ({ ...row, valid: !row.errors.length })) } });
+});
+
+export const confirmImport = asyncHandler(async (req, res) => {
+  const token = String(req.body?.token || ''); const preview = importPreviews.get(token);
+  importPreviews.delete(token);
+  if (!preview || preview.expiresAt < Date.now() || preview.actorId !== req.auth.userId) throw new ApiError(410, 'IMPORT_PREVIEW_EXPIRED', 'La vista previa venció. Vuelve a cargar y validar el archivo.');
+  const skus = preview.products.map((product) => product.sku);
+  const conflicts = await prisma.product.count({ where: { sku: { in: skus } } });
+  if (conflicts) throw new ApiError(409, 'IMPORT_SKU_CONFLICT', 'El catálogo cambió desde la validación. Revisa el archivo nuevamente.');
+  const ids = await importProducts(preview.products, req.auth.userId);
+  res.status(201).json({ success: true, data: { imported: ids.length } });
+});
+
+export const downloadImportTemplate = (_req, res) => {
+  const file = buildProductImportTemplate();
+  res.set({ 'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Content-Disposition': 'attachment; filename="plantilla-importacion-productos.xlsx"' });
+  res.send(file);
+};
 export const updateProduct = asyncHandler(async (req, res) => { const input = productInputSchema.parse(req.body); const product = await prisma.$transaction(async (tx) => { const current = await tx.product.findUnique({ where: { id: req.params.id }, include: { inventory: true, variants: { include: { inventory: true } } } }); if (!current || current.status === 'ARCHIVED') throw new ApiError(404, 'PRODUCT_NOT_FOUND', 'No encontramos ese producto activo.'); ensureOfferStartIsValid(input, current); const cat = await category(tx, input.categoryName); const br = await brand(tx, input.brandName); await tx.product.update({ where: { id: current.id }, data: productData(input, br?.id, input.slug ? await uniqueSlug(tx, 'product', input.slug, current.id) : await uniqueSlug(tx, 'product', input.name, current.id)) }); await tx.productCategory.deleteMany({ where: { productId: current.id } }); await tx.productCategory.create({ data: { productId: current.id, categoryId: cat.id, isPrimary: true } }); await images(tx, current.id, input.imageUrls, input.name); await relatedProducts(tx, current.id, input.relatedProductIds); await inventory(tx, current.id, input, req.auth.userId, current.inventory?.physicalQuantity || 0); await variants(tx, current.id, input.variants, req.auth.userId, current.variants); return tx.product.findUnique({ where: { id: current.id }, include }); }); res.json({ success: true, data: { product: serialize(product) } }); });
 export const deleteProduct = asyncHandler(async (req, res) => {
   await prisma.$transaction(async (tx) => {

@@ -16,6 +16,15 @@ pnpm start
 pnpm db:seed
 ```
 
+## Importación masiva de productos
+
+Los usuarios con rol `ADMIN` o `EMPLOYEE` pueden importar un archivo `.xlsx` desde el panel de productos. El flujo valida el archivo antes de guardar y crea todos los productos en una única transacción.
+
+- Descarga la plantilla desde el botón **Importar Excel** del panel.
+- Usa la hoja `Productos` para los datos principales y `Variantes` para las versiones por SKU.
+- La importación admite hasta 500 productos y archivos de hasta 5 MB.
+- No sobrescribe productos existentes: corrige o cambia cualquier SKU ya registrado antes de confirmar.
+
 ## Endpoints disponibles
 
 - `GET /api/v1/health`

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, Boxes, CheckCircle2, Eye, FilePenLine, Image as ImageIcon, Pencil, Plus, RotateCcw, Search, ShieldAlert, Trash2, X, XCircle } from 'lucide-react';
+import { AlertTriangle, Boxes, CheckCircle2, Eye, FilePenLine, Image as ImageIcon, Pencil, Plus, RotateCcw, Search, ShieldAlert, Trash2, Upload, X, XCircle } from 'lucide-react';
 import { StoreBanner } from '../components/StoreBanner';
 import { useAuth } from '../context/AuthContext';
 import styles from './AdminProductsPage.module.css';
@@ -8,6 +8,7 @@ import confirmStyles from './AdminProductsConfirm.module.css';
 import dashboardStyles from './AdminProductsDashboard.module.css';
 import noticeStyles from './AdminProductNotice.module.css';
 import { ProductFormDialog } from './ProductFormDialog';
+import { ProductImportDialog } from './ProductImportDialog';
 
 const blankProduct = { name: '', sku: '', category: '', brand: '', basePrice: '', compareAtPrice: '', offerStartsAt: '', offerEndsAt: '', physicalQuantity: 0, shortDescription: '', description: '', imageUrl: '', status: 'ACTIVE', isFeatured: false };
 const money = (value) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(value));
@@ -31,6 +32,7 @@ export function AdminProductsPage() {
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [editing, setEditing] = useState(null);
+  const [importing, setImporting] = useState(false);
   const [pendingDelete, setPendingDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [notice, setNotice] = useState(null);
@@ -48,7 +50,7 @@ export function AdminProductsPage() {
   return <main className={styles.page}>
     <StoreBanner title="Productos" items={['Inicio', 'Administración', 'Productos']} />
     <section className={styles.content}>
-      <div className={styles.heading}><div><p>Panel administrativo</p><h1>Gestión de productos</h1><span>Controla catálogo, disponibilidad y precios desde un solo lugar.</span></div><button onClick={() => setEditing(blankProduct)}><Plus size={18} />Nuevo producto</button></div>
+      <div className={styles.heading}><div><p>Panel administrativo</p><h1>Gestión de productos</h1><span>Controla catálogo, disponibilidad y precios desde un solo lugar.</span></div><div className={dashboardStyles.headingActions}><button className={dashboardStyles.importButton} onClick={() => setImporting(true)}><Upload size={18} />Importar Excel</button><button onClick={() => setEditing(blankProduct)}><Plus size={18} />Nuevo producto</button></div></div>
       <div className={dashboardStyles.summary}>{metrics.map(({ label, value, Icon }) => <article className={dashboardStyles.metric} key={label}><span className={dashboardStyles.metricIcon}><Icon size={20} /></span><div><small>{label}</small><b>{value}</b></div></article>)}</div>
       <div className={dashboardStyles.toolbar}><label className={dashboardStyles.search}><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar por nombre, SKU, marca o categoría" /></label><label className={dashboardStyles.filter}>Estado<select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><option value="ALL">Todos</option><option value="ACTIVE">Activos</option><option value="DRAFT">Borradores</option><option value="INACTIVE">Inactivos</option><option value="ARCHIVED">Archivados</option></select></label>{(query || statusFilter !== 'ALL') && <button className={dashboardStyles.clear} type="button" onClick={resetFilters}><RotateCcw size={15} />Limpiar</button>}</div>
       <div className={dashboardStyles.resultBar}><span><b>{filtered.length}</b> de {products.length} productos</span><span>Los cambios se guardan directamente en el catálogo.</span></div>
@@ -56,6 +58,7 @@ export function AdminProductsPage() {
       {loading ? <p className={styles.loading}>Cargando productos…</p> : <div className={styles.tableWrap}><table><thead><tr><th>Producto</th><th>SKU</th><th>Categoría / Marca</th><th>Precio</th><th>Inventario</th><th>Estado</th><th aria-label="Acciones" /></tr></thead><tbody>{filtered.map((product) => <tr key={product.id}><td><div className={styles.productCell}>{product.imageUrl ? <img src={product.imageUrl} alt="" /> : <span><ImageIcon size={18} /></span>}<div className={dashboardStyles.tableProduct}><b>{product.name}</b><small>{product.shortDescription || 'Sin descripción corta'}</small></div></div></td><td>{product.sku || '—'}</td><td>{product.category}<small>{product.brand || 'Sin marca'}</small></td><td>{money(product.basePrice)}{product.compareAtPrice && <small>Antes: {money(product.compareAtPrice)}</small>}</td><td><b>{product.totalPhysicalQuantity ?? product.physicalQuantity} unidades</b><small>Base: {product.physicalQuantity}</small></td><td><span className={`${styles.status} ${styles[product.status.toLowerCase()]}`}>{product.status === 'ARCHIVED' ? 'Archivado' : product.status === 'ACTIVE' ? 'Activo' : product.status === 'DRAFT' ? 'Borrador' : 'Inactivo'}</span></td><td><div className={styles.actions}><button type="button" aria-label={`Ver ${product.name} en tienda`} title={product.status === 'ACTIVE' ? 'Ver producto en tienda' : 'Solo los productos activos pueden verse en tienda'} disabled={product.status !== 'ACTIVE'} onClick={() => window.open(`/producto/${encodeURIComponent(product.slug)}`, '_blank', 'noopener,noreferrer')}><Eye size={17} /></button><button type="button" title="Editar" disabled={product.status === 'ARCHIVED'} onClick={() => setEditing(product)}><Pencil size={17} /></button><button type="button" title="Eliminar definitivamente" onClick={() => setPendingDelete(product)}><Trash2 size={17} /></button></div></td></tr>)}{!filtered.length && <tr><td colSpan="7"><div className={dashboardStyles.empty}><Search size={30} /><h2>No encontramos productos</h2><p>Ajusta la búsqueda o limpia los filtros para ver el catálogo.</p></div></td></tr>}</tbody></table></div>}
     </section>
     {editing && <ProductFormDialog product={editing} onCancel={() => setEditing(null)} onSaved={save} onFailed={(message) => setNotice({ type: 'error', message })} />}
+    {importing && <ProductImportDialog onCancel={() => setImporting(false)} onFailed={(message) => setNotice({ type: 'error', message })} onImported={(count) => { setImporting(false); load(); setNotice({ type: 'success', message: `${count} productos fueron importados correctamente.` }); window.dispatchEvent(new Event('catalog-updated')); }} />}
     <DeleteProductDialog product={pendingDelete} deleting={deleting} onCancel={() => setPendingDelete(null)} onConfirm={remove} />
     <ProductNotice notice={notice} onClose={() => setNotice(null)} />
   </main>;
