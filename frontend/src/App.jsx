@@ -42,21 +42,28 @@ import { catalogService } from './services/catalogService';
 function Storefront() {
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [catalogProducts, setCatalogProducts] = useState([]);
+  const [catalogLoaded, setCatalogLoaded] = useState(false);
   const { isAuthenticated, isLoading } = useAuth();
   const { itemCount, addItem } = useCart();
   const wishlist = useWishlist();
   const compareState = useCompare();
-  const { wishlistCount } = wishlist;
   const getPage = (pathname = window.location.pathname) => pathname === '/admin/productos' ? 'admin-products' : pathname.startsWith('/tienda') ? 'store' : pathname.startsWith('/producto/') ? 'product' : pathname === '/carrito' ? 'cart' : pathname === '/checkout' ? 'checkout' : pathname === '/favoritos' ? 'wishlist' : pathname === '/comparar' ? 'compare' : pathname === '/contacto' ? 'contact' : pathname === '/nosotros' ? 'about' : pathname === '/terminos-y-condiciones' ? 'terms' : pathname.startsWith('/login') ? 'login' : pathname.startsWith('/registro') ? 'register' : pathname.startsWith('/recuperar-password') ? 'forgot' : pathname.startsWith('/restablecer-password') ? 'reset' : pathname.startsWith('/mis-pedidos/') ? 'order-detail' : pathname.startsWith('/mis-pedidos') ? 'orders' : pathname === '/mis-direcciones' ? 'addresses' : pathname === '/cuenta' ? 'account' : 'home';
   const [locationHash, setLocationHash] = useState(() => window.location.pathname + window.location.search);
   const page = getPage(locationHash);
   useEffect(() => {
     let mounted = true;
-    const loadCatalog = () => catalogService.list().then(({ products }) => { if (mounted) setCatalogProducts(products); }).catch(() => {});
+    const loadCatalog = () => catalogService.list().then(({ products }) => {
+      if (mounted) { setCatalogProducts(products); setCatalogLoaded(true); }
+    }).catch(() => {});
     loadCatalog();
     window.addEventListener('catalog-updated', loadCatalog);
     return () => { mounted = false; window.removeEventListener('catalog-updated', loadCatalog); };
   }, []);
+  useEffect(() => {
+    if (!catalogLoaded) return;
+    wishlist.reconcileProducts(catalogProducts);
+    compareState.reconcileProducts(catalogProducts);
+  }, [catalogLoaded, catalogProducts, wishlist.reconcileProducts, compareState.reconcileProducts]);
   useEffect(() => {
     const updateLocation = () => setLocationHash(window.location.pathname + window.location.search);
     const handleInternalLink = (event) => {
@@ -76,7 +83,12 @@ function Storefront() {
   const addToCart = (product, quantity = 1) => addItem(product, quantity);
   const addToWishlist = (product) => console.info('Favorito actualizado:', product.slug);
   const compare = (product) => compareState.toggleCompare(product);
-  const sharedHeader = <Header products={catalogProducts} cartCount={itemCount} wishlistCount={wishlistCount} compareCount={compareState.compareCount} />;
+  // The catalog is the renderable source of truth. During its initial load a
+  // persisted ID is not counted until it can be resolved to a public product.
+  const visibleProductIds = new Set(catalogProducts.map((product) => product.id));
+  const wishlistCount = catalogLoaded ? wishlist.productIds.filter((id) => visibleProductIds.has(id)).length : 0;
+  const compareCount = catalogLoaded ? compareState.productIds.filter((id) => visibleProductIds.has(id)).length : 0;
+  const sharedHeader = <Header products={catalogProducts} cartCount={itemCount} wishlistCount={wishlistCount} compareCount={compareCount} />;
   const sharedQuickView = <QuickViewModal product={quickViewProduct} onClose={() => setQuickViewProduct(null)} onAddToCart={addToCart} onAddToWishlist={addToWishlist} onCompare={compare} />;
   const welcomeOfferProduct = catalogProducts[0] || null;
   const featuredCatalogProducts = catalogProducts.filter((product) => product.isFeatured);
