@@ -7,6 +7,7 @@ import { z } from 'zod';
 const { Prisma } = prismaPackage;
 
 export const CONFIRMED_SALE_STATUSES = ['PAYMENT_APPROVED', 'PREPARING', 'SHIPPED', 'DELIVERED'];
+export const SALE_STATUSES = [...CONFIRMED_SALE_STATUSES, 'CANCELLED'];
 const saleInclude = {
   user: { select: { name: true, lastName: true, email: true, phone: true } },
   items: { select: { id: true, skuSnapshot: true, nameSnapshot: true, imageUrlSnapshot: true, quantity: true, unitPrice: true, lineTotal: true } },
@@ -72,7 +73,7 @@ const parseDate = (value, endOfDay = false) => {
 const FUZZY_SEARCH_THRESHOLD = 0.28;
 const fuzzySaleSearch = async ({ q, status, start, end, page, pageSize }) => {
   const normalizedQuery = q.toLocaleLowerCase('es-CO');
-  const statuses = status ? [status] : CONFIRMED_SALE_STATUSES;
+  const statuses = status ? [status] : SALE_STATUSES;
   const statusValues = Prisma.join(statuses.map((value) => Prisma.sql`${value}::"OrderStatus"`));
   const filters = [Prisma.sql`o."status" IN (${statusValues})`];
   if (start) filters.push(Prisma.sql`o."created_at" >= ${start}`);
@@ -121,11 +122,11 @@ export const listSales = asyncHandler(async (request, response) => {
   await syncSaleNotifications();
   const { page, pageSize } = pagination(request.query);
   const q = String(request.query.q || '').trim();
-  const status = CONFIRMED_SALE_STATUSES.includes(request.query.status) ? request.query.status : null;
+  const status = SALE_STATUSES.includes(request.query.status) ? request.query.status : null;
   const start = parseDate(request.query.startDate);
   const end = parseDate(request.query.endDate, true);
   const where = {
-    status: status ? status : { in: CONFIRMED_SALE_STATUSES },
+    status: status ? status : { in: SALE_STATUSES },
     ...(start || end ? { createdAt: { ...(start ? { gte: start } : {}), ...(end ? { lte: end } : {}) } } : {}),
   };
   const confirmedWhere = { status: { in: CONFIRMED_SALE_STATUSES } };
@@ -149,7 +150,7 @@ export const listSales = asyncHandler(async (request, response) => {
 });
 
 export const saleDetail = asyncHandler(async (request, response) => {
-  const order = await prisma.order.findFirst({ where: { id: request.params.id, status: { in: CONFIRMED_SALE_STATUSES } }, include: { ...saleInclude, payments: { select: { provider: true, providerReference: true, status: true, amount: true, paidAt: true } }, shipment: true, statusHistory: { orderBy: { createdAt: 'asc' } } } });
+  const order = await prisma.order.findFirst({ where: { id: request.params.id, status: { in: SALE_STATUSES } }, include: { ...saleInclude, payments: { select: { provider: true, providerReference: true, status: true, amount: true, paidAt: true } }, shipment: true, statusHistory: { orderBy: { createdAt: 'asc' } } } });
   if (!order) throw new ApiError(404, 'SALE_NOT_FOUND', 'No encontramos esa venta confirmada.');
   response.json({ success: true, data: { sale: { ...serializeSale(order), payments: order.payments.map((payment) => ({ ...payment, amount: number(payment.amount) })), shipment: order.shipment, statusHistory: order.statusHistory } } });
 });
@@ -172,11 +173,11 @@ export const markNotificationRead = asyncHandler(async (request, response) => {
   response.json({ success: true, data: { notificationId: notification.id, readAt: read.readAt } });
 });
 
-const statusSchema = z.object({ status: z.enum(['PAYMENT_APPROVED', 'PREPARING', 'SHIPPED', 'DELIVERED']), comment: z.string().trim().max(1000).optional() });
+const statusSchema = z.object({ status: z.enum(['PAYMENT_APPROVED', 'PREPARING', 'SHIPPED', 'DELIVERED', 'CANCELLED']), comment: z.string().trim().max(1000).optional() });
 export const updateSaleStatus = asyncHandler(async (request, response) => {
   const input = statusSchema.parse(request.body);
   const order = await prisma.$transaction(async (tx) => {
-    const current = await tx.order.findFirst({ where: { id: request.params.id, status: { in: CONFIRMED_SALE_STATUSES } } });
+    const current = await tx.order.findFirst({ where: { id: request.params.id, status: { in: SALE_STATUSES } } });
     if (!current) throw new ApiError(404, 'SALE_NOT_FOUND', 'No encontramos esa venta confirmada.');
     if (current.status === input.status) throw new ApiError(422, 'SALE_STATUS_UNCHANGED', 'Selecciona un estado diferente para actualizar la venta.');
     const updated = await tx.order.update({ where: { id: current.id }, data: { status: input.status } });

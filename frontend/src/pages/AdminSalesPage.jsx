@@ -8,8 +8,8 @@ import './AdminSalesTable.css';
 
 const PER_PAGE = 5;
 const NOTIFICATIONS_PER_PAGE = 4;
-const saleStatuses = ['PAYMENT_APPROVED', 'PREPARING', 'SHIPPED', 'DELIVERED'];
-const labels = { PAYMENT_APPROVED: 'Pago aprobado', PREPARING: 'En preparación', SHIPPED: 'Enviado', DELIVERED: 'Entregado' };
+const saleStatuses = ['PAYMENT_APPROVED', 'PREPARING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
+const labels = { PAYMENT_APPROVED: 'Pago aprobado', PREPARING: 'En preparación', SHIPPED: 'Enviado', DELIVERED: 'Entregado', CANCELLED: 'Cancelado' };
 const money = (value) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(value));
 const dateTime = (value) => new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
 const isAdmin = (user) => user?.roles?.includes('ADMIN');
