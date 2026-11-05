@@ -1,7 +1,10 @@
 import { prisma } from '../config/prisma.js';
+import prismaPackage from '@prisma/client';
 import { ApiError } from '../utils/api-error.js';
 import { asyncHandler } from '../utils/async-handler.js';
 import { z } from 'zod';
+
+const { Prisma } = prismaPackage;
 
 export const CONFIRMED_SALE_STATUSES = ['PAYMENT_APPROVED', 'PREPARING', 'SHIPPED', 'DELIVERED'];
 const saleInclude = {
@@ -66,6 +69,54 @@ const parseDate = (value, endOfDay = false) => {
   return date;
 };
 
+const FUZZY_SEARCH_THRESHOLD = 0.28;
+const fuzzySaleSearch = async ({ q, status, start, end, page, pageSize }) => {
+  const normalizedQuery = q.toLocaleLowerCase('es-CO');
+  const statuses = status ? [status] : CONFIRMED_SALE_STATUSES;
+  const statusValues = Prisma.join(statuses.map((value) => Prisma.sql`${value}::"OrderStatus"`));
+  const filters = [Prisma.sql`o."status" IN (${statusValues})`];
+  if (start) filters.push(Prisma.sql`o."created_at" >= ${start}`);
+  if (end) filters.push(Prisma.sql`o."created_at" <= ${end}`);
+
+  const recipientName = Prisma.sql`COALESCE(o."shipping_address_snapshot"->>'recipientName', '')`;
+  const buyerName = Prisma.sql`(COALESCE(u."name", '') || ' ' || COALESCE(u."last_name", ''))`;
+  const exactMatch = Prisma.join([
+    Prisma.sql`o."public_number" ILIKE ${`%${q}%`}`,
+    Prisma.sql`o."customer_email" ILIKE ${`%${q}%`}`,
+    Prisma.sql`${buyerName} ILIKE ${`%${q}%`}`,
+    Prisma.sql`${recipientName} ILIKE ${`%${q}%`}`,
+    Prisma.sql`EXISTS (SELECT 1 FROM "order_items" item WHERE item."order_id" = o."id" AND item."name_snapshot" ILIKE ${`%${q}%`})`,
+  ], ' OR ');
+  const similarityScore = Prisma.sql`GREATEST(
+    similarity(lower(o."public_number"), ${normalizedQuery}),
+    similarity(lower(o."customer_email"), ${normalizedQuery}),
+    similarity(lower(${buyerName}), ${normalizedQuery}),
+    word_similarity(${normalizedQuery}, lower(${buyerName})),
+    similarity(lower(${recipientName}), ${normalizedQuery}),
+    word_similarity(${normalizedQuery}, lower(${recipientName})),
+    COALESCE((SELECT MAX(GREATEST(similarity(lower(item."name_snapshot"), ${normalizedQuery}), word_similarity(${normalizedQuery}, lower(item."name_snapshot")))) FROM "order_items" item WHERE item."order_id" = o."id"), 0)
+  )`;
+  const threshold = q.length >= 3 ? FUZZY_SEARCH_THRESHOLD : 1;
+  const rows = await prisma.$queryRaw`
+    WITH ranked_sales AS (
+      SELECT o."id", o."created_at",
+        CASE WHEN (${exactMatch}) THEN 1 ELSE 0 END AS exact_match,
+        ${similarityScore} AS similarity_score
+      FROM "orders" o
+      LEFT JOIN "users" u ON u."id" = o."user_id"
+      WHERE ${Prisma.join(filters, ' AND ')}
+    ), matched_sales AS (
+      SELECT * FROM ranked_sales
+      WHERE exact_match = 1 OR similarity_score >= ${threshold}
+    )
+    SELECT "id", COUNT(*) OVER() AS "total"
+    FROM matched_sales
+    ORDER BY exact_match DESC, similarity_score DESC, "created_at" DESC
+    OFFSET ${(page - 1) * pageSize} LIMIT ${pageSize}
+  `;
+  return { ids: rows.map((row) => row.id), total: Number(rows[0]?.total || 0) };
+};
+
 export const listSales = asyncHandler(async (request, response) => {
   await syncSaleNotifications();
   const { page, pageSize } = pagination(request.query);
@@ -76,17 +127,24 @@ export const listSales = asyncHandler(async (request, response) => {
   const where = {
     status: status ? status : { in: CONFIRMED_SALE_STATUSES },
     ...(start || end ? { createdAt: { ...(start ? { gte: start } : {}), ...(end ? { lte: end } : {}) } } : {}),
-    ...(q ? { OR: [{ publicNumber: { contains: q, mode: 'insensitive' } }, { customerEmail: { contains: q, mode: 'insensitive' } }, { items: { some: { nameSnapshot: { contains: q, mode: 'insensitive' } } } }] } : {}),
   };
   const confirmedWhere = { status: { in: CONFIRMED_SALE_STATUSES } };
   const recentSince = new Date(); recentSince.setDate(recentSince.getDate() - 7);
-  const [total, orders, revenue, recentSales, unreadNotifications] = await prisma.$transaction([
-    prisma.order.count({ where }),
-    prisma.order.findMany({ where, include: saleInclude, orderBy: { createdAt: 'desc' }, skip: (page - 1) * pageSize, take: pageSize }),
+  const fuzzyResults = q ? await fuzzySaleSearch({ q, status, start, end, page, pageSize }) : null;
+  const [revenue, recentSales, unreadNotifications] = await prisma.$transaction([
     prisma.order.aggregate({ where: confirmedWhere, _sum: { grandTotal: true }, _count: { _all: true } }),
     prisma.order.count({ where: { ...confirmedWhere, createdAt: { gte: recentSince } } }),
     prisma.saleNotification.count({ where: { reads: { none: { userId: request.auth.userId } } } }),
   ]);
+  const total = fuzzyResults ? fuzzyResults.total : await prisma.order.count({ where });
+  let orders;
+  if (fuzzyResults) {
+    const unorderedOrders = fuzzyResults.ids.length ? await prisma.order.findMany({ where: { id: { in: fuzzyResults.ids } }, include: saleInclude }) : [];
+    const ordersById = new Map(unorderedOrders.map((order) => [order.id, order]));
+    orders = fuzzyResults.ids.map((id) => ordersById.get(id)).filter(Boolean);
+  } else {
+    orders = await prisma.order.findMany({ where, include: saleInclude, orderBy: { createdAt: 'desc' }, skip: (page - 1) * pageSize, take: pageSize });
+  }
   response.json({ success: true, data: { sales: orders.map(serializeSale), pagination: { page, pageSize, total, totalPages: Math.max(1, Math.ceil(total / pageSize)) }, summary: { totalSales: revenue._count._all, revenue: number(revenue._sum.grandTotal || 0), recentSales, unreadNotifications } } });
 });
 
