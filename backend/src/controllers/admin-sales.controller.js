@@ -9,6 +9,8 @@ const saleInclude = {
   items: { select: { id: true, skuSnapshot: true, nameSnapshot: true, imageUrlSnapshot: true, quantity: true, unitPrice: true, lineTotal: true } },
 };
 const number = (value) => Number(value);
+const SALES_PAGE_SIZE = 6;
+const NOTIFICATION_PAGE_SIZE = 4;
 const buyer = (order) => {
   const address = order.shippingAddressSnapshot && typeof order.shippingAddressSnapshot === 'object' ? order.shippingAddressSnapshot : {};
   const name = [order.user?.name, order.user?.lastName].filter(Boolean).join(' ') || address.recipientName || null;
@@ -32,7 +34,12 @@ const syncSaleNotifications = async () => {
 
 const pagination = (query) => {
   const page = Math.max(1, Number.parseInt(query.page, 10) || 1);
-  const pageSize = Math.min(50, Math.max(1, Number.parseInt(query.pageSize, 10) || 12));
+  const pageSize = Math.min(SALES_PAGE_SIZE, Math.max(1, Number.parseInt(query.pageSize, 10) || SALES_PAGE_SIZE));
+  return { page, pageSize };
+};
+const notificationPagination = (query) => {
+  const page = Math.max(1, Number.parseInt(query.page, 10) || 1);
+  const pageSize = Math.min(NOTIFICATION_PAGE_SIZE, Math.max(1, Number.parseInt(query.pageSize, 10) || NOTIFICATION_PAGE_SIZE));
   return { page, pageSize };
 };
 const parseDate = (value, endOfDay = false) => {
@@ -75,8 +82,12 @@ export const saleDetail = asyncHandler(async (request, response) => {
 
 export const listNotifications = asyncHandler(async (request, response) => {
   await syncSaleNotifications();
-  const notifications = await prisma.saleNotification.findMany({ include: { order: { include: saleInclude }, reads: { where: { userId: request.auth.userId }, select: { readAt: true } } }, orderBy: { createdAt: 'desc' }, take: 30 });
-  response.json({ success: true, data: { notifications: notifications.map((notification) => ({ id: notification.id, createdAt: notification.createdAt, readAt: notification.reads[0]?.readAt || null, sale: serializeSale(notification.order) })) } });
+  const { page, pageSize } = notificationPagination(request.query);
+  const [total, notifications] = await prisma.$transaction([
+    prisma.saleNotification.count(),
+    prisma.saleNotification.findMany({ include: { order: { include: saleInclude }, reads: { where: { userId: request.auth.userId }, select: { readAt: true } } }, orderBy: { createdAt: 'desc' }, skip: (page - 1) * pageSize, take: pageSize }),
+  ]);
+  response.json({ success: true, data: { notifications: notifications.map((notification) => ({ id: notification.id, createdAt: notification.createdAt, readAt: notification.reads[0]?.readAt || null, sale: serializeSale(notification.order) })), pagination: { page, pageSize, total, totalPages: Math.max(1, Math.ceil(total / pageSize)) } } });
 });
 
 export const markNotificationRead = asyncHandler(async (request, response) => {
