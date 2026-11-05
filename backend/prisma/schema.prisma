@@ -90,6 +90,7 @@ model User {
   addresses         Address[]
   carts             Cart[]
   orders            Order[]
+  saleNotificationReads SaleNotificationRead[]
   inventoryMoves    InventoryMovement[]    @relation("InventoryMovementActor")
   orderStatusChanges OrderStatusHistory[]  @relation("OrderStatusActor")
 
@@ -407,10 +408,34 @@ model Order {
   statusHistory           OrderStatusHistory[]
   payments                Payment[]
   shipment                Shipment?
+  saleNotification        SaleNotification?
 
   @@index([userId, createdAt])
   @@index([status, createdAt])
   @@map("orders")
+}
+
+model SaleNotification {
+  id        String                 @id @default(uuid()) @db.Uuid
+  orderId   String                 @unique @map("order_id") @db.Uuid
+  createdAt DateTime               @default(now()) @map("created_at")
+  order     Order                  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  reads     SaleNotificationRead[]
+
+  @@index([createdAt])
+  @@map("sale_notifications")
+}
+
+model SaleNotificationRead {
+  notificationId String           @map("notification_id") @db.Uuid
+  userId         String           @map("user_id") @db.Uuid
+  readAt         DateTime         @default(now()) @map("read_at")
+  notification   SaleNotification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([notificationId, userId])
+  @@index([userId, readAt])
+  @@map("sale_notification_reads")
 }
 
 model OrderItem {
