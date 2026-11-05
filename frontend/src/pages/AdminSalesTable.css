@@ -7,7 +7,7 @@ section[class*="sales"] table {
 
 section[class*="sales"] th,
 section[class*="sales"] td {
-  padding: 13px 10px;
+  padding: 13px 14px;
 }
 
 section[class*="sales"] th:nth-child(1) { width: 30%; }
