@@ -9,8 +9,9 @@ const saleInclude = {
   items: { select: { id: true, skuSnapshot: true, nameSnapshot: true, imageUrlSnapshot: true, quantity: true, unitPrice: true, lineTotal: true } },
 };
 const number = (value) => Number(value);
-const SALES_PAGE_SIZE = 6;
+const SALES_PAGE_SIZE = 5;
 const NOTIFICATION_PAGE_SIZE = 4;
+const MAX_SALE_NOTIFICATIONS = 20;
 const buyer = (order) => {
   const address = order.shippingAddressSnapshot && typeof order.shippingAddressSnapshot === 'object' ? order.shippingAddressSnapshot : {};
   const name = [order.user?.name, order.user?.lastName].filter(Boolean).join(' ') || address.recipientName || null;
@@ -30,6 +31,21 @@ const serializeSale = (order) => ({
 const syncSaleNotifications = async () => {
   const pending = await prisma.order.findMany({ where: { status: { in: CONFIRMED_SALE_STATUSES }, saleNotification: null }, select: { id: true } });
   if (pending.length) await prisma.saleNotification.createMany({ data: pending.map((order) => ({ orderId: order.id })), skipDuplicates: true });
+  await pruneReadSaleNotifications();
+};
+
+const pruneReadSaleNotifications = async () => {
+  const [administrators, candidates] = await prisma.$transaction([
+    prisma.user.findMany({ where: { status: 'ACTIVE', roles: { some: { role: { name: 'ADMIN' } } } }, select: { id: true } }),
+    prisma.saleNotification.findMany({ orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], skip: MAX_SALE_NOTIFICATIONS, select: { id: true, reads: { select: { userId: true } } } }),
+  ]);
+  if (!administrators.length || !candidates.length) return;
+  const administratorIds = administrators.map((administrator) => administrator.id);
+  const idsToDelete = candidates.filter((notification) => {
+    const readers = new Set(notification.reads.map((read) => read.userId));
+    return administratorIds.every((administratorId) => readers.has(administratorId));
+  }).map((notification) => notification.id);
+  if (idsToDelete.length) await prisma.saleNotification.deleteMany({ where: { id: { in: idsToDelete } } });
 };
 
 const pagination = (query) => {
@@ -94,6 +110,7 @@ export const markNotificationRead = asyncHandler(async (request, response) => {
   const notification = await prisma.saleNotification.findUnique({ where: { id: request.params.id }, select: { id: true } });
   if (!notification) throw new ApiError(404, 'SALE_NOTIFICATION_NOT_FOUND', 'No encontramos esa notificación.');
   const read = await prisma.saleNotificationRead.upsert({ where: { notificationId_userId: { notificationId: notification.id, userId: request.auth.userId } }, create: { notificationId: notification.id, userId: request.auth.userId }, update: {} });
+  await pruneReadSaleNotifications();
   response.json({ success: true, data: { notificationId: notification.id, readAt: read.readAt } });
 });
 
