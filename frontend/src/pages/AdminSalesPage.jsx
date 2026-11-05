@@ -4,6 +4,7 @@ import { StoreBanner } from '../components/StoreBanner';
 import { useAuth } from '../context/AuthContext';
 import styles from './AdminSalesPage.module.css';
 import './AdminSalesNotifications.css';
+import './AdminSalesTable.css';
 
 const PER_PAGE = 5;
 const NOTIFICATIONS_PER_PAGE = 4;

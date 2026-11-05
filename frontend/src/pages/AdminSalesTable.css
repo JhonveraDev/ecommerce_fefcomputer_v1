@@ -1,0 +1,129 @@
+/* Exclusivo de la tabla Ventas confirmadas. */
+section[class*="sales"] table {
+  min-width: 0;
+  table-layout: fixed;
+  width: 100%;
+}
+
+section[class*="sales"] th,
+section[class*="sales"] td {
+  padding: 13px 10px;
+}
+
+section[class*="sales"] th:nth-child(1) { width: 30%; }
+section[class*="sales"] th:nth-child(2) { width: 22%; }
+section[class*="sales"] th:nth-child(3) { width: 16%; }
+section[class*="sales"] th:nth-child(4) { width: 12%; }
+section[class*="sales"] th:nth-child(5) { width: 14%; }
+section[class*="sales"] th:nth-child(6) { width: 6%; }
+
+section[class*="sales"] th:nth-child(n + 3),
+section[class*="sales"] td:nth-child(n + 3) {
+  text-align: center;
+}
+
+section[class*="sales"] td {
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+section[class*="sales"] td b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+section[class*="sales"] td:first-child span,
+section[class*="sales"] td:nth-child(2) span {
+  -webkit-box-orient: vertical;
+  display: -webkit-box;
+  line-height: 1.45;
+  margin-top: 4px;
+  min-height: 2.9em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  -webkit-line-clamp: 2;
+}
+
+section[class*="sales"] td:nth-child(3),
+section[class*="sales"] td:nth-child(4),
+section[class*="sales"] td:nth-child(5) {
+  white-space: nowrap;
+}
+
+section[class*="sales"] button[class*="view"] {
+  align-items: center;
+  display: inline-flex;
+  height: 28px;
+  justify-content: center;
+  padding: 0;
+  width: 28px;
+}
+
+@media (max-width: 760px) {
+  section[class*="sales"] table,
+  section[class*="sales"] tbody,
+  section[class*="sales"] tr,
+  section[class*="sales"] td {
+    display: block;
+    width: 100%;
+  }
+
+  section[class*="sales"] thead {
+    display: none;
+  }
+
+  section[class*="sales"] tbody {
+    display: grid;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  section[class*="sales"] tr {
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    display: grid;
+    gap: 11px 14px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 14px;
+  }
+
+  section[class*="sales"] td {
+    border: 0;
+    font-size: 13px;
+    min-width: 0;
+    padding: 0;
+    text-align: left !important;
+    white-space: normal;
+  }
+
+  section[class*="sales"] td:first-child {
+    grid-column: 1 / -1;
+  }
+
+  section[class*="sales"] td:nth-child(n + 2):not(:last-child)::before {
+    color: var(--color-text-subtle);
+    display: block;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    margin-bottom: 3px;
+    text-transform: uppercase;
+  }
+
+  section[class*="sales"] td:nth-child(2)::before { content: 'Comprador'; }
+  section[class*="sales"] td:nth-child(3)::before { content: 'Fecha'; }
+  section[class*="sales"] td:nth-child(4)::before { content: 'Total'; }
+  section[class*="sales"] td:nth-child(5)::before { content: 'Estado'; }
+
+  section[class*="sales"] td:first-child span,
+  section[class*="sales"] td:nth-child(2) span {
+    min-height: 0;
+  }
+
+  section[class*="sales"] td:last-child {
+    grid-column: 1 / -1;
+  }
+}
