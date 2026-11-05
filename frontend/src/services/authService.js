@@ -9,6 +9,7 @@ const messageFor = (error) => {
     AUTHENTICATION_REQUIRED: 'Debes iniciar sesión para continuar.',
     INVALID_ACCESS_TOKEN: 'Tu sesión expiró. Inicia sesión nuevamente.',
     TOO_MANY_AUTH_ATTEMPTS: 'Demasiados intentos. Inténtalo más tarde.',
+    TOO_MANY_REQUESTS: 'Se realizaron demasiadas solicitudes. Espera unos minutos e inténtalo nuevamente.',
   };
   return messages[code] || error?.error?.message || 'No fue posible completar la solicitud.';
 };

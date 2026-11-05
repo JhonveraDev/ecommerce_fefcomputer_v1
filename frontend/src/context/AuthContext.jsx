@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { apiRequest, authService } from '../services/authService';
 
 const AuthContext = createContext(null);
@@ -7,11 +7,19 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const refreshInFlight = useRef(null);
 
   const applySession = useCallback((data) => { setUser(data.user); setAccessToken(data.accessToken); return data.user; }, []);
   const refreshSession = useCallback(async () => {
-    try { const data = await authService.refresh(); applySession(data); return data; }
-    catch { setUser(null); setAccessToken(null); return null; }
+    // Share a refresh when several protected requests fail at once.
+    if (refreshInFlight.current) return refreshInFlight.current;
+
+    const attempt = authService.refresh()
+      .then((data) => { applySession(data); return data; })
+      .catch(() => { setUser(null); setAccessToken(null); return null; })
+      .finally(() => { if (refreshInFlight.current === attempt) refreshInFlight.current = null; });
+    refreshInFlight.current = attempt;
+    return attempt;
   }, [applySession]);
 
   useEffect(() => { refreshSession().finally(() => setIsLoading(false)); }, [refreshSession]);

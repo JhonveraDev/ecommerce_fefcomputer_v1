@@ -19,6 +19,48 @@ import { paymentRouter } from './routes/payment.routes.js';
 
 export const app = express();
 
+// This development-only monitor makes unexpected request loops visible before
+// the API-wide rate limiter is exhausted. It deliberately avoids request
+// bodies and authorization headers so no credentials are written to logs.
+const recentRequests = new Map();
+const REQUEST_ACTIVITY_WINDOW_MS = 60 * 1000;
+const REQUEST_ACTIVITY_WARNING_AT = 30;
+const requestSource = (request) => ({
+  ip: request.ip,
+  origin: request.get('origin') || null,
+  referer: request.get('referer') || null,
+  forwardedFor: request.get('x-forwarded-for') || null,
+});
+
+const monitorRequestActivity = (request, _response, next) => {
+  if (env.NODE_ENV === 'production') return next();
+
+  const now = Date.now();
+  const key = `${request.ip}:${request.method}:${request.path}`;
+  const current = recentRequests.get(key);
+  const activity = !current || current.resetAt <= now
+    ? { count: 1, resetAt: now + REQUEST_ACTIVITY_WINDOW_MS }
+    : { ...current, count: current.count + 1 };
+
+  recentRequests.set(key, activity);
+
+  if (activity.count === REQUEST_ACTIVITY_WARNING_AT || activity.count % 100 === 0) {
+    console.warn({
+      event: 'high_request_volume',
+      method: request.method,
+      path: request.path,
+      requestsInLastMinute: activity.count,
+      ...requestSource(request),
+    });
+  }
+
+  for (const [storedKey, storedActivity] of recentRequests) {
+    if (storedActivity.resetAt <= now) recentRequests.delete(storedKey);
+  }
+
+  return next();
+};
+
 app.disable('x-powered-by');
 app.use(requestId);
 app.use(helmet());
@@ -26,7 +68,34 @@ app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json({ limit: '1mb' }));
 app.use(cookieParser());
 app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'));
-app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 500, standardHeaders: 'draft-7', legacyHeaders: false }));
+app.use(monitorRequestActivity);
+const apiRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  // En desarrollo la recarga de Vite y React puede generar muchas consultas
+  // legítimas al catálogo. Producción conserva una protección más estricta.
+  limit: env.NODE_ENV === 'production' ? 500 : 5_000,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: {
+      code: 'TOO_MANY_REQUESTS',
+      message: 'Se realizaron demasiadas solicitudes. Espera unos minutos e inténtalo nuevamente.',
+      details: [],
+    },
+  },
+  handler: (request, response, _next, options) => {
+    console.warn({
+      event: 'rate_limit_exceeded',
+      method: request.method,
+      path: request.path,
+      ...requestSource(request),
+    });
+    response.status(options.statusCode).send(options.message);
+  },
+});
+
+app.use(apiRateLimit);
 
 app.get('/', (_request, response) => response.json({ success: true, data: { name: 'FEFCOMPUTER API', version: 'v1' } }));
 app.use('/api/v1/health', healthRouter);

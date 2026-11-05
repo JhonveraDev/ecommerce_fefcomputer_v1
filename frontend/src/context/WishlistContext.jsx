@@ -14,6 +14,7 @@ export function WishlistProvider({ children }) {
   const [notice, setNotice] = useState(null);
   const [remoteReady, setRemoteReady] = useState(false);
   const syncQueue = useRef(Promise.resolve());
+  const skipNextRemoteSync = useRef(false);
 
   useEffect(() => {
     let active = true;
@@ -27,6 +28,7 @@ export function WishlistProvider({ children }) {
     request('/account/shopping-state')
       .then((data) => {
         if (!active) return;
+        skipNextRemoteSync.current = true;
         setProductIds(normalizeIds(data.wishlist));
         setRemoteReady(true);
       })
@@ -37,12 +39,22 @@ export function WishlistProvider({ children }) {
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(productIds));
     if (isAuthenticated && remoteReady) {
+      if (skipNextRemoteSync.current) {
+        skipNextRemoteSync.current = false;
+        return;
+      }
       // Serialize snapshots so an older PUT cannot arrive after a newer one.
       const snapshot = productIds;
       syncQueue.current = syncQueue.current.catch(() => {}).then(() => request('/account/shopping-state/wishlist', {
         method: 'PUT',
         body: JSON.stringify({ items: snapshot }),
-      })).then(({ items }) => setProductIds((current) => sameIds(current, snapshot) ? normalizeIds(items) : current)).catch(() => {});
+      })).then(({ items }) => setProductIds((current) => {
+        // Do not replace state with an equivalent array: that would retrigger
+        // this effect and create an endless sequence of PUT requests.
+        if (!sameIds(current, snapshot)) return current;
+        const normalized = normalizeIds(items);
+        return sameIds(current, normalized) ? current : normalized;
+      })).catch(() => {});
     }
   }, [productIds, isAuthenticated, remoteReady, request]);
 

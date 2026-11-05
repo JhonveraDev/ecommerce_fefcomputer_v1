@@ -1,5 +1,6 @@
 ﻿import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useAuth } from './AuthContext';
+import { useRef } from 'react';
 
 const CartContext = createContext(null);
 const STORAGE_KEY = 'fefcomputer-cart';
@@ -16,6 +17,7 @@ export function CartProvider({ children }) {
   const [items, setItems] = useState(readCart);
   const [notice, setNotice] = useState(null);
   const [remoteReady, setRemoteReady] = useState(false);
+  const skipNextRemoteSync = useRef(false);
 
   useEffect(() => {
     let active = true;
@@ -29,6 +31,7 @@ export function CartProvider({ children }) {
     request('/account/shopping-state')
       .then((data) => {
         if (!active) return;
+        skipNextRemoteSync.current = true;
         setItems(Array.isArray(data.cart) ? data.cart : []);
         setRemoteReady(true);
       })
@@ -39,6 +42,10 @@ export function CartProvider({ children }) {
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
     if (isAuthenticated && remoteReady) {
+      if (skipNextRemoteSync.current) {
+        skipNextRemoteSync.current = false;
+        return;
+      }
       request('/account/shopping-state/cart', {
         method: 'PUT',
         body: JSON.stringify({ items }),

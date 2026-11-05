@@ -14,6 +14,7 @@ export function CompareProvider({ children }) {
   const [notice, setNotice] = useState(null);
   const [remoteReady, setRemoteReady] = useState(false);
   const syncQueue = useRef(Promise.resolve());
+  const skipNextRemoteSync = useRef(false);
 
   useEffect(() => {
     let active = true;
@@ -27,6 +28,7 @@ export function CompareProvider({ children }) {
     request('/account/shopping-state')
       .then((data) => {
         if (!active) return;
+        skipNextRemoteSync.current = true;
         setProductIds(normalizeIds(data.compare));
         setRemoteReady(true);
       })
@@ -37,12 +39,22 @@ export function CompareProvider({ children }) {
   useEffect(() => {
     window.localStorage.setItem(KEY, JSON.stringify(productIds));
     if (isAuthenticated && remoteReady) {
+      if (skipNextRemoteSync.current) {
+        skipNextRemoteSync.current = false;
+        return;
+      }
       // Preserve local mutation order when requests are slow or users click fast.
       const snapshot = productIds;
       syncQueue.current = syncQueue.current.catch(() => {}).then(() => request('/account/shopping-state/compare', {
         method: 'PUT',
         body: JSON.stringify({ items: snapshot }),
-      })).then(({ items }) => setProductIds((current) => sameIds(current, snapshot) ? normalizeIds(items) : current)).catch(() => {});
+      })).then(({ items }) => setProductIds((current) => {
+        // Keep the existing reference when the server confirms the same state;
+        // otherwise the effect would schedule another synchronization.
+        if (!sameIds(current, snapshot)) return current;
+        const normalized = normalizeIds(items);
+        return sameIds(current, normalized) ? current : normalized;
+      })).catch(() => {});
     }
   }, [productIds, isAuthenticated, remoteReady, request]);
 
