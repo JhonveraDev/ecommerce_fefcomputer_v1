@@ -1,6 +1,7 @@
 import { prisma } from '../config/prisma.js';
 import { ApiError } from '../utils/api-error.js';
 import { asyncHandler } from '../utils/async-handler.js';
+import { z } from 'zod';
 
 export const CONFIRMED_SALE_STATUSES = ['PAYMENT_APPROVED', 'PREPARING', 'SHIPPED', 'DELIVERED'];
 const saleInclude = {
@@ -83,4 +84,18 @@ export const markNotificationRead = asyncHandler(async (request, response) => {
   if (!notification) throw new ApiError(404, 'SALE_NOTIFICATION_NOT_FOUND', 'No encontramos esa notificación.');
   const read = await prisma.saleNotificationRead.upsert({ where: { notificationId_userId: { notificationId: notification.id, userId: request.auth.userId } }, create: { notificationId: notification.id, userId: request.auth.userId }, update: {} });
   response.json({ success: true, data: { notificationId: notification.id, readAt: read.readAt } });
+});
+
+const statusSchema = z.object({ status: z.enum(['PAYMENT_APPROVED', 'PREPARING', 'SHIPPED', 'DELIVERED']), comment: z.string().trim().max(1000).optional() });
+export const updateSaleStatus = asyncHandler(async (request, response) => {
+  const input = statusSchema.parse(request.body);
+  const order = await prisma.$transaction(async (tx) => {
+    const current = await tx.order.findFirst({ where: { id: request.params.id, status: { in: CONFIRMED_SALE_STATUSES } } });
+    if (!current) throw new ApiError(404, 'SALE_NOT_FOUND', 'No encontramos esa venta confirmada.');
+    if (current.status === input.status) throw new ApiError(422, 'SALE_STATUS_UNCHANGED', 'Selecciona un estado diferente para actualizar la venta.');
+    const updated = await tx.order.update({ where: { id: current.id }, data: { status: input.status } });
+    await tx.orderStatusHistory.create({ data: { orderId: current.id, actorId: request.auth.userId, previousStatus: current.status, newStatus: input.status, comment: input.comment || null } });
+    return updated;
+  });
+  response.json({ success: true, data: { id: order.id, status: order.status, updatedAt: order.updatedAt } });
 });

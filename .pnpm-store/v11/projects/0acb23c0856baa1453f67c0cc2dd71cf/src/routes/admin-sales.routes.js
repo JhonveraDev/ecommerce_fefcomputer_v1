@@ -8,4 +8,5 @@ adminSalesRouter.use(authenticate, authorize(ROLES.ADMIN));
 adminSalesRouter.get('/', sales.listSales);
 adminSalesRouter.get('/notifications', sales.listNotifications);
 adminSalesRouter.patch('/notifications/:id/read', sales.markNotificationRead);
+adminSalesRouter.patch('/:id/status', sales.updateSaleStatus);
 adminSalesRouter.get('/:id', sales.saleDetail);
