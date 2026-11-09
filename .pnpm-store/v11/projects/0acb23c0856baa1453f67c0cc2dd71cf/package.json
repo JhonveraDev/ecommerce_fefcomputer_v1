@@ -9,7 +9,8 @@
     "prisma:validate": "prisma validate --schema prisma/schema.prisma",
     "prisma:format": "prisma format --schema prisma/schema.prisma",
     "prisma:generate": "prisma generate --schema prisma/schema.prisma",
-    "db:seed": "node prisma/seed.js"
+    "db:seed": "node prisma/seed.js",
+    "db:seed-sales-demo": "node prisma/seed-sales-analytics-demo.js"
   },
   "dependencies": {
     "@prisma/client": "^6.0.0",
