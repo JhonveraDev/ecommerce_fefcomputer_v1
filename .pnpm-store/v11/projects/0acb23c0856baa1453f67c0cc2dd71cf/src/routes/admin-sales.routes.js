@@ -5,6 +5,7 @@ import * as sales from '../controllers/admin-sales.controller.js';
 
 export const adminSalesRouter = Router();
 adminSalesRouter.use(authenticate, authorize(ROLES.ADMIN));
+adminSalesRouter.get('/analytics', sales.salesAnalytics);
 adminSalesRouter.get('/', sales.listSales);
 adminSalesRouter.get('/notifications', sales.listNotifications);
 adminSalesRouter.patch('/notifications/:id/read', sales.markNotificationRead);

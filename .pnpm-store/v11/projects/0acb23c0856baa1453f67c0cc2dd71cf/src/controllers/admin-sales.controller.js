@@ -70,6 +70,73 @@ const parseDate = (value, endOfDay = false) => {
   return date;
 };
 
+const analyticsPeriods = ['today', 'last7days', 'last30days', 'month', 'year', 'custom'];
+const startOfDay = (date) => { const value = new Date(date); value.setHours(0, 0, 0, 0); return value; };
+const startOfWeek = (date) => { const value = startOfDay(date); value.setDate(value.getDate() - ((value.getDay() + 6) % 7)); return value; };
+const normalizeCity = (value) => String(value || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase('es-CO').replace(/(^|[\s-])\p{L}/gu, (letter) => letter.toLocaleUpperCase('es-CO'));
+const analyticsDateRange = (query) => {
+  const period = analyticsPeriods.includes(query.period) ? query.period : 'last30days';
+  const now = new Date();
+  let start;
+  let end = now;
+  if (period === 'today') start = startOfDay(now);
+  if (period === 'last7days') { start = startOfDay(now); start.setDate(start.getDate() - 6); }
+  if (period === 'last30days') { start = startOfDay(now); start.setDate(start.getDate() - 29); }
+  if (period === 'month') start = new Date(now.getFullYear(), now.getMonth(), 1);
+  if (period === 'year') start = new Date(now.getFullYear(), 0, 1);
+  if (period === 'custom') {
+    start = parseDate(query.startDate);
+    end = parseDate(query.endDate, true);
+    if (!start || !end || start > end) throw new ApiError(422, 'INVALID_ANALYTICS_RANGE', 'Selecciona un rango de fechas válido.');
+  }
+  return { period, start, end };
+};
+const dateKey = (date, grouping) => {
+  const value = new Date(date);
+  if (grouping === 'year') return String(value.getFullYear());
+  if (grouping === 'month') return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}`;
+  if (grouping === 'week') { const week = startOfWeek(value); return `${week.getFullYear()}-${String(week.getMonth() + 1).padStart(2, '0')}-${String(week.getDate()).padStart(2, '0')}`; }
+  return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`;
+};
+const formatBucket = (key, grouping) => grouping === 'year' ? key : new Intl.DateTimeFormat('es-CO', grouping === 'month' ? { month: 'short', year: 'numeric' } : { day: 'numeric', month: 'short' }).format(new Date(`${key}${grouping === 'month' ? '-01' : ''}T12:00:00`));
+
+// Historical order items are immutable snapshots and deliberately do not point
+// to Product. This keeps reported item revenue faithful to what was charged,
+// but means category analytics cannot be reconstructed reliably yet.
+export const salesAnalytics = asyncHandler(async (request, response) => {
+  const { start, end, period } = analyticsDateRange(request.query);
+  const grouping = ['day', 'week', 'month', 'year'].includes(request.query.grouping) ? request.query.grouping : 'day';
+  const rangeWhere = { createdAt: { gte: start, lte: end } };
+  const previousEnd = new Date(start.getTime() - 1);
+  const previousStart = new Date(previousEnd.getTime() - (end.getTime() - start.getTime()));
+  const [orders, previousEffectiveRevenue] = await prisma.$transaction([
+    prisma.order.findMany({ where: rangeWhere, select: { id: true, status: true, currency: true, grandTotal: true, createdAt: true, shippingAddressSnapshot: true, items: { select: { id: true, nameSnapshot: true, imageUrlSnapshot: true, quantity: true, lineTotal: true } } }, orderBy: { createdAt: 'asc' } }),
+    prisma.order.aggregate({ where: { status: { in: CONFIRMED_SALE_STATUSES }, createdAt: { gte: previousStart, lte: previousEnd } }, _sum: { grandTotal: true } }),
+  ]);
+  const effective = orders.filter((order) => CONFIRMED_SALE_STATUSES.includes(order.status));
+  const revenue = effective.reduce((sum, order) => sum + number(order.grandTotal), 0);
+  const units = effective.reduce((sum, order) => sum + order.items.reduce((itemSum, item) => itemSum + item.quantity, 0), 0);
+  const products = new Map(); const cities = new Map(); const evolution = new Map();
+  for (const order of effective) {
+    const key = dateKey(order.createdAt, grouping);
+    const bucket = evolution.get(key) || { key, label: formatBucket(key, grouping), revenue: 0, orders: 0 };
+    bucket.revenue += number(order.grandTotal); bucket.orders += 1; evolution.set(key, bucket);
+    const city = normalizeCity(order.shippingAddressSnapshot?.city);
+    if (city) { const row = cities.get(city) || { city, orders: 0, units: 0, revenue: 0 }; row.orders += 1; row.units += order.items.reduce((sum, item) => sum + item.quantity, 0); row.revenue += number(order.grandTotal); cities.set(city, row); }
+    for (const item of order.items) { const row = products.get(item.nameSnapshot) || { name: item.nameSnapshot, imageUrl: item.imageUrlSnapshot, units: 0, revenue: 0 }; row.units += item.quantity; row.revenue += number(item.lineTotal); products.set(item.nameSnapshot, row); }
+  }
+  const rankedProducts = [...products.values()].sort((a, b) => b.units - a.units || b.revenue - a.revenue).map((item, index) => ({ ...item, rank: index + 1, share: units ? (item.units / units) * 100 : 0 }));
+  const rankedCities = [...cities.values()].sort((a, b) => b.orders - a.orders || b.revenue - a.revenue).map((city) => ({ ...city, share: revenue ? (city.revenue / revenue) * 100 : 0 }));
+  const previousRevenue = number(previousEffectiveRevenue._sum.grandTotal || 0);
+  const statuses = Object.fromEntries(['PAYMENT_APPROVED', 'PREPARING', 'SHIPPED', 'DELIVERED', 'PENDING_PAYMENT', 'PAYMENT_REJECTED', 'EXPIRED', 'CANCELLED'].map((status) => [status, orders.filter((order) => order.status === status).length]));
+  response.json({ success: true, data: {
+    period: { key: period, start, end },
+    summary: { revenue, units, orders: effective.length, averageTicket: effective.length ? revenue / effective.length : 0, bestProduct: rankedProducts[0]?.name || null, bestCity: rankedCities[0]?.city || null, growth: previousRevenue ? ((revenue - previousRevenue) / previousRevenue) * 100 : null },
+    products: rankedProducts.slice(0, 20), cities: rankedCities, evolution: [...evolution.values()], statuses: { values: statuses, cancellationRate: orders.length ? (statuses.CANCELLED / orders.length) * 100 : 0 },
+    availability: { categories: false, categoriesReason: 'Los ítems de pedidos históricos no almacenan el producto ni la categoría; se requiere guardar productId o una categoría como snapshot al crear cada ítem.' },
+  } });
+});
+
 const FUZZY_SEARCH_THRESHOLD = 0.28;
 const fuzzySaleSearch = async ({ q, status, start, end, page, pageSize }) => {
   const normalizedQuery = q.toLocaleLowerCase('es-CO');
